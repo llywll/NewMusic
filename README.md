@@ -5,6 +5,11 @@
 yarn install
 ```
 
+## 启动项目
+```
+yarn run electron:serve
+```
+
 ### 编译以及使用热重新加载的方式进行开发
 ```
 yarn serve
