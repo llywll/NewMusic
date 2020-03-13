@@ -94,9 +94,9 @@
     <main id="right_mainContent">
       <p_header></p_header>
       <keep-alive :max="10">
-          <router-view v-if="$route.meta.keepAlive" />
+        <router-view v-if="$route.meta.keepAlive" />
       </keep-alive>
-        <router-view v-if="!$route.meta.keepAlive" />
+      <router-view v-if="!$route.meta.keepAlive" />
       <playBar></playBar>
     </main>
   </div>
@@ -153,7 +153,13 @@ export default {
       return this.$store.state.state.isThePlaybackPageAlreadyOpen;
     },
     coverImgUrl() {
-      if (isNaN(this.$store.state.playing.playing.albumMid)) return "";
+      if (
+        (this.$store.state.playing.playing.albumMid === undefined) |
+        isNaN(this.$store.state.playing.playing.albumMid) |
+        (this.$store.state.playing.playing.albumMid == "0")
+      ) {
+        return "";
+      }
       return (
         "background-image: url(http://imgcache.qq.com/music/photo/album_300/" +
         (this.$store.state.playing.playing.albumMid % 100) +
@@ -163,9 +169,9 @@ export default {
       );
     },
     lyric() {
-      if (this.$store.state.playing.playing.lyric == undefined)
-        return "新音乐，聆听生活";
-      return this.$store.state.playing.playing.lyric;
+      return this.$store.state.playing.playing.lyric == undefined
+        ? "新音乐，聆听生活"
+        : this.$store.state.playing.playing.lyric;
     }
   },
 

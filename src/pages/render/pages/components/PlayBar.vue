@@ -20,12 +20,12 @@
             autoplay
             id="music_play"
             ref="music_player"
-            @click="music_Play()"
             @timeupdate="timeUp()"
             @loadstart="loading()"
             @pause="pauseState()"
             @play="playState()"
             @ended="playEnded()"
+            @error="playError($event)"
           >
             <source :src="playing.playLists[0]" type="audio/flac" />
           </audio>
@@ -34,10 +34,6 @@
           <i class="im im-next"></i>
         </span>
       </div>
-      <!-- <div class="wave_box">
-        <div class="pre" ref="pre"></div>
-        <div id="waveform" ref="waveform"></div>
-      </div> -->
       <div id="player_pressBar">
         <span class="time" id="played_time">{{ already_time }}</span>
         <div id="progress_box" v-on:click.stop="changeProgress($event)">
@@ -57,7 +53,7 @@
     </div>
     <div id="vcon">
       <div class="playViewListBox">
-        <div :class="is_p?'song_list_box':'song_list_box off_box'">
+        <div ref="bbox" @click.stop :class="is_p?'song_list_box':'song_list_box off_box'">
           <div class="title_and_cont">
             <div class="list_info">
               <span>播放列表</span>
@@ -75,8 +71,13 @@
             </div>
           </div>
           <div class="song_list">
-            <ul class="songs_ul">
-              <li class="song_item" v-for="(item,index) in playList" :key="index">
+            <ul class="songs_ul" ref="songs">
+              <li
+                :class="index==playListIndex?'song_item act_item': 'song_item'"
+                v-for="(item,index) in playList"
+                :key="index"
+                @click="playSong(index)"
+              >
                 <div class="album_img_box" :data-song-id="item.songMid">
                   <img :src="item.url" />
                 </div>
@@ -89,18 +90,17 @@
             </ul>
           </div>
         </div>
-        <button class="view_lyric_btn" @click="showLyric()">
-          <span>歌词</span>
-        </button>
-        <button class="view_list_btn" @click="isPlayListPage()">
-          <i class="im im-data"></i>
-        </button>
       </div>
+      <button class="view_lyric_btn" @click.stop="showLyric()">
+        <span>歌词</span>
+      </button>
+      <button class="view_list_btn" @click.stop="showListPage()">
+        <i class="im im-data"></i>
+      </button>
     </div>
   </div>
 </template>
 <script>
-// import WaveSurfer from "wavesurfer.js"; //导入wavesurfer.js
 export default {
   name: "playBar",
   data: function() {
@@ -112,19 +112,41 @@ export default {
       boxele: "",
       dishX: 0,
       isShow: false,
-      wavesurfer: null
+      isCreateEve: false
     };
   },
+
   mounted: function() {
     this.boxele = document.getElementById("progress_box");
-
+  },
+  watch: {
+    playing() {
+      this.$refs.music_player.load();
+    },
+    is_p() {
+      if (this.is_p) {
+        document.addEventListener("click", event => {
+          if (this.$refs.bbox.contains(event.target)) {
+            event.preventDefault();
+          }
+          if (!this.$refs.bbox.contains(event.target)) {
+            this.isCreateEve = true;
+            this.is_p = false;
+          }
+        });
+      } else {
+        if (this.isCreateEve) {
+          document.removeEventListener("mousedown", () => {});
+            this.isCreateEve = false;
+        }
+      }
+    }
   },
   computed: {
     playBar() {
       if (this.$store.state.state.isThePlaybackPageAlreadyOpen) {
         return "playBar act_playBar";
       } else {
-        // console.log(this.$store.state.state.count)
         return this.$store.state.state.count > 0
           ? "playBar over_playBar"
           : "playBar";
@@ -138,29 +160,31 @@ export default {
       return tempList;
     },
     playing() {
-      if (Object.keys(this.$store.state.playing.playing).length < 1)
-        return {
-          title: "新音乐，聆听生活",
-          singer: "---",
-          songMid: "",
-          interval: "0",
-          albumMid: "",
-          playLists: ""
-        };
-      else {
-        // this.wavesurfer.load(this.$store.state.playing.playing.playLists[0]);
-        // this.wavesurfer.load(
-        //   "http://m7.music.126.net/20200312171004/7af33136ee68be141272ad3920136c49/ymusic/0fd6/4f65/43ed/a8772889f38dfcb91c04da915b301617.mp3"
-        // );
-        this.$refs.music_player.load();
-        return this.$store.state.playing.playing;
-      }
+      return Object.keys(this.$store.state.playing.playing).length < 1
+        ? {
+            title: "新音乐，聆听生活",
+            singer: "---",
+            songMid: "",
+            interval: "0",
+            albumMid: "",
+            playLists: ""
+          }
+        : this.$store.state.playing.playing;
+    },
+    playListIndex() {
+      return this.$store.state.playList.playListIndex;
     },
     pause() {
       return this.$store.state.playing.pause;
     }
   },
   methods: {
+    playSong: function(index) {
+      this.$store.dispatch("chageplayingStateAsync", {
+        tempList: this.$store.state.playList.playList[index],
+        actIndex: index
+      });
+    },
     timeUp: function() {
       if (Object.keys(this.$store.state.playing.playing.lyric).length === 0) {
         this.$ipc.send("chageLyric", { text: "暂无歌词" });
@@ -231,7 +255,8 @@ export default {
       );
     },
     toUrl: function(albumId) {
-      if (isNaN(albumId)) return "";
+      if ((albumId === undefined) | isNaN(albumId) | (albumId == "0"))
+        return "";
       return (
         "http://imgcache.qq.com/music/photo/album_300/" +
         (albumId % 100) +
@@ -248,7 +273,7 @@ export default {
       if (stime % 60 < 10) return parseInt(stime / 60) + ":0" + (stime % 60);
       return parseInt(stime / 60) + ":" + (stime % 60);
     },
-    isPlayListPage() {
+    showListPage() {
       this.is_p = !this.is_p;
     },
     music_Play: function() {
@@ -281,6 +306,9 @@ export default {
     },
     playEnded() {
       this.nextSong();
+    },
+    playError(err) {
+      console(err);
     },
     changeProgress(el) {
       this.$refs.already_press.style =
@@ -578,10 +606,14 @@ export default {
 }
 #vcon {
   z-index: 15;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
 }
 .playViewListBox {
-  margin: 0 20px;
-  position: relative;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
 }
 .song_list_box {
   background: white;
@@ -651,15 +683,18 @@ export default {
 }
 .song_item {
   border-radius: 5px;
+  cursor: pointer;
   padding: 5px 15px;
   display: flex;
   flex-direction: row;
   transition: all 0.1s linear;
 }
-.song_item:hover {
+.song_item:hover,
+.act_item {
   background-color: rgb(49, 122, 255);
 }
-.song_item:hover span {
+.song_item:hover span,
+.act_item span {
   color: white;
 }
 .album_img_box img {
@@ -693,7 +728,7 @@ export default {
 }
 .view_list_btn .im {
   pointer-events: none;
-  font-size: 18px;
+  font-size: 14px;
   color: rgba(0, 0, 0, 0.589);
   transition: all 0.1s linear;
 }
@@ -701,27 +736,4 @@ export default {
   color: black;
 }
 /*** */
-.wave_box {
-  width: 400px;
-  height: 30px;
-  position: relative;
-  overflow: hidden;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  margin: 0 auto;
-  border-bottom: 1px dashed #0000004f;
-}
-.pre {
-  height: 100%;
-  width: 0;
-  background: rgba(0, 0, 0, 0.534);
-}
-#waveform {
-  width: 2000px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  transition: all 0.1s linear;
-  z-index: -1;
-}
 </style>

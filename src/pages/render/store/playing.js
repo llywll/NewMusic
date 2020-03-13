@@ -4,7 +4,9 @@ const playing = {
     state: {
         playing: {},
         pause: true,
-        lyricLine: 0
+        lyricLine: 0,
+        playListIndex: -1,
+        errorType: -1
     },
     mutations: {
         chageplayingState: (state, playing) => {
@@ -14,15 +16,24 @@ const playing = {
                 state.playing = playing
         },
         chageplayState: (state, platState = true) => state.pause = platState,
-        chagelyricLine: (state, line = 0) => state.lyricLine = line
+        chagelyricLine: (state, line = 0) => state.lyricLine = line,
+        chagePlayListIndex: (state, index = 0) => {
+            state.playListIndex = index
+        },
+        chageErrorState: (state, errorType = -1) => state.errorType = errorType,
+
     },
     getters: {},
     actions: {
-        chageplayingStateAsync: async (store, playing) => {
+        chageplayingStateAsync: async (store, playingObj) => {
+            let playing = playingObj.tempList
+            let actIndex = playingObj.actIndex
             if (playing.songMid != store.state.playing.songMid) {
                 await http.get('http://localhost:3200/getMusicVKey?songmid=' + playing.songMid)
                     .then(response => {
                         playing.playLists = response.data.response.playLists
+                        if(playing.playLists[0] =='http://ws.stream.qqmusic.qq.com')
+                        store.commit('chageErrorState',4)
                     }).catch(error => console.log(error))
                 await http.get('http://localhost:3200/getLyric?songmid=' + playing.songMid)
                     .then(response => {
@@ -56,38 +67,42 @@ const playing = {
                             store.commit('chagelyricLine')
                         }
                     }).catch(error => console.log(error))
-                store.commit('chageplayingState', playing)
             }
-            else store.commit('chageplayingState', playing)
+            store.commit('chageplayingState', playing)
+            store.commit('chagePlayListIndex', actIndex)
+            store.commit('changeActivesindex', actIndex)
         },
         nextSongAsync: (store) => {
-            let zero = 0
+            let index = -1
             let t_list = ""
-            if (store.state.playing.playListIndex == Object.keys(store.rootState.playList.playList).length - 1) {
-                t_list = store.rootState.playList.playList[zero]
-                t_list.playListIndex = zero
+            if (store.state.playListIndex == Object.keys(store.rootState.playList.playList).length - 1) {
+                t_list = store.rootState.playList.playList[0]
+                index = 0
             } else {
-                t_list = store.rootState.playList.playList[store.state.playing.playListIndex + 1]
-                t_list.playListIndex = store.state.playing.playListIndex + 1
+                t_list = store.rootState.playList.playList[store.state.playListIndex + 1]
+                index = store.state.playListIndex + 1
             }
-            console.log(t_list)
-            store.dispatch('chageplayingStateAsync', t_list)
+            store.dispatch('chageplayingStateAsync', {
+                tempList: t_list,
+                actIndex: index
+            })
 
         },
         lastSongAsync: (store) => {
-            let zero = 0
+            let index = 0
             let t_list = ""
-            if (store.state.playing.playListIndex == zero) {
+            if (store.state.playListIndex == 0) {
                 t_list = store.rootState.playList.playList[Object.keys(store.rootState.playList).length - 1]
-                t_list.playListIndex = Object.keys(store.rootState.playList.playList).length - 1
+                index = Object.keys(store.rootState.playList.playList).length - 1
             } else {
                 t_list = store.rootState.playList.playList[store.state.playing.playListIndex - 1]
-                t_list.playListIndex = store.state.playing.playListIndex - 1
+                index = store.state.playListIndex - 1
 
             }
-
-            console.log(t_list)
-            store.dispatch('chageplayingStateAsync', t_list)
+            store.dispatch('chageplayingStateAsync', {
+                tempList: t_list,
+                actIndex: index
+            })
         }
     }
 }

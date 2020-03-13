@@ -71,31 +71,32 @@ export default {
   },
   methods: {
     playMusic: async function(el) {
-      let p_list =[];
+      let p_list = [];
       let smid = el.target.attributes["data-song-id"].value;
-      let actIndex=-1;
+      let actIndex = -1;
       for (let i = 0; i < this.cdlist.songlist.length; i++) {
-        if(this.cdlist.songlist[i].mid == smid)
-       actIndex=i
-      await p_list.push({
+        if (this.cdlist.songlist[i].mid == smid) actIndex = i;
+        await p_list.push({
           title: this.cdlist.songlist[i].title,
           singer: this.cdlist.songlist[i].singer[0].title,
           songMid: this.cdlist.songlist[i].mid,
           interval: this.cdlist.songlist[i].interval,
-          albumMid:this.cdlist.songlist[i].album.id
-        });        
+          albumMid: this.cdlist.songlist[i].album.id
+        });
       }
-      this.$store.commit('replacePlayList',p_list)
-      let tempList=p_list[actIndex]
-      tempList.playListIndex = actIndex
-      this.$store.dispatch("chageplayingStateAsync",tempList)
+      this.$store.commit("replacePlayList", p_list);
+      let tempList = p_list[actIndex];
+      this.$store.dispatch("chageplayingStateAsync", {
+        tempList: tempList,
+        actIndex: actIndex
+      });
     }
   },
-  beforeRouteLeave(to, from, next){
-    if(to.name === 'PageContent') {
-      to.meta.keepAlive = true
+  beforeRouteLeave(to, from, next) {
+    if (to.name === "PageContent") {
+      to.meta.keepAlive = true;
     }
-    next()
+    next();
   }
 };
 </script>
