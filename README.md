@@ -1,24 +1,23 @@
-#  electron-vue-example
+#  毕业设计项目 新音乐
 
-## Project setup
+## 安装依赖
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### 编译以及使用热重新加载的方式进行开发
 ```
 yarn serve
 ```
 
-### Compiles and minifies for production
+### 编译项目
 ```
 yarn build
 ```
 
-### Lints and fixes files
+### Lints和fixes文件
 ```
 yarn lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
