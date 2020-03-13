@@ -32,40 +32,42 @@ const playing = {
                 await http.get('http://localhost:3200/getMusicVKey?songmid=' + playing.songMid)
                     .then(response => {
                         playing.playLists = response.data.response.playLists
-                        if(playing.playLists[0] =='http://ws.stream.qqmusic.qq.com')
-                        store.commit('chageErrorState',4)
+                        console.log(playing.playLists[0].length - playing.playLists[0].lastIndexOf('.com') )
+                        if (playing.playLists[0].length - playing.playLists[0].lastIndexOf('.com') <= 5)
+                            store.commit('chageErrorState', 4)
                     }).catch(error => console.log(error))
                 await http.get('http://localhost:3200/getLyric?songmid=' + playing.songMid)
                     .then(response => {
                         let lyricStr = response.data.response.lyric.split("\n");
                         let lyricArr = [];
-                        for (let i = 0; i < lyricStr.length; i++) {
-                            if (
-                                !lyricStr[i].includes("ti:") &&
-                                !lyricStr[i].includes("ar:") &&
-                                !lyricStr[i].includes("al:") &&
-                                !lyricStr[i].includes("by:") &&
-                                !lyricStr[i].includes("offset:")
-                            ) {
-                                let regExp = "";
-                                if (lyricStr.length == 1)
-                                    regExp = /\[(\d{2}):(\d{2}):(\d{2})\](.*)/g;
-                                else regExp = /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/g;
-
-                                let result = regExp.exec(lyricStr[i]);
-                                if (result[4] === "") {
-                                    continue
+                        if (!response.data.response.lyric.includes("[")) { lyricArr = lyricStr }
+                        else {
+                            for (let i = 0; i < lyricStr.length; i++) {
+                                if (lyricStr[i] === "") continue;
+                                if (
+                                    !lyricStr[i].includes("ti:") &&
+                                    !lyricStr[i].includes("ar:") &&
+                                    !lyricStr[i].includes("al:") &&
+                                    !lyricStr[i].includes("by:") &&
+                                    !lyricStr[i].includes("offset:")
+                                ) {
+                                    let regExp = lyricStr.length == 1 ? /\[(\d{2}):(\d{2}):(\d{2})\](.*)/g : /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/g;
+                                    let result = regExp.exec(lyricStr[i]);
+                                    if (result[4] === "") {
+                                        continue
+                                    }
+                                    let temp = parseInt(result[1] * 60) + parseInt(result[2])
+                                    lyricArr.push({
+                                        time: temp + "." + result[3],
+                                        text: result[4]
+                                    });
                                 }
-                                let temp = parseInt(result[1] * 60) + parseInt(result[2])
-                                lyricArr.push({
-                                    time: temp + "." + result[3],
-                                    text: result[4]
-                                });
+
                             }
 
-                            playing.lyric = lyricArr
-                            store.commit('chagelyricLine')
                         }
+                        playing.lyric = lyricArr
+                        store.commit('chagelyricLine')
                     }).catch(error => console.log(error))
             }
             store.commit('chageplayingState', playing)

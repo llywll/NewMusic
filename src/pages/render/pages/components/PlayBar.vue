@@ -52,45 +52,7 @@
       </div>
     </div>
     <div id="vcon">
-      <div class="playViewListBox">
-        <div ref="bbox" @click.stop :class="is_p?'song_list_box':'song_list_box off_box'">
-          <div class="title_and_cont">
-            <div class="list_info">
-              <span>播放列表</span>
-              <span>共{{ playList.length }}首歌</span>
-            </div>
-
-            <div class="list_con">
-              <button class="intoBtn">
-                <i class="im im-plus"></i>
-                添加到
-              </button>
-              <button class="removeBtn">
-                <i class="im im-trash-can"></i>清空
-              </button>
-            </div>
-          </div>
-          <div class="song_list">
-            <ul class="songs_ul" ref="songs">
-              <li
-                :class="index==playListIndex?'song_item act_item': 'song_item'"
-                v-for="(item,index) in playList"
-                :key="index"
-                @click="playSong(index)"
-              >
-                <div class="album_img_box" :data-song-id="item.songMid">
-                  <img :src="item.url" />
-                </div>
-                <div class="song_name">
-                  <span>{{ item.title }}</span>
-                  <span>{{ item.singer }}</span>
-                </div>
-                <span class="song_time">{{comtime(item.interval)}}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <PlayList v-show="is_p"></PlayList>
       <button class="view_lyric_btn" @click.stop="showLyric()">
         <span>歌词</span>
       </button>
@@ -101,6 +63,7 @@
   </div>
 </template>
 <script>
+import PlayList from "./PlayList";
 export default {
   name: "playBar",
   data: function() {
@@ -115,7 +78,9 @@ export default {
       isCreateEve: false
     };
   },
-
+  components: {
+    PlayList: PlayList
+  },
   mounted: function() {
     this.boxele = document.getElementById("progress_box");
   },
@@ -126,10 +91,10 @@ export default {
     is_p() {
       if (this.is_p) {
         document.addEventListener("click", event => {
-          if (this.$refs.bbox.contains(event.target)) {
+          if (document.getElementById("bbox").contains(event.target)) {
             event.preventDefault();
           }
-          if (!this.$refs.bbox.contains(event.target)) {
+          if (!document.getElementById("bbox").contains(event.target)) {
             this.isCreateEve = true;
             this.is_p = false;
           }
@@ -137,7 +102,7 @@ export default {
       } else {
         if (this.isCreateEve) {
           document.removeEventListener("mousedown", () => {});
-            this.isCreateEve = false;
+          this.isCreateEve = false;
         }
       }
     }
@@ -152,13 +117,6 @@ export default {
           : "playBar";
       }
     },
-    playList() {
-      let tempList = this.$store.state.playList.playList;
-      for (let i = 0; i < Object.keys(tempList).length; i++) {
-        tempList[i].url = this.toUrl(tempList[i].albumMid);
-      }
-      return tempList;
-    },
     playing() {
       return Object.keys(this.$store.state.playing.playing).length < 1
         ? {
@@ -171,20 +129,11 @@ export default {
           }
         : this.$store.state.playing.playing;
     },
-    playListIndex() {
-      return this.$store.state.playList.playListIndex;
-    },
     pause() {
       return this.$store.state.playing.pause;
     }
   },
   methods: {
-    playSong: function(index) {
-      this.$store.dispatch("chageplayingStateAsync", {
-        tempList: this.$store.state.playList.playList[index],
-        actIndex: index
-      });
-    },
     timeUp: function() {
       if (Object.keys(this.$store.state.playing.playing.lyric).length === 0) {
         this.$ipc.send("chageLyric", { text: "暂无歌词" });
@@ -269,7 +218,8 @@ export default {
       this.isShow = !this.isShow;
       this.$ipc.send("showlyirc", this.isShow);
     },
-    comtime: function(stime) {
+    comtime: function(stime = 0) {
+      if ((stime == 0) | (stime < 0)) return "";
       if (stime % 60 < 10) return parseInt(stime / 60) + ":0" + (stime % 60);
       return parseInt(stime / 60) + ":" + (stime % 60);
     },
@@ -286,11 +236,12 @@ export default {
       }
     },
     loading: function() {
-      // console.log("音乐正在加载中");
-      document.getElementById("lyric_lines").children[0].scrollIntoView({
-        block: "center",
-        inline: "center"
-      });
+      console.log("音乐正在加载中");
+      if (this.$store.state.playing.errorType > 0) console.log('error id:',this.$store.state.playing.errorType)
+        document.getElementById("lyric_lines").children[0].scrollIntoView({
+          block: "center",
+          inline: "center"
+        });
     },
     nextSong() {
       this.$store.dispatch("nextSongAsync");
@@ -610,115 +561,7 @@ export default {
   display: flex;
   align-items: center;
 }
-.playViewListBox {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-}
-.song_list_box {
-  background: white;
-  width: 330px;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  height: 80vh;
-  margin-bottom: 40px;
-  border-radius: 10px;
-  box-shadow: 1px 0px 20px 0px #00000042;
-}
-.title_and_cont {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin: 10px;
-}
-.list_info {
-  display: flex;
-  flex-direction: column;
-}
-.list_info span:first-child {
-  color: rgb(44, 44, 44);
-  font-size: 24px;
-}
-.list_info span:last-child {
-  color: rgb(44, 44, 44);
-  font-size: 14px;
-  margin-top: 2px;
-}
-.list_con {
-  display: flex;
-  flex-direction: row;
-}
-.list_con button {
-  border: 0;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  color: rgb(44, 44, 44);
-  transition: all 0.1s linear;
-}
-.list_con button .im {
-  font-size: 10px;
-  margin: 1px 2px 0px 2px;
-  color: rgb(44, 44, 44);
-  transition: all 0.1s linear;
-}
-.list_con button:hover .im,
-.list_con button:hover {
-  color: rgb(49, 112, 255);
-}
 
-.song_list {
-  overflow: hidden;
-  overflow-y: auto;
-  height: calc(100% - 80px);
-}
-.songs_ul {
-  padding: 0;
-  list-style: none;
-}
-.song_item {
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 5px 15px;
-  display: flex;
-  flex-direction: row;
-  transition: all 0.1s linear;
-}
-.song_item:hover,
-.act_item {
-  background-color: rgb(49, 122, 255);
-}
-.song_item:hover span,
-.act_item span {
-  color: white;
-}
-.album_img_box img {
-  width: 35px;
-  border-radius: 3px;
-}
-.song_name {
-  display: flex;
-  flex-direction: column;
-  margin: 0 10px;
-  width: 80%;
-}
-.song_name span,
-.song_time {
-  font-size: 12px;
-  transition: all 0.1s linear;
-}
-.song_time {
-  align-self: flex-end;
-  margin: 5px 0;
-}
-.off_box {
-  display: none;
-}
 /*** */
 .view_list_btn {
   cursor: pointer;
