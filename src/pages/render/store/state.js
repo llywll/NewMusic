@@ -2,7 +2,7 @@ const state = {
     state: {
         count: 0,
         isThePlaybackPageAlreadyOpen: false,
-        cycleState: ""
+        cycleState: "",
     },
     mutations: {
         chageRement: state => state.count += 1,

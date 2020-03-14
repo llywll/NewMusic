@@ -54,7 +54,8 @@
     <div id="vcon">
       <PlayList v-show="is_p"></PlayList>
       <button class="view_lyric_btn" @click.stop="showLyric()">
-        <span>歌词</span>
+        <img class="lyricIcon" v-if="isShow" src="./../../assets/ciblue.svg" />
+        <img class="lyricIcon" v-else src="./../../assets/ciblack.svg" />
       </button>
       <button class="view_list_btn" @click.stop="showListPage()">
         <i class="im im-data"></i>
@@ -237,11 +238,14 @@ export default {
     },
     loading: function() {
       console.log("音乐正在加载中");
-      if (this.$store.state.playing.errorType > 0) console.log('error id:',this.$store.state.playing.errorType)
-        document.getElementById("lyric_lines").children[0].scrollIntoView({
-          block: "center",
-          inline: "center"
-        });
+      if (this.$store.state.playing.errorType > 0) {
+        this.$store.commit('chageErrorState',-1)
+        this.nextSong();
+      }
+      document.getElementById("lyric_lines").children[0].scrollIntoView({
+        block: "center",
+        inline: "center"
+      });
     },
     nextSong() {
       this.$store.dispatch("nextSongAsync");
@@ -563,6 +567,15 @@ export default {
 }
 
 /*** */
+.view_lyric_btn {
+  background: none;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+}
+.lyricIcon {
+  width: 15px;
+}
 .view_list_btn {
   cursor: pointer;
   background: none;

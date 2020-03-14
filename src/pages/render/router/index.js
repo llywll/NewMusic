@@ -11,12 +11,13 @@ import SearchResultsPage from '../pages/components/SearchResultsPage'
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 Vue.use(Router)
+
 const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location)
-  .catch(err => err)
+    .catch(err => err)
 }
-export default new Router({
+const router = new Router({
   name: '#app',
   mode: 'history',
   routes: [
@@ -31,7 +32,7 @@ export default new Router({
         path: '/PageContent',
         name: 'PageContent',
         component: PageContent,
-        meta: { 
+        meta: {
           isUseCache: false,
           keepAlive: true
         }
@@ -54,3 +55,9 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  console.log("路由检测to：",to)
+  console.log("路由检测from：",from)
+  next()
+})
+export default router

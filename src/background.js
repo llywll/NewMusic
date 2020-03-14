@@ -29,6 +29,7 @@ function createWindow() {
     minHeight: 800,
     zoomFactor: 1,
     titleBarStyle: "customButtonsOnHover",
+    show:false,
     webPreferences: {
       // webSecurity:false,
       nodeIntegration: true
@@ -47,6 +48,9 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null
+  })
+  win.on('ready-to-show', function () {
+    win.show() // 初始化后再显示
   })
 }
 

@@ -1,5 +1,8 @@
 <template>
-  <div id="albumPage">
+  <div class="albumPage">
+    <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
+      <loading></loading>
+    </div>
     <div class="album_info">
       <div class="album_name">
         <span>{{cdlist.dissname}}</span>
@@ -9,7 +12,6 @@
         <p v-html="cdlist.desc"></p>
       </div>
     </div>
-
     <div class="song_list_box">
       <ul class="song_list" ref="songList">
         <li class="songlist_item_th">
@@ -50,13 +52,21 @@
   </div>
 </template>
 <script>
+import loading from './../loading'
 export default {
   name: "AlbumPage",
   data: function() {
     return {
       album_id: "",
-      cdlist: []
+      cdlist: [],
+      isloading_Box: true
     };
+  },
+  components:{
+    loading
+  },
+  created() {
+    // this.isloading_Box = true;
   },
   mounted: function() {
     this.$data.album_id = this.$route.params.album_id;
@@ -64,6 +74,8 @@ export default {
       .get("http://localhost:3200/getSongListDetail?disstid=" + this.album_id)
       .then(response => {
         this.cdlist = response.data.response.cdlist[0];
+        // this.$refs.loading_Box.className = "loading_Box overloading_Box";
+        this.isloading_Box =false
       })
       .catch(error => {
         console.log(error);
@@ -101,7 +113,7 @@ export default {
 };
 </script>
 <style scoped>
-#albumPage {
+.albumPage {
   width: 100%;
   height: calc(100% - 160px);
   position: relative;
@@ -110,6 +122,36 @@ export default {
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
+}
+.loading_Box {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: white;
+  font-size: 72px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.overloading_Box {
+  animation: overloading_BoxAni 0.2s linear forwards;
+}
+@keyframes overloading_BoxAni {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+    height: 0;
+  }
 }
 .album_info {
   margin-top: 20px;

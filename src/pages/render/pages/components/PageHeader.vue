@@ -1,6 +1,17 @@
 <template>
   <div id="page-header">
     <div id="left_box">
+      <div class="router_control">
+        <button class="ctl_btn" @click="goback">
+          <i class="im im-angle-left"></i>
+        </button>
+        <button class="ctl_btn">
+          <i class="im im-angle-right" @click="goforward"></i>
+        </button>
+        <button class="ctl_btn" @click="refreshPage">
+          <i class="im im-sync"></i>
+        </button>
+      </div>
       <div id="logo_box">
         <img src="../../assets/logo.png" />
       </div>
@@ -40,10 +51,10 @@
             <div class="keyList">
               <span
                 class="key_text"
-                v-for="(item,index) in hotkey.slice(0, 10)"
+                v-for="(item,index) in searchHistory.slice(0, 10)"
                 :key="index"
-                @click="intoInput(item.k)"
-              >{{item.k}}</span>
+                @click="intoInput(item.queryText)"
+              >{{item.queryText}}</span>
             </div>
           </div>
         </div>
@@ -69,7 +80,9 @@ export default {
       isfoucs: false,
       isCount: 0,
       hotkey: [],
-      inText: ""
+      inText: "",
+      isSeach: 0,
+      searchHistory: []
     };
   },
   mounted() {
@@ -81,6 +94,46 @@ export default {
       .catch(err => {
         console.log(err);
       });
+    this.$db.find({ name: "queryText" }, (err, ret) => {
+      if (!err) this.searchHistory = ret;
+    });
+  },
+  watch: {
+    isSeach() {
+      let q = {
+        name: "queryText",
+        queryText: this.inText
+      };
+      new Promise((resolve, reject) => {
+        this.$db.count(q, (err, ret) => {
+          if (!err)
+            if (ret < 1)
+              this.$db.insert(
+                { ...q, time: Number(new Date()) },
+                (err, ret) => {
+                  if (!err) resolve(ret);
+                  else reject(err);
+                }
+              );
+        });
+      })
+        .then(() => {
+          this.$db
+            .find({ name: "queryText" })
+            .sort({ time: -1 })
+            .exec((err, ret) => {
+              if (!err) this.searchHistory = ret;
+            });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    inText() {
+      if (this.inText.length > 0 && this.isfoucs) {
+        console.log(this.inText.length);
+      }
+    }
   },
   methods: {
     openLoginWindow: function() {
@@ -103,8 +156,35 @@ export default {
           searchKey: this.inText,
           ladding: true
         });
+        this.isSeach++;
         this.$router.push("/searchResultsPage");
       }
+    },
+    inspectionRecord: async function(text) {
+      let rt = "";
+      await this.$db.count(
+        { name: "queryText", queryText: text },
+        (err, ret) => {
+          if (!err) {
+            rt = ret > 0 ? true : false;
+          }
+        }
+      );
+      return rt;
+    },
+    goback: function() {
+      this.$router.go(-1);
+    },
+    goforward: function() {
+      this.$router.go(1);
+    },
+    refreshPage: function() {
+      this.$db.remove({}, { multi: true }, (err, ret) => {
+        if (!err) console.log(ret);
+      });
+      this.$db.find({}, (err, ret) => {
+        if (!err) console.log(ret);
+      });
     }
   }
 };
@@ -131,8 +211,22 @@ export default {
   align-items: center;
   position: relative;
 }
+.router_control {
+  margin: 0 15px 0 20px;
+}
+.ctl_btn {
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  margin: 0 2px;
+}
+.ctl_btn .im {
+  font-size: 12px;
+  font-weight: lighter;
+}
 #logo_box {
-  margin: 0 15px 0 30px;
+  /* margin: 0 15px 0 30px; */
   position: relative;
   top: 2px;
 }
@@ -140,11 +234,11 @@ export default {
   width: 70px;
 }
 .search_box {
-  position: absolute;
-  top: 0;
-  left: 120px;
-
+  /* position: absolute;
+  top: 0; */
+  left: 240px;
   width: 220px;
+  margin: 0 15px;
 
   display: flex;
   flex-direction: row;
@@ -196,7 +290,7 @@ export default {
   position: absolute;
   overflow: hidden;
   top: 40%;
-  width: calc(100% - 40px);
+  width: calc(220px - 40px);
   height: 0;
   background: white;
   padding: 0 20px;

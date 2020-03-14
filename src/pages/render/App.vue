@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <video class="bg_video" autoplay loop muted>
+    <!-- <video class="bg_video" autoplay loop muted>
       <source src="../../../public/andrade.mp4" type="video/mp4" />
       <source src="movie.ogg" type="video/ogg" />您的浏览器不支持Video标签。
-    </video>
+    </video> -->
     <div id="region"></div>
     <router-view />
   </div>

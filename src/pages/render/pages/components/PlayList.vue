@@ -157,16 +157,19 @@ export default {
   list-style: none;
 }
 .song_item {
-  border-radius: 5px;
+  /* border-radius: 5px; */
   cursor: pointer;
   padding: 5px 15px;
   display: flex;
   flex-direction: row;
   transition: all 0.1s linear;
 }
-.song_item:hover,
-.act_item {
+.song_item:hover
+{
   background-color: rgb(49, 122, 255);
+}
+.act_item {
+  border-left: 2px solid rgb(49, 122, 255);
 }
 .song_item:hover span,
 .act_item span {

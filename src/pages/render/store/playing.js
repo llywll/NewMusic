@@ -32,7 +32,6 @@ const playing = {
                 await http.get('http://localhost:3200/getMusicVKey?songmid=' + playing.songMid)
                     .then(response => {
                         playing.playLists = response.data.response.playLists
-                        console.log(playing.playLists[0].length - playing.playLists[0].lastIndexOf('.com') )
                         if (playing.playLists[0].length - playing.playLists[0].lastIndexOf('.com') <= 5)
                             store.commit('chageErrorState', 4)
                     }).catch(error => console.log(error))
@@ -43,7 +42,7 @@ const playing = {
                         if (!response.data.response.lyric.includes("[")) { lyricArr = lyricStr }
                         else {
                             for (let i = 0; i < lyricStr.length; i++) {
-                                if (lyricStr[i] === "") continue;
+                                if (lyricStr[i].replace(/\s/g, '').length==0) continue;
                                 if (
                                     !lyricStr[i].includes("ti:") &&
                                     !lyricStr[i].includes("ar:") &&
@@ -53,9 +52,9 @@ const playing = {
                                 ) {
                                     let regExp = lyricStr.length == 1 ? /\[(\d{2}):(\d{2}):(\d{2})\](.*)/g : /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/g;
                                     let result = regExp.exec(lyricStr[i]);
-                                    if (result[4] === "") {
-                                        continue
-                                    }
+                                    if (result[4] === null) continue
+                                    if (result[4] === "") continue
+
                                     let temp = parseInt(result[1] * 60) + parseInt(result[2])
                                     lyricArr.push({
                                         time: temp + "." + result[3],
