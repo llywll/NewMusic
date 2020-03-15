@@ -243,7 +243,7 @@ export default {
         this.nextSong();
       }
       document.getElementById("lyric_lines").children[0].scrollIntoView({
-        block: "center",
+        block: "start",
         inline: "center"
       });
     },
@@ -443,11 +443,12 @@ export default {
 }
 #progress_box {
   width: 380px;
-  height: 6px;
+  /* height: 6px; */
   border-radius: 6px;
   position: relative;
   display: flex;
   align-items: center;
+  border: 1px solid rgb(196, 196, 196);
 }
 #cached {
   width: 100%;
@@ -462,7 +463,7 @@ export default {
   background: rgb(73, 73, 73);
   border-radius: 10px;
   position: absolute;
-  top: 1.5px;
+  /* top: 1.5px; */
   left: 0;
   pointer-events: none;
 }

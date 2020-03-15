@@ -29,13 +29,17 @@
             @blur="showHotKey(false)"
             v-model="inText"
             @keyup.enter="search()"
+            :placeholder="placeholderText"
           />
           <button id="search_button" @click="search">
             <i class="im im-magnifier"></i>
           </button>
         </div>
-        <div class="hotkey_box">
-          <div class="hotkeyList">
+
+        <div
+          :class="Object.keys(tipList).length>0 && inText.length>0?'hotkey_box smt_box':'hotkey_box'"
+        >
+          <div v-show="inText.length==0" class="hotkeyList">
             <span class="key_title">热搜</span>
             <div class="keyList">
               <span
@@ -46,15 +50,77 @@
               >{{item.k}}</span>
             </div>
           </div>
-          <div class="search_history">
+          <div v-show="inText.length==0" class="search_history">
             <span class="key_title">搜索历史</span>
             <div class="keyList">
               <span
                 class="key_text"
-                v-for="(item,index) in searchHistory.slice(0, 10)"
+                v-for="(item,index) in searchHistory.slice(0, 20)"
                 :key="index"
                 @click="intoInput(item.queryText)"
               >{{item.queryText}}</span>
+            </div>
+          </div>
+          <div v-show="Object.keys(tipList).length>0 && inText.length>0" class="smartTip_box">
+            <div class="smart_songs" v-show="Object.keys(tipList.song.itemlist).length>0">
+              <div class="tip_title">
+                <span>单曲</span>
+              </div>
+              <ul class="s_t s_songs_list" v-if="Object.keys(tipList).length>0">
+                <li
+                  class="list_item"
+                  v-for="(item,index) in tipList.song.itemlist"
+                  :key="index"
+                  @click="intoInput(item.name + ' - '+item.singer)"
+                >
+                  <span>{{ item.name }} - {{ item.singer }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="smart_album">
+              <div class="tip_title" v-show="Object.keys(tipList.album.itemlist).length>0">
+                <span>专辑</span>
+              </div>
+              <ul class="s_t s_album_list" v-if="Object.keys(tipList).length>0">
+                <li
+                  class="list_item"
+                  v-for="(item,index) in tipList.album.itemlist"
+                  :key="index"
+                  @click="intoInput(item.name + ' - '+item.singer)"
+                >
+                  <span>{{ item.name }} - {{ item.singer }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="smart_singer" v-show="Object.keys(tipList.singer.itemlist).length>0">
+              <div class="tip_title">
+                <span>歌手</span>
+              </div>
+              <ul class="s_t s_singer_list" v-if="Object.keys(tipList).length>0">
+                <li
+                  class="list_item"
+                  v-for="(item,index) in tipList.singer.itemlist"
+                  :key="index"
+                  @click="intoInput(item.name + ' - '+item.singer)"
+                >
+                  <span>{{ item.name }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="smart_mv" v-show="Object.keys(tipList.mv.itemlist).length>0">
+              <div class="tip_title">
+                <span>MV</span>
+              </div>
+              <ul class="s_t s_mv_list" v-if="Object.keys(tipList).length>0">
+                <li
+                  class="list_item"
+                  v-for="(item,index) in tipList.mv.itemlist"
+                  :key="index"
+                  @click="intoInput(item.name + ' - '+item.singer)"
+                >
+                  <span>{{ item.name }} - {{ item.singer }}</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -63,7 +129,7 @@
     <div class="right_box">
       <div class="name_box">
         <i class="im im-angle-down"></i>
-        <span class="user_name">跌落人间</span>
+        <span class="user_name">橘子猫</span>
       </div>
       <div class="head_img_box">
         <img class="head" src="../../assets/fin.jpg" />
@@ -72,6 +138,7 @@
   </div>
 </template>
 <script>
+import vbus from "./../../vbus/vbus";
 export default {
   name: "PageHeader",
   data() {
@@ -82,7 +149,22 @@ export default {
       hotkey: [],
       inText: "",
       isSeach: 0,
-      searchHistory: []
+      placeholderText: "搜索",
+      searchHistory: [],
+      tipList: {
+        song: {
+          itemlist: []
+        },
+        album: {
+          itemlist: []
+        },
+        mv: {
+          itemlist: []
+        },
+        singer: {
+          itemlist: []
+        }
+      }
     };
   },
   mounted() {
@@ -131,7 +213,24 @@ export default {
     },
     inText() {
       if (this.inText.length > 0 && this.isfoucs) {
-        console.log(this.inText.length);
+        this.$http
+          .get("http://localhost:3200/getSmartbox?key=" + this.inText)
+          .then(res => {
+            if (
+              res.data.response.data.song.count == 0 &&
+              res.data.response.data.album.count == 0 &&
+              res.data.response.data.mv.count == 0 &&
+              res.data.response.data.singer.count == 0
+            ) {
+              console.log("诶嘿嘿，是空的，我要拿上一次的数据来骗你");
+            } else {
+              
+              this.tipList = res.data.response.data;
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       }
     }
   },
@@ -143,6 +242,27 @@ export default {
     showHotKey: function(e = false) {
       this.isCount++;
       this.isfoucs = e;
+      if (this.isfoucs) this.placeholderText = "";
+      else if (!this.isfoucs && this.inText.length == 0)
+        this.placeholderText = "搜索";
+      if (!this.isfoucs)
+        this.tipList = {
+          song: {
+            itemlist: []
+          },
+          album: {
+            itemlist: []
+          },
+          mv: {
+            itemlist: []
+          },
+          singer: {
+            itemlist: []
+          }
+        };
+      else if (this.isfoucs && this.inText) {
+        this.inText = this.inText + " ";
+      }
     },
     offEvent: function(enent) {
       if (enent.target.id !== "search_input") event.preventDefault();
@@ -179,6 +299,7 @@ export default {
       this.$router.go(1);
     },
     refreshPage: function() {
+      vbus.$emit("refresh");
       this.$db.remove({}, { multi: true }, (err, ret) => {
         if (!err) console.log(ret);
       });
@@ -272,6 +393,9 @@ export default {
   border: none;
   background: none;
 }
+#search_input::-webkit-input-placeholder {
+  color: rgb(156, 156, 156);
+}
 #search_button {
   border: none;
   outline: none;
@@ -301,11 +425,15 @@ export default {
   flex-direction: column;
   z-index: 13;
 }
+.smt_box {
+  padding: 0;
+  width: 220px;
+}
 .focus_search .hotkey_box {
   height: unset;
   border-right: 1px solid rgb(230, 230, 230);
   border-left: 1px solid rgb(230, 230, 230);
-  border-bottom: 1px solid rgb(230, 230, 230);
+  /* border-bottom: 1px solid rgb(230, 230, 230); */
   box-shadow: 0px 13px 20px -5px #00000029;
   /* animation: hotkey_foucs 0.2s 0.1s linear both; */
 }
@@ -360,7 +488,33 @@ export default {
 .key_text:hover {
   background: rgb(248, 248, 248);
 }
-
+.smartTip_box {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgb(231, 231, 231);
+  transition: 0.2s linear;
+}
+.s_t {
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+.tip_title {
+  font-size: 10px;
+  padding-left: 20px;
+}
+.list_item {
+  transition: 0.2s linear;
+  cursor: pointer;
+  padding-left: 20px;
+}
+.list_item:hover {
+  background: rgb(240, 240, 240);
+}
+.list_item span {
+  color: rgb(61, 61, 61);
+  font-size: 12px;
+}
 /*** */
 .right_box {
   margin-right: 20px;

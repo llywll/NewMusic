@@ -1,8 +1,9 @@
 <template>
   <div class="resulet_box">
     <div class="sreach_info">
-      <span class="info_title">“{{stext.trim()}}”的检索结果</span>
+      <span class="info_title">{{stext.trim()}}</span>
     </div>
+
   </div>
 </template>
 <script>
@@ -25,8 +26,11 @@ export default {
   height: 100%;
   position: relative;
 }
+.sreach_info{
+  margin-left: 20px;
+}
 .info_title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   color: rgb(90, 90, 90);
 }

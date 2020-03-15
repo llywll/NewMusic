@@ -29,7 +29,7 @@ function createWindow() {
     minHeight: 800,
     zoomFactor: 1,
     titleBarStyle: "customButtonsOnHover",
-    show:false,
+    show: false,
     webPreferences: {
       // webSecurity:false,
       nodeIntegration: true
@@ -49,9 +49,9 @@ function createWindow() {
   win.on('closed', () => {
     win = null
   })
-  win.on('ready-to-show', function () {
-    win.show() // 初始化后再显示
-  })
+  // win.on('ready-to-show', function () {
+  //   win.show() // 初始化后再显示
+  // })
 }
 
 
@@ -89,6 +89,9 @@ ipc.on("showlyirc", (event, val) => {
 ipc.on("chageLyric", (e, message) => {
   if (desktopLylrc)
     desktopLylrc.webContents.send('showlyirc', message)
+})
+ipc.on("showMainWindow", (e, message) => {
+  win.show()
 })
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {

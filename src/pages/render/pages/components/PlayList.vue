@@ -80,15 +80,16 @@ export default {
     comtime: function(stime) {
       if (stime % 60 < 10) return parseInt(stime / 60) + ":0" + (stime % 60);
       return parseInt(stime / 60) + ":" + (stime % 60);
-    },
+    }
   }
 };
 </script>
 <style scoped>
 .playViewListBox {
   position: absolute;
-  right: 20px;
+  right: 10px;
   bottom: 20px;
+  height: 100vh;
 }
 .song_list_box {
   background: white;
@@ -96,7 +97,7 @@ export default {
   position: absolute;
   right: 0;
   bottom: 0;
-  height: 80vh;
+  height: calc(80% - 50px);
   margin-bottom: 40px;
   border-radius: 10px;
   box-shadow: 1px 0px 20px 0px #00000042;
@@ -164,15 +165,16 @@ export default {
   flex-direction: row;
   transition: all 0.1s linear;
 }
-.song_item:hover
-{
+.song_item:hover {
   background-color: rgb(49, 122, 255);
 }
 .act_item {
   border-left: 2px solid rgb(49, 122, 255);
 }
-.song_item:hover span,
 .act_item span {
+  color: rgb(49, 122, 255);
+}
+.song_item:hover span {
   color: white;
 }
 .album_img_box img {
