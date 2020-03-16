@@ -3,7 +3,7 @@
     <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
       <loading></loading>
     </div>
-    <div class="album_info">
+    <div class="album_info" v-if="cdlist">
       <div class="album_name">
         <span>{{cdlist.dissname}}</span>
       </div>
@@ -12,7 +12,7 @@
         <p v-html="cdlist.desc"></p>
       </div>
     </div>
-    <div class="song_list_box">
+    <div class="song_list_box" v-if="cdlist">
       <ul class="song_list" ref="songList">
         <li class="songlist_item_th">
           <div class="song_index"></div>
@@ -52,7 +52,7 @@
   </div>
 </template>
 <script>
-import loading from './../loading'
+import loading from "./../loading";
 export default {
   name: "AlbumPage",
   data: function() {
@@ -62,26 +62,34 @@ export default {
       isloading_Box: true
     };
   },
-  components:{
+  components: {
     loading
   },
   created() {
     // this.isloading_Box = true;
   },
+  watch: {
+    $route() {
+      this.init();
+    }
+  },
   mounted: function() {
-    this.$data.album_id = this.$route.params.album_id;
-    this.$http
-      .get("http://localhost:3200/getSongListDetail?disstid=" + this.album_id)
-      .then(response => {
-        this.cdlist = response.data.response.cdlist[0];
-        // this.$refs.loading_Box.className = "loading_Box overloading_Box";
-        this.isloading_Box =false
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    this.init();
   },
   methods: {
+    init: function() {
+      this.$data.album_id = this.$route.params.album_id;
+      this.$http
+        .get("http://localhost:3200/getSongListDetail?disstid=" + this.album_id)
+        .then(response => {
+          this.cdlist = response.data.response.cdlist[0];
+          this.isloading_Box = false;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     playMusic: async function(el) {
       let p_list = [];
       let smid = el.target.attributes["data-song-id"].value;
@@ -107,6 +115,8 @@ export default {
   beforeRouteLeave(to, from, next) {
     if (to.name === "PageContent") {
       to.meta.keepAlive = true;
+      this.isloading_Box = true;
+      this.cdlist = [];
     }
     next();
   }
