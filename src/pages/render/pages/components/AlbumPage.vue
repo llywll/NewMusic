@@ -3,7 +3,7 @@
     <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
       <loading></loading>
     </div>
-    <div class="bg_text">
+    <div class="bg_text"  v-if="cdlist">
       <span>{{cdlist.dissname}}</span>
     </div>
     <div class="album_info" v-if="cdlist">

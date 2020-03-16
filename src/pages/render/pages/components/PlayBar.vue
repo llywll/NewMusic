@@ -154,7 +154,7 @@ export default {
         this.lyric_line_Act = this.$store.state.playing.lyricLine;
         if (
           this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
-            this.$refs.music_player.currentTime &&
+            this.$refs.music_player.currentTime + 0.5 &&
           this.lyric_line_Act <
             Object.keys(this.$store.state.playing.playing.lyric).length
         ) {
@@ -210,7 +210,7 @@ export default {
       if (Object.keys(this.$store.state.playing.playing.lyric).length > 1) {
         if (
           this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
-            this.$refs.music_player.currentTime &&
+            this.$refs.music_player.currentTime +0.5 &&
           this.lyric_line_Act <
             Object.keys(this.$store.state.playing.playing.lyric).length
         ) {

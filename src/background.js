@@ -93,6 +93,35 @@ ipc.on("chageLyric", (e, message) => {
 ipc.on("showMainWindow", (e, message) => {
   win.show()
 })
+
+let loginWindow
+function createLoginWindw() {
+  loginWindow = new BrowserWindow({
+    width: 650,
+    height: 400,
+    minimizable: false,
+    fullscreenable: false,
+    maximizable: false,
+    resizable: false,
+    frame: false,
+    alwaysOnTop: true,
+    // transparent: true,
+    // parent: win, //win是主窗口
+    webPreferences: {
+      // backgroundThrottling: false,
+      nodeIntegration: true
+    },
+    // hasShadow: false,
+  })
+  loginWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + '/login.html');
+  loginWindow.on('closed', () => { loginWindow = null })
+
+}
+ipc.on("showLoginWindow", (e, val) => {
+  if (loginWindow)
+    val ? loginWindow.show() : loginWindow.hide()
+  else createLoginWindw()
+})
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar

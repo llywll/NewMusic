@@ -131,7 +131,7 @@
         <i class="im im-angle-down"></i>
         <span class="user_name">橘子猫</span>
       </div>
-      <div class="head_img_box">
+      <div class="head_img_box" @click="showLogin(true)">
         <img class="head" src="../../assets/fin.jpg" />
       </div>
     </div>
@@ -306,6 +306,10 @@ export default {
       this.$db.find({}, (err, ret) => {
         if (!err) console.log(ret);
       });
+    },
+    showLogin:function(val){
+      this.$store.commit('changeLoginWindwState',val)
+      this.$ipc.send("showLoginWindow", this.$store.state.state.loginWindowIsShow);
     }
   }
 };

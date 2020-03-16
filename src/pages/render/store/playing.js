@@ -42,7 +42,7 @@ const playing = {
                         if (!response.data.response.lyric.includes("[")) { lyricArr = lyricStr }
                         else {
                             for (let i = 0; i < lyricStr.length; i++) {
-                                if (lyricStr[i].replace(/\s/g, '').length==0) continue;
+                                if (lyricStr[i].replace(/\s/g, '').length == 0) continue;
                                 if (
                                     !lyricStr[i].includes("ti:") &&
                                     !lyricStr[i].includes("ar:") &&
@@ -89,19 +89,15 @@ const playing = {
             })
 
         },
-        lastSongAsync: (store) => {
+        lastSongAsync: async (store) => {
             let index = 0
-            let t_list = ""
             if (store.state.playListIndex == 0) {
-                t_list = store.rootState.playList.playList[Object.keys(store.rootState.playList).length - 1]
                 index = Object.keys(store.rootState.playList.playList).length - 1
             } else {
-                t_list = store.rootState.playList.playList[store.state.playing.playListIndex - 1]
                 index = store.state.playListIndex - 1
-
             }
             store.dispatch('chageplayingStateAsync', {
-                tempList: t_list,
+                tempList: store.rootState.playList.playList[index],
                 actIndex: index
             })
         }
