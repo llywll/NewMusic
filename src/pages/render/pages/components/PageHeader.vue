@@ -224,7 +224,6 @@ export default {
             ) {
               console.log("诶嘿嘿，是空的，我要拿上一次的数据来骗你");
             } else {
-              
               this.tipList = res.data.response.data;
             }
           })
@@ -243,9 +242,7 @@ export default {
       this.isCount++;
       this.isfoucs = e;
       if (this.isfoucs) this.placeholderText = "";
-      else if (!this.isfoucs && this.inText.length == 0)
-        this.placeholderText = "搜索";
-      if (!this.isfoucs)
+      else if (!this.isfoucs && this.inText.length == 0) {
         this.tipList = {
           song: {
             itemlist: []
@@ -260,8 +257,11 @@ export default {
             itemlist: []
           }
         };
-      else if (this.isfoucs && this.inText) {
-        this.inText = this.inText + " ";
+        this.placeholderText = "搜索";
+      }
+      if (this.isfoucs && this.inText) {
+        let textt = this.inText;
+        this.inText = textt;
       }
     },
     offEvent: function(enent) {

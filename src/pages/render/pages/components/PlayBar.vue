@@ -76,7 +76,8 @@ export default {
       boxele: "",
       dishX: 0,
       isShow: false,
-      isCreateEve: false
+      isCreateEve: false,
+      lyric_line_Act: -1
     };
   },
   components: {
@@ -137,52 +138,54 @@ export default {
   methods: {
     timeUp: function() {
       if (Object.keys(this.$store.state.playing.playing.lyric).length === 0) {
+        this.lyric_line_Act = 0;
         this.$ipc.send("chageLyric", { text: "暂无歌词" });
         console.log("暂无歌词");
       } else if (
         Object.keys(this.$store.state.playing.playing.lyric).length === 1
       ) {
+        this.lyric_line_Act = 0;
         document.getElementById("lyric_lines").children[0].className =
           "lyric_line act_line";
         this.$ipc.send("chageLyric", {
           text: this.$store.state.playing.playing.lyric[0].text
         });
       } else {
-        let lyricLineTemp = this.$store.state.playing.lyricLine;
+        this.lyric_line_Act = this.$store.state.playing.lyricLine;
         if (
-          this.$store.state.playing.playing.lyric[lyricLineTemp].time <=
+          this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
             this.$refs.music_player.currentTime &&
-          lyricLineTemp <
+          this.lyric_line_Act <
             Object.keys(this.$store.state.playing.playing.lyric).length
         ) {
           let lines = document.getElementById("lyric_lines").childNodes;
-
           for (let i = 0; i < lines.length; i++) {
-            if (i != lyricLineTemp) lines[i].className = "lyric_line";
+            if (i != this.lyric_line_Act) lines[i].className = "lyric_line";
           }
-          document.getElementById("lyric_lines").children[
-            lyricLineTemp
-          ].className = "lyric_line act_line";
-          document
-            .getElementById("lyric_lines")
-            .children[lyricLineTemp].scrollIntoView({
-              block: "center",
-              inline: "center"
-            });
-
-          this.$ipc.send("chageLyric", {
-            text: this.$store.state.playing.playing.lyric[lyricLineTemp].text
-          });
-          if (lyricLineTemp != this.$store.state.playing.lyricLine)
-            lyricLineTemp = this.$store.state.playing.lyricLine;
-          else
-            lyricLineTemp <
-            Object.keys(this.$store.state.playing.playing.lyric).length - 1
-              ? lyricLineTemp++
-              : lyricLineTemp;
-          this.$store.commit("chagelyricLine", lyricLineTemp);
         }
       }
+
+      if (
+        this.lyric_line_Act > 0 &&
+        document.getElementById("lyric_lines").children[this.lyric_line_Act - 1]
+          .className !== "lyric_line act_line"
+      ) {
+        document.getElementById("lyric_lines").children[
+          this.lyric_line_Act
+        ].className = "lyric_line act_line";
+        document
+          .getElementById("lyric_lines")
+          .children[this.lyric_line_Act].scrollIntoView({
+            block: "center",
+            inline: "center"
+          });
+
+        this.$ipc.send("chageLyric", {
+          text: this.$store.state.playing.playing.lyric[this.lyric_line_Act]
+            .text
+        });
+      }
+
       this.$refs.already_press.style =
         "width:" +
         (parseInt(this.$refs.music_player.currentTime) /
@@ -203,6 +206,24 @@ export default {
       this.already_time = this.comtime(
         parseInt(this.$refs.music_player.currentTime)
       );
+
+      if (Object.keys(this.$store.state.playing.playing.lyric).length > 1) {
+        if (
+          this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
+            this.$refs.music_player.currentTime &&
+          this.lyric_line_Act <
+            Object.keys(this.$store.state.playing.playing.lyric).length
+        ) {
+          if (this.lyric_line_Act != this.$store.state.playing.lyricLine)
+            this.lyric_line_Act = this.$store.state.playing.lyricLine;
+          else
+            this.lyric_line_Act <
+            Object.keys(this.$store.state.playing.playing.lyric).length - 1
+              ? this.lyric_line_Act++
+              : this.lyric_line_Act;
+          this.$store.commit("chagelyricLine", this.lyric_line_Act);
+        }
+      }
     },
     toUrl: function(albumId) {
       if ((albumId === undefined) | isNaN(albumId) | (albumId == "0"))
@@ -239,7 +260,7 @@ export default {
     loading: function() {
       console.log("音乐正在加载中");
       if (this.$store.state.playing.errorType > 0) {
-        this.$store.commit('chageErrorState',-1)
+        this.$store.commit("chageErrorState", -1);
         this.nextSong();
       }
       document.getElementById("lyric_lines").children[0].scrollIntoView({
@@ -260,6 +281,7 @@ export default {
       this.$store.commit("chageplayState", false);
     },
     playEnded() {
+      this.lyric_line_Act = -1;
       this.nextSong();
     },
     playError(err) {
@@ -444,24 +466,25 @@ export default {
 #progress_box {
   width: 380px;
   /* height: 6px; */
-  border-radius: 6px;
+  /* border-radius: 6px; */
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid rgb(196, 196, 196);
+  padding: 5px 0;
+  /* border: 1px solid rgb(196, 196, 196); */
 }
 #cached {
   width: 100%;
-  height: 3px;
+  height: 1px;
   background: rgb(194, 194, 194);
-  border-radius: 10px;
+  /* border-radius: 10px; */
   pointer-events: none;
 }
 #already_played {
   width: 0;
-  height: 3px;
+  height: 1px;
   background: rgb(73, 73, 73);
-  border-radius: 10px;
+  /* border-radius: 10px; */
   position: absolute;
   /* top: 1.5px; */
   left: 0;
@@ -477,7 +500,7 @@ export default {
   border: 5px solid rgb(73, 73, 73);
   background-color: rgb(255, 255, 255);
   position: absolute;
-  top: -5px;
+  top: -8px;
   right: -2.5px;
   display: none;
   pointer-events: all;

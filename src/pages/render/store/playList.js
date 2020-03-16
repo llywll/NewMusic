@@ -10,6 +10,9 @@ const playList = {
         removeAllItem: (state) => state.playList = [],
         changeActivesindex: (state, index) => {
             state.playListIndex = index < Object.keys(state.playList).length && index >= 0 ? index : state.playListIndex
+        },
+        addToListHead: (state, item) => {
+            state.playList.splice(0, 0, item)
         }
     },
     getters: {}

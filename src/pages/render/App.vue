@@ -67,4 +67,8 @@ body {
   top: 0;
   z-index: -1;
 }
+.res_list_item:hover .d_li span span{
+  transition: all 0.1s linear;
+  color: white;
+}
 </style>

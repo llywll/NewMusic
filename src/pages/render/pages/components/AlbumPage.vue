@@ -3,6 +3,9 @@
     <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
       <loading></loading>
     </div>
+    <div class="bg_text">
+      <span>{{cdlist.dissname}}</span>
+    </div>
     <div class="album_info" v-if="cdlist">
       <div class="album_name">
         <span>{{cdlist.dissname}}</span>
@@ -132,6 +135,20 @@ export default {
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+.bg_text {
+  position: absolute;
+  left: -10%;
+  z-index: -1;
+  top: 12%;
+  width: 1000%;
+}
+.bg_text span {
+  font-family: "宋体-简";
+  font-size: 172px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.01);
 }
 .loading_Box {
   width: 100%;
@@ -227,7 +244,7 @@ export default {
 .songlist_item_th {
   display: flex;
   padding: 10px 0;
-  background: white;
+  /* background: white; */
   align-items: baseline;
 }
 .songlist_item {
