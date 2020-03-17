@@ -6,6 +6,7 @@ import {
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
 
+import axios from 'axios'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const ipc = require('electron').ipcMain
@@ -83,8 +84,6 @@ ipc.on("showlyirc", (event, val) => {
   if (desktopLylrc)
     val ? desktopLylrc.show() : desktopLylrc.hide()
   else createDesktopLyirc()
-
-  // desktopLylrc.webContents.send('showlyirc', message)
 })
 ipc.on("chageLyric", (e, message) => {
   if (desktopLylrc)
@@ -92,6 +91,11 @@ ipc.on("chageLyric", (e, message) => {
 })
 ipc.on("showMainWindow", (e, message) => {
   win.show()
+})
+
+ipc.on("loginIn",(e,msg) =>{
+  console.log("主线程已经收到")
+  win.webContents.send('userLoginIn',msg)
 })
 
 let loginWindow
@@ -104,9 +108,10 @@ function createLoginWindw() {
     maximizable: false,
     resizable: false,
     frame: false,
+    titleBarStyle: "customButtonsOnHover",
     alwaysOnTop: true,
     // transparent: true,
-    // parent: win, //win是主窗口
+    parent: win, //win是主窗口
     webPreferences: {
       // backgroundThrottling: false,
       nodeIntegration: true

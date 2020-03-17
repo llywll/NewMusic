@@ -129,16 +129,17 @@
     <div class="right_box">
       <div class="name_box">
         <i class="im im-angle-down"></i>
-        <span class="user_name">橘子猫</span>
+        <span class="user_name" @click="testv()">{{ suser.info.userName }}</span>
       </div>
       <div class="head_img_box" @click="showLogin(true)">
-        <img class="head" src="../../assets/fin.jpg" />
+        <img class="head" :src="suser.info.headImgLink" />
       </div>
     </div>
   </div>
 </template>
 <script>
 import vbus from "./../../vbus/vbus";
+// import Qs from "qs";
 export default {
   name: "PageHeader",
   data() {
@@ -179,6 +180,11 @@ export default {
     this.$db.find({ name: "queryText" }, (err, ret) => {
       if (!err) this.searchHistory = ret;
     });
+  },
+  computed: {
+    suser() {
+      return this.$store.state.suser.suser;
+    }
   },
   watch: {
     isSeach() {
@@ -307,9 +313,27 @@ export default {
         if (!err) console.log(ret);
       });
     },
-    showLogin:function(val){
-      this.$store.commit('changeLoginWindwState',val)
-      this.$ipc.send("showLoginWindow", this.$store.state.state.loginWindowIsShow);
+    showLogin: function(val) {
+      this.$store.commit("changeLoginWindwState", val);
+      this.$ipc.send(
+        "showLoginWindow",
+        this.$store.state.state.loginWindowIsShow
+      );
+    },
+    testv: function() {
+      this.$httpV({
+        method: "post",
+        url: "http://localhost:9649/user/exit",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };

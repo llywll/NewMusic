@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <!-- <video class="bg_video" autoplay loop muted>
-      <source src="../../../public/andrade.mp4" type="video/mp4" />
-      <source src="movie.ogg" type="video/ogg" />您的浏览器不支持Video标签。
-    </video> -->
     <div id="region"></div>
     <router-view />
   </div>
@@ -15,8 +11,16 @@ export default {
   // mounted: function() {
   //   console.log(this.$store.state.playList);
   // },
-  created: function() {
-    
+  created: function() {},
+  mounted: function() {
+    this.$ipc.on("userLoginIn", () => {
+      this.$user.findOne({ name: "user" }, (err, res) => {
+        if (!err) {
+          let suser = res.user;
+          this.$store.dispatch("loginIn", suser);
+        }
+      });
+    });
   }
 };
 </script>
@@ -67,7 +71,7 @@ body {
   top: 0;
   z-index: -1;
 }
-.res_list_item:hover .d_li span span{
+.res_list_item:hover .d_li span span {
   transition: all 0.1s linear;
   color: white;
 }

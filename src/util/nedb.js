@@ -6,4 +6,9 @@ const db = new nedb({
     filename: path.join(remote.app.getPath('userData'), '/data.db'),
 
 })
-export default db;
+const userDb = new nedb({
+    autoload: true,
+    filename: path.join(remote.app.getPath('userData'), '/user.db'),
+
+})
+export { db, userDb };
