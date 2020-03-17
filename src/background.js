@@ -93,9 +93,8 @@ ipc.on("showMainWindow", (e, message) => {
   win.show()
 })
 
-ipc.on("loginIn",(e,msg) =>{
-  console.log("主线程已经收到")
-  win.webContents.send('userLoginIn',msg)
+ipc.on("loginIn", (e, msg) => {
+  win.webContents.send('userLoginIn', msg)
 })
 
 let loginWindow
@@ -126,6 +125,10 @@ ipc.on("showLoginWindow", (e, val) => {
   if (loginWindow)
     val ? loginWindow.show() : loginWindow.hide()
   else createLoginWindw()
+})
+
+ipc.on("offLoginWindow", (e, msg) => {
+  loginWindow = null
 })
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {

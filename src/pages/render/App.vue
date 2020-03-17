@@ -14,8 +14,12 @@ export default {
   created: function() {},
   mounted: function() {
     this.$ipc.on("userLoginIn", () => {
+      this.$user.find({},(err,res) =>{
+        if(!err)console.log(res)
+      })
       this.$user.findOne({ name: "user" }, (err, res) => {
         if (!err) {
+          console.log(res)
           let suser = res.user;
           this.$store.dispatch("loginIn", suser);
         }

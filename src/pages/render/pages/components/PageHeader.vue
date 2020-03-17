@@ -330,6 +330,10 @@ export default {
       })
         .then(res => {
           console.log(res);
+          this.$user.remove({}, { multi: true })
+          this.$user.find({},(err,res) =>{
+           if(!err) console.log(res)
+          })
         })
         .catch(err => {
           console.log(err);
@@ -570,6 +574,7 @@ export default {
 }
 .head {
   width: 30px;
+  height: 30px;
   border-radius: 50%;
   position: relative;
   top: 3px;

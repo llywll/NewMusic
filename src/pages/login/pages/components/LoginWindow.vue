@@ -44,9 +44,10 @@
             <i :class="isCheck?'im im-check-square-i':'im im-square-o'"></i>
           </div>
           <span>自动登录</span>
+          <span style="margin-left:10px;color:red" ref="error_message"></span>
         </div>
         <div class="xy_box">
-          <span>登录即同意《用户许可协议》《隐私政策》</span>
+          <span>登录即同意《用户许可协议》《隐私政策》</span>          
         </div>
       </div>
     </div>
@@ -70,6 +71,7 @@ export default {
       this.isfocus = isfocus;
       this.$refs.name_tip.innerHTML = "用户名";
       this.$refs.pwd_tip.innerHTML = "密码";
+      this.$refs.error_message.innerHTML=""
       if (ele == "name") {
         this.$refs.name_box.className = isfocus
           ? "t_box user_name_box focus_box"
@@ -82,7 +84,6 @@ export default {
     },
     check() {
       this.isCheck = !this.isCheck;
-      console.log();
     },
     login() {
       if (this.inName.length == 0) {
@@ -92,6 +93,7 @@ export default {
         this.$refs.pwd_tip.innerHTML = `<i class="im im-warning-circle" style='color: red; font-size: 10px;margin-right:2px'></i><span style='color:red'>密码不能为空</span>`;
       }
       if (this.inName.length > 0 && this.inPwd.length > 0) {
+        this.$refs.error_message.innerHTML="登录中..."
         this.$httpV({
           method: "post",
           url: "http://localhost:9649/user/login",
@@ -101,18 +103,38 @@ export default {
           })
         })
           .then(res => {
-            console.log(res);
-            this.$user.insert(
-              {
-                name: "user",
-                user: res.data.data[0]
-              },
-              (err, res) => {
-                if (!err) if (res) {
-                  this.$ipc.send("loginIn", "登录成功");
+            if (res.data.state === "success") {
+              let userData= res
+              this.$user.findOne(
+                {
+                  name: "user",
+                  user: userData.data.data[0]
+                },
+                (err, res) => {
+                  if (!err)
+                    if (!res) {
+                      this.$user.insert(
+                        {
+                          name: "user",
+                          user: userData.data.data[0]
+                        },
+                        (err, resp) => {
+                          if (!err)
+                            if (resp) {
+                              console.log(resp)
+                               this.$refs.error_message.innerHTML=""
+                               this.$ipc.send("loginIn", "登录成功");
+                               this.$ipc.send('offLoginWindow')
+                            }
+                        }
+                      );
+                    }
                 }
-              }
-            );
+              );
+            }else{
+              this.$refs.error_message.innerHTML=`<i class="im im-warning-circle" style="margin-right:2px;font-size:10px"></i>${res.data.message}`
+            }
+
           })
           .catch(err => {
             console.log(err);
@@ -196,7 +218,7 @@ export default {
 .name_input::selection,
 .pwd_input::selection {
   color: white;
-  background: rgb(49, 112, 255);
+  background: rgba(49, 111, 255);
 }
 .pwd_input {
   letter-spacing: 2px;
