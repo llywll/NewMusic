@@ -330,8 +330,8 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.$user.remove({}, { multi: true })
-          this.$user.find({},(err,res) =>{
+          this.$userDb.remove({}, { multi: true })
+          this.$userDb.find({},(err,res) =>{
            if(!err) console.log(res)
           })
         })

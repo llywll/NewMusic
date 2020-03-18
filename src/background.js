@@ -5,7 +5,7 @@ import {
   createProtocol,
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
-
+import store from './pages/render/store/store.js'
 import axios from 'axios'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -80,23 +80,6 @@ function createDesktopLyirc() {
 
 }
 
-ipc.on("showlyirc", (event, val) => {
-  if (desktopLylrc)
-    val ? desktopLylrc.show() : desktopLylrc.hide()
-  else createDesktopLyirc()
-})
-ipc.on("chageLyric", (e, message) => {
-  if (desktopLylrc)
-    desktopLylrc.webContents.send('showlyirc', message)
-})
-ipc.on("showMainWindow", (e, message) => {
-  win.show()
-})
-
-ipc.on("loginIn", (e, msg) => {
-  win.webContents.send('userLoginIn', msg)
-})
-
 let loginWindow
 function createLoginWindw() {
   loginWindow = new BrowserWindow({
@@ -127,9 +110,34 @@ ipc.on("showLoginWindow", (e, val) => {
   else createLoginWindw()
 })
 
-ipc.on("offLoginWindow", (e, msg) => {
-  loginWindow = null
+
+ipc.on("showlyirc", (event, val) => {
+  if (desktopLylrc)
+    val ? desktopLylrc.show() : desktopLylrc.hide()
+  else createDesktopLyirc()
 })
+ipc.on("chageLyric", (e, message) => {
+  if (desktopLylrc)
+    desktopLylrc.webContents.send('showlyirc', message)
+})
+ipc.on("showMainWindow", (e, message) => {
+  win.show()
+})
+
+ipc.on("offLoginWindow", (e, msg) => {
+  loginWindow.hide()
+})
+ipc.on("loginIn", (e, obj) => {
+  win.webContents.send("loginIn",obj)
+})
+ipc.on("showError", (e, obj) => {
+  loginWindow.webContents.send("showError", obj)
+})
+ipc.on("loginSuccess", (e, obj) => {
+  loginWindow.webContents.send("loginSuccess", obj)
+
+})
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar

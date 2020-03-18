@@ -1,3 +1,4 @@
+
 const suser = {
     state: {
         suser: {
@@ -117,20 +118,19 @@ const suser = {
     },
     actions: {
         loginIn: (store, suser) => {
-            let tuser = {
-                info: {
-                    userName: suser.nName,
-                    desc: suser.nDesc,
-                    sex: suser.nSex,
-                    birthday: suser.nBirthday,
-                    headImgLink: suser.nHeadportraitUrl
-                }
-            }
-            store.commit('setUser', tuser)
+           store.commit('setUser',{
+               info:{
+                userName: suser.nName,
+                desc: suser.nDesc,
+                sex: suser.nSex,
+                birthday: suser.nBirthday,
+                headImgLink: suser.nHeadImgLink
+               }
+           })
         }
     },
-    getters:{
-        suser(state){
+    getters: {
+        suser(state) {
             return state.suser
         }
     }

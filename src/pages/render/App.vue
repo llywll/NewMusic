@@ -6,22 +6,47 @@
 </template>
 
 <script>
+import Qs from "qs";
 export default {
   name: "app",
-  // mounted: function() {
-  //   console.log(this.$store.state.playList);
-  // },
-  created: function() {},
-  mounted: function() {
-    this.$ipc.on("userLoginIn", () => {
-      this.$user.find({},(err,res) =>{
-        if(!err)console.log(res)
-      })
-      this.$user.findOne({ name: "user" }, (err, res) => {
-        if (!err) {
-          console.log(res)
-          let suser = res.user;
-          this.$store.dispatch("loginIn", suser);
+  mounted() {
+    this.$ipc.on("loginIn", (e, userData) => {
+      this.$httpV({
+        method: "post",
+        url: "http://localhost:9649/user/login",
+        data: Qs.stringify({
+          userName: userData.userName,
+          password: userData.password
+        })
+      }).then(response => {
+        if (response.data.state === "success") {
+          this.$userDb.findOne(
+            {
+              name: "user",
+              user: response.data.data[0]
+            },
+            (err, queryDbres) => {
+              if (!err)
+                if (!queryDbres) {
+                  this.$userDb.insert(
+                    {
+                      name: "user",
+                      user: response.data.data[0]
+                    },
+                    (err, insertRes) => {
+                      if (!err)
+                        if (insertRes !== null) {
+                          console.log(insertRes);
+                          this.$store.dispatch("loginIn", insertRes.user);
+                          this.$ipc.send("loginSuccess");
+                        }
+                    }
+                  );
+                }
+            }
+          );
+        } else {
+          this.$ipc.send("showError", response.data.message);
         }
       });
     });
