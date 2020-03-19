@@ -124,7 +124,7 @@ const suser = {
                 desc: suser.nDesc,
                 sex: suser.nSex,
                 birthday: suser.nBirthday,
-                headImgLink: suser.nHeadImgLink
+                headImgLink: suser.nHeadportraitUrl
                }
            })
         }

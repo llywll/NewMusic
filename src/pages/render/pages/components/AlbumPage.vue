@@ -4,11 +4,11 @@
       <loading></loading>
     </div>
     <div class="bg_text"  v-if="cdlist">
-      <span>{{cdlist.dissname}}</span>
+      <span v-html="cdlist.dissname"></span>
     </div>
     <div class="album_info" v-if="cdlist">
       <div class="album_name">
-        <span>{{cdlist.dissname}}</span>
+        <span v-html="cdlist.dissname"></span>
       </div>
       <div class="album_author"></div>
       <div class="album_desc">

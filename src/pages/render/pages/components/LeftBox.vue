@@ -122,7 +122,8 @@ export default {
       return this.$store.state.playing.playing.lyric == undefined
         ? "新音乐，聆听生活"
         : this.$store.state.playing.playing.lyric;
-    }
+    },
+    
   },
   methods: {
     topage: function(page) {

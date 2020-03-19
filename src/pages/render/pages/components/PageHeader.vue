@@ -126,13 +126,40 @@
         </div>
       </div>
     </div>
-    <div class="right_box">
+    <div :class="isHeadPapel?'right_box hover_box':'right_box'">
       <div class="name_box">
         <i class="im im-angle-down"></i>
-        <span class="user_name" @click="testv()">{{ suser.info.userName }}</span>
+        <span class="user_name" @click="showLogin(true)">{{ suser.info.userName }}</span>
       </div>
-      <div class="head_img_box" @click="showLogin(true)">
-        <img class="head" :src="suser.info.headImgLink" />
+      <div class="head_img_box" @mouseover="showOverPapel(true)" @mouseout="showOverPapel(false)">
+        <img class="head" :src="suser.info.headImgLink" @click="showLogin(true)" />
+        <div
+          class="head_hover"
+          v-show="isHeadPapel"
+          @mouseover="switchFlag(true)"
+          @mouseout="switchFlag(false)"
+        >
+          <div class="song_overview">
+            <div class="ov_box like_ov_box">
+              <span class="count like_count">49</span>
+              <span class="title like_title">喜欢的歌</span>
+            </div>
+
+            <div class="ov_box established_ov_box">
+              <span class="count established_count">6</span>
+              <span class="title established_title">收藏的歌单</span>
+            </div>
+
+            <div class="ov_box collection_ov_box">
+              <span class="count collection_count">12</span>
+              <span class="title collection_title">建立的歌单</span>
+            </div>
+          </div>
+          <div class="func_btns">
+            <button class="func_btn edit_userdata_btn" @click="testv()">编辑资料</button>
+            <button class="func_btn exit_user_btn" @click="userExit">登出</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -150,6 +177,8 @@ export default {
       hotkey: [],
       inText: "",
       isSeach: 0,
+      isHeadPapel: false,
+      isHeadFlag: false,
       placeholderText: "搜索",
       searchHistory: [],
       tipList: {
@@ -240,6 +269,21 @@ export default {
     }
   },
   methods: {
+    showOverPapel: function(val) {
+      if (val) {
+        this.isHeadPapel = true;
+        this.isHeadFlag = true;
+      } else {
+        if (!this.isHeadFlag)
+          setTimeout(() => {
+            this.isHeadPapel = false;
+          }, 1500);
+      }
+    },
+    switchFlag: function(val) {
+      if (val) this.isHeadFlag = true;
+      else this.isHeadFlag = false;
+    },
     openLoginWindow: function() {
       // this.isShow = !this.isShow;
       // this.$ipc.send("showlyirc", this.isShow);
@@ -323,6 +367,17 @@ export default {
     testv: function() {
       this.$httpV({
         method: "post",
+        url: "http://localhost:9649/songList/getUserList",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      })
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
+    },
+    userExit: function() {
+      this.$httpV({
+        method: "post",
         url: "http://localhost:9649/user/exit",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
@@ -330,10 +385,10 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.$userDb.remove({}, { multi: true })
-          this.$userDb.find({},(err,res) =>{
-           if(!err) console.log(res)
-          })
+          this.$userDb.remove({}, { multi: true });
+          this.$userDb.find({}, (err, res) => {
+            if (!err) console.log(res);
+          });
         })
         .catch(err => {
           console.log(err);
@@ -572,6 +627,9 @@ export default {
 .name_box:hover .im {
   color: rgb(49, 122, 255);
 }
+.head_img_box {
+  position: relative;
+}
 .head {
   width: 30px;
   height: 30px;
@@ -579,5 +637,78 @@ export default {
   position: relative;
   top: 3px;
   cursor: pointer;
+}
+.head_hover {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 240px;
+  /* height: 140px; */
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 0 20px 0 #00000024;
+  background: url("./../../assets/bb-king.gif") no-repeat;
+  background-color: white;
+  background-size: cover;
+  background-position-y: -88px;
+  background-position-x: -135px;
+}
+.hover_box .head_img_box {
+  pointer-events: none;
+}
+.hover_box .head,
+.hover_box .name_box {
+  z-index: 2;
+  pointer-events: none;
+}
+.hover_box .name_box .im {
+  opacity: 0;
+}
+
+.song_overview {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 25%;
+  overflow: hidden;
+}
+.ov_box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 15px;
+  /* border-right: 1px solid rgb(221, 221, 221); */
+}
+.collection_ov_box {
+  border: 0;
+}
+.ov_box .count {
+  font-size: 16px;
+}
+.ov_box .title {
+  margin-top: 3px;
+  font-size: 10px;
+}
+.func_btns {
+  pointer-events: all;
+  width: 100%;
+  margin-top: 15px;
+  /* border-top: 1px solid rgb(221, 221, 221); */
+  transition: all 0.2s linear;
+}
+.func_btn {
+  width: 50%;
+  background: none;
+  outline: none;
+  height: 30px;
+  border: 0;
+  cursor: pointer;
+}
+
+.edit_userdata_btn {
+  /* border-right: 1px solid rgb(221, 221, 221); */
+}
+.func_btn:hover {
+  color: rgb(49, 112, 255);
 }
 </style>
