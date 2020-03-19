@@ -127,6 +127,9 @@ ipc.on("showMainWindow", (e, message) => {
 ipc.on("offLoginWindow", (e, msg) => {
   loginWindow.hide()
 })
+ipc.on("autoLogin",(e,val)=>{
+  win.webContents.send("autoLogin",val)
+})
 ipc.on("loginIn", (e, obj) => {
   win.webContents.send("loginIn",obj)
 })

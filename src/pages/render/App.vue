@@ -9,7 +9,55 @@
 import Qs from "qs";
 export default {
   name: "app",
+  created() {
+    this.$userDb.find({},(err,res)=>{
+      console.log(res)
+    })
+    this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
+      console.log("aotologin检查:", res);
+      if (!err)
+        if (res !== null && res !== undefined && res !== "")
+          if (res.autoLogin) {
+            console.log("已开启自动登录:", res.autoLogin);
+            this.$userDb.findOne(
+              {
+                name: "user"
+              },
+              (err, res) => {
+                if (!err) if (res) this.$store.dispatch("loginIn", res.user);
+              }
+            );
+          }
+    });
+  },
   mounted() {
+    this.$ipc.on("autoLogin", (e, val) => {
+      console.log("autologin:", val);
+      if (val !== null && val !== undefined && val !== "")
+        this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
+          console.log("findOne:", res);
+          if (!err)
+            if (res)
+              this.$userDb.update(
+                { name: "autoLogin" },
+                { name: "autoLogin", aotoLogin: val },
+                (uperr, upres) => {
+                  console.log("update:", upres);
+                  if (!uperr)
+                    if (upres > 0) this.$store.commit("setAutoLogin", val);
+                }
+              );
+            else
+              this.$userDb.insert(
+                { name: "autoLogin", autoLogin: val },
+                (err, insres) => {
+                  console.log("inster:", insres);
+                  if (!err)
+                    if (insres > 0) this.$store.commit("setAutoLogin", val);
+                }
+              );
+        });
+    });
     this.$ipc.on("loginIn", (e, userData) => {
       this.$httpV({
         method: "post",
@@ -36,8 +84,24 @@ export default {
                     (err, insertRes) => {
                       if (!err)
                         if (insertRes !== null) {
-                          console.log(insertRes);
                           this.$store.dispatch("loginIn", insertRes.user);
+                          this.$ipc.send("loginSuccess");
+                        }
+                    }
+                  );
+                } else {
+                  this.$userDb.update(
+                    {
+                      name: "user"
+                    },
+                    {
+                      name: "user",
+                      user: response.data.data[0]
+                    },
+                    (err, upres) => {
+                      if (!err)
+                        if (upres > 0) {
+                          this.$store.dispatch("loginIn", queryDbres.user);
                           this.$ipc.send("loginSuccess");
                         }
                     }

@@ -39,22 +39,10 @@
           <span>播放历史</span>
         </li>
       </ul>
-      <span class="list_title s2_title">创建的歌单</span>
-      <ul class="s_menu" id="song_nav">
-        <li class="s3_li">
-          <span>精品冷门 | 牵动神经的电子</span>
-        </li>
-        <li class="s3_li">
-          <span>Riot Grrrl | 女性变革呐喊</span>
-        </li>
-        <li class="s3_li">
-          <span>日式活力 嘟嘟</span>
-        </li>
-        <li class="s3_li">
-          <span>精品冷门 | 牵动神经的电子</span>
-        </li>
-        <li class="s3_li">
-          <span>Riot Grrrl | 女性变革呐喊</span>
+      <span class="list_title s2_title" v-show="suser.isLogin">创建的歌单</span>
+      <ul class="s_menu" id="song_nav" v-show="suser.isLogin">
+        <li class="s3_li" v-for="(item,index) in collectionSonglist" :key="index">
+          <span v-html="item.lListname"></span>
         </li>
         <li class="s3_li">
           <button id="createSongList_btn">
@@ -101,6 +89,24 @@ export default {
       play_page: "play_page "
     };
   },
+  watch: {
+    "$store.state.suser.suser"() {
+      if (this.$store.state.suser.suser.isLogin)
+        this.$httpV
+          .get("http://localhost:9649/songList/getSongList")
+          .then(res => {
+            console.log(res.data);
+            if (res.data.state == "success") {
+              this.$store.dispatch(
+                "changeCollectionSonglist",
+                res.data.data[0]
+              );
+            }
+          })
+          .catch(err => console.log(err));
+      else this.$store.commit("setCollectionSonglist");
+    }
+  },
   computed: {
     coverImgUrl() {
       if (
@@ -123,7 +129,13 @@ export default {
         ? "新音乐，聆听生活"
         : this.$store.state.playing.playing.lyric;
     },
-    
+    collectionSonglist() {
+      return this.$store.state.suser.collectionSonglist;
+    },
+    suser(){
+      console.log(this.$store.state.suser.suser)
+      return this.$store.state.suser.suser
+    }
   },
   methods: {
     topage: function(page) {
@@ -192,7 +204,7 @@ export default {
   display: block;
   padding-left: 25px;
   margin-top: 15px;
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.582);
 }
 .s1_title {

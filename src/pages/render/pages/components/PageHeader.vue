@@ -212,7 +212,10 @@ export default {
   },
   computed: {
     suser() {
-      return this.$store.state.suser.suser;
+      let userData = this.$store.state.suser.suser;
+      if (userData.info.headImgLink == "")
+        userData.info.headImgLink = require("../../assets/user.png");
+      return userData;
     }
   },
   watch: {
@@ -271,8 +274,10 @@ export default {
   methods: {
     showOverPapel: function(val) {
       if (val) {
-        this.isHeadPapel = true;
-        this.isHeadFlag = true;
+        if (this.$store.state.suser.suser.isLogin) {
+          this.isHeadPapel = true;
+          this.isHeadFlag = true;
+        }
       } else {
         if (!this.isHeadFlag)
           setTimeout(() => {
@@ -385,7 +390,9 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.$userDb.remove({}, { multi: true });
+          this.$userDb.remove({}, { multi: true }, (err, res) => {
+            if (!err) if (res > 0) this.$store.commit("destructionUser");
+          });
           this.$userDb.find({}, (err, res) => {
             if (!err) console.log(res);
           });
@@ -633,10 +640,11 @@ export default {
 .head {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
   position: relative;
   top: 3px;
   cursor: pointer;
+  background: rgb(212, 212, 212);
+  border-radius: 50%;
 }
 .head_hover {
   position: absolute;
@@ -652,9 +660,6 @@ export default {
   background-size: cover;
   background-position-y: -88px;
   background-position-x: -135px;
-}
-.hover_box .head_img_box {
-  pointer-events: none;
 }
 .hover_box .head,
 .hover_box .name_box {

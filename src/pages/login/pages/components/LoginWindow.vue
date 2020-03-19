@@ -65,13 +65,25 @@ export default {
       isfocus: false
     };
   },
+  computed: {
+    autoLogin() {
+      return this.$store.state.suser.autoLogin;
+    }
+  },
   mounted() {
+    this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
+      if (!err)
+        if (res) {
+          console.log("自主查询", res);
+          this.isCheck = res.aotoLogin;
+        }
+    });
     this.$ipc.on("showError", (e, message) => {
-      console.log(e)
+      console.log(e);
       this.$refs.error_message.innerHTML = `<i class="im im-warning-circle" style="margin-right:2px;font-size:10px"></i>${message}`;
     });
     this.$ipc.on("loginSuccess", (e, message) => {
-      console.log(e,message)
+      console.log(e, message);
       this.$refs.error_message.innerHTML = "";
       this.$ipc.send("offLoginWindow");
     });
@@ -94,6 +106,8 @@ export default {
     },
     check() {
       this.isCheck = !this.isCheck;
+      console.log(this.isCheck);
+      this.$ipc.send("autoLogin", this.isCheck);
     },
     login() {
       if (this.inName.length == 0) {
