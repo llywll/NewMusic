@@ -370,15 +370,9 @@ export default {
       );
     },
     testv: function() {
-      this.$httpV({
-        method: "post",
-        url: "http://localhost:9649/songList/getUserList",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+      this.$userDb.find({},(e,res)=>{
+        console.log(res)
       })
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
     },
     userExit: function() {
       this.$httpV({

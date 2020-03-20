@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import Main from '../pages/MainPage'
 import PageContent from '../pages/components/PageContent'
 import AlbumPage from '../pages/components/AlbumPage'
-
+import songlistPage from '../pages/components/SongListPage'
 
 import SearchResultsPage from '../pages/components/SearchResultsPage'
 
@@ -36,6 +36,11 @@ const router = new Router({
           isUseCache: false,
           keepAlive: true
         }
+      },{
+        path: '/SonglistPage/:list_id',
+        name: 'SonglistPage',
+        component: songlistPage,
+        props: { default: true, sidebar: false }
       },
       {
         path: '/AlbumPage/:album_id',

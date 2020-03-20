@@ -75,7 +75,10 @@ export default {
       if (!err)
         if (res) {
           console.log("自主查询", res);
-          this.isCheck = res.aotoLogin;
+          this.isCheck = res.autoLogin;
+        }else{
+          console.log("autologin为空", res);
+          this.$ipc.send("autoLogin", false);
         }
     });
     this.$ipc.on("showError", (e, message) => {

@@ -10,13 +10,14 @@ import Qs from "qs";
 export default {
   name: "app",
   created() {
-    this.$userDb.find({},(err,res)=>{
-      console.log(res)
-    })
+    this.$userDb.find({}, (err, res) => {
+      console.log("启动自检：", res);
+    });
     this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
-      console.log("aotologin检查:", res);
+      console.log("autoLogin检查:", res);
       if (!err)
-        if (res !== null && res !== undefined && res !== "")
+        if (res !== null && res !== undefined && res !== "") {
+          console.log("自检结果:", res.autoLogin);
           if (res.autoLogin) {
             console.log("已开启自动登录:", res.autoLogin);
             this.$userDb.findOne(
@@ -28,6 +29,7 @@ export default {
               }
             );
           }
+        }
     });
   },
   mounted() {
@@ -40,7 +42,7 @@ export default {
             if (res)
               this.$userDb.update(
                 { name: "autoLogin" },
-                { name: "autoLogin", aotoLogin: val },
+                { name: "autoLogin", autoLogin: val },
                 (uperr, upres) => {
                   console.log("update:", upres);
                   if (!uperr)

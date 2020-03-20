@@ -21,7 +21,7 @@
         </li>
       </ul>
       <span class="list_title s2_title">我的音乐</span>
-      <ul class="s_menu" id="song_nav">
+      <ul class="s_menu s_menu_s2" id="song_nav">
         <li class="s2_li">
           <i class="im im-heart"></i>
           <span>我喜欢</span>
@@ -41,14 +41,38 @@
       </ul>
       <span class="list_title s2_title" v-show="suser.isLogin">创建的歌单</span>
       <ul class="s_menu" id="song_nav" v-show="suser.isLogin">
-        <li class="s3_li" v-for="(item,index) in collectionSonglist" :key="index">
+        <li
+          class="s3_li"
+          v-for="(item,index) in collectionSonglist"
+          :key="index"
+          @click="intoSongListPage(item.lId)"
+        >
+          <i class="im_icon"></i>
           <span v-html="item.lListname"></span>
         </li>
-        <li class="s3_li">
-          <button id="createSongList_btn">
-            <i class="im im-plus"></i>
-            <span>创建新的歌单</span>
-          </button>
+        <li :class="isOpenNewListPapel?'s3_li nohover act_s3':'s3_li nohover'">
+          <div class="cerate_list_box">
+            <div class="cerate_input_hack">
+              <input
+                class="cerate_input"
+                type="text"
+                ref="cera_text"
+                @focus="isCreateInputFoucs=true"
+                @keyup.enter="submitNewitem"
+                @keyup.esc="cancelEdit"
+                v-model="cre_text"
+              />
+              <img
+                :class="isLoading?'loadingimg start_loading':'loadingimg'"
+                src="../../assets/loading.gif"
+              />
+            </div>
+
+            <button id="createSongList_btn" @click="openCreatePapel()">
+              <i class="im im-plus"></i>
+              <span>创建新的歌单</span>
+            </button>
+          </div>
         </li>
       </ul>
     </div>
@@ -80,17 +104,22 @@
   </nav>
 </template>
 <script>
+import Qs from "qs";
 export default {
   name: "leftBox",
   data() {
     return {
       cover_box: "cover_box",
       sidebar_a: "sidebar_a",
-      play_page: "play_page "
+      play_page: "play_page ",
+      isOpenNewListPapel: false,
+      isCreateInputFoucs: false,
+      isLoading: false,
+      cre_text: ""
     };
   },
   watch: {
-    "$store.state.suser.suser"() {
+    suser() {
       if (this.$store.state.suser.suser.isLogin)
         this.$httpV
           .get("http://localhost:9649/songList/getSongList")
@@ -132,9 +161,9 @@ export default {
     collectionSonglist() {
       return this.$store.state.suser.collectionSonglist;
     },
-    suser(){
-      console.log(this.$store.state.suser.suser)
-      return this.$store.state.suser.suser
+    suser() {
+      console.log(this.$store.state.suser.suser);
+      return this.$store.state.suser.suser;
     }
   },
   methods: {
@@ -151,7 +180,10 @@ export default {
         this.$data.sidebar_a = "sidebar_a act_Sidebar";
       }
     },
-
+    intoSongListPage(akey) {
+      this.$router.push("/SonglistPage/" + akey)
+      console.log(akey);
+    },
     downplay: function() {
       this.$store.commit("closePlayPage");
       if (!this.$store.state.state.isThePlaybackPageAlreadyOpen) {
@@ -162,6 +194,44 @@ export default {
     full_down: function() {
       if (this.$data.cover_box == "cover_box over_clover") {
         this.$data.sidebar_a = "sidebar_a";
+      }
+    },
+    openCreatePapel: function() {
+      this.isOpenNewListPapel = true;
+      this.$refs.cera_text.focus();
+    },
+    submitNewitem: function() {
+      console.log("老子提交了");
+      this.isLoading = true;
+      if (this.isLoading)
+        this.$httpV
+          .post(
+            "http://localhost:9649/songList/addSongList",
+            Qs.stringify({
+              lListname: this.cre_text
+            })
+          )
+          .then(res => {
+            if (res.data.state == "success") {
+              console.log(res.data.data[0]);
+              this.isOpenNewListPapel = false;
+              this.cre_text = "";
+              this.$store.dispatch(
+                "changeCollectionSonglist",
+                res.data.data[0]
+              );
+            }
+            this.isLoading = false;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            console.log(err);
+          });
+    },
+    cancelEdit: function() {
+      if (this.isOpenNewListPapel) {
+        this.cre_text = "";
+        this.isOpenNewListPapel = false;
       }
     }
   }
@@ -192,12 +262,15 @@ export default {
   /**列表共用 */
   margin: 12px 0;
   list-style: none;
-  padding-left: 16px;
+  padding: 0;
+}
+.s_menu_s2 {
 }
 #top_nav {
   /**顶部列表 */
   display: flex;
   flex-direction: row;
+  padding-left: 10px;
 }
 .list_title {
   /**列表标题 */
@@ -244,7 +317,8 @@ export default {
   display: flex;
   align-items: center;
   margin: 10px 0;
-  padding-left: 7px;
+  padding-left: 24px;
+  /* padding-left: 7px; */
 }
 
 .s2_li i {
@@ -253,18 +327,48 @@ export default {
 }
 .s2_li span {
   font-size: 12px;
-  margin: 0 13px;
+  margin: 0 8px;
   color: rgb(58, 57, 57);
 }
 .s3_li {
   display: flex;
   align-items: center;
-  margin: 12px 0;
-  padding-left: 9px;
+  padding: 6px 0;
+  cursor: pointer;
+  padding-left: 24px;
+  transition: background 0.2s linear;
+}
+.s3_li:hover {
+  background: rgba(255, 255, 255, 0.308);
+}
+.im_icon {
+  width: 20px;
+  height: 20px;
+  background: url(../../assets/musiclist.svg);
+  background-size: 20px;
 }
 .s3_li span {
   font-size: 12px;
+  margin: 0 3px;
   color: rgb(58, 57, 57);
+}
+.cerate_input_hack {
+  height: 0;
+}
+.cerate_input {
+  opacity: 0;
+}
+.loadingimg {
+  width: 0;
+  height: 0;
+}
+
+.start_loading {
+  height: unset;
+  width: 40px;
+  position: absolute;
+  right: -10px;
+  top: 0;
 }
 #createSongList_btn {
   display: flex;
@@ -289,6 +393,63 @@ export default {
   color: white;
   font-size: 12px;
 }
+.act_s3 {
+  margin-left: -5%;
+  background: unset;
+}
+.nohover:hover {
+  background: unset;
+  cursor: unset;
+}
+.act_s3 .cerate_list_box {
+  overflow: hidden;
+  border: 2px solid rgba(139, 147, 186, 0.9);
+  /* background-color:rgba(139, 147, 186, 0.9); */
+  background: white;
+  border-radius: 5px;
+  /* background-color: rgba(139, 147, 186, 0.9); */
+  box-shadow: 0 0 20px 0 rgb(173, 173, 173);
+}
+.act_s3 .cerate_input_hack {
+  margin: 0 3px;
+  background: white;
+  height: unset;
+  position: relative;
+  overflow: hidden;
+}
+.act_s3 .cerate_input {
+  background: none;
+  width: 200px;
+  font-size: 12px;
+  opacity: 1;
+  outline: none;
+  /* border:1px solid pink; */
+  border: 0;
+}
+.act_s3 #createSongList_btn {
+  background: white;
+  margin: 0;
+  width: 100%;
+  /* padding: 0 10px; */
+  border-radius: 0;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.act_s3 #createSongList_btn i,
+.act_s3 #createSongList_btn span {
+  color: rgb(109, 109, 109);
+  font-size: 10px;
+}
+.act_s3 #createSongList_btn span::after {
+  content: "按Enter键确认创建";
+  background: white;
+  width: 100%;
+  text-align: left;
+  position: absolute;
+  left: 0;
+  padding-left: 8px;
+}
 .cover_box {
   position: absolute;
   overflow: visible;
@@ -306,7 +467,8 @@ export default {
   height: 220px;
   border-radius: 5px;
   cursor: pointer;
-  background-image: url(../../assets/fin.jpg);
+  background-image: url(../../assets/defCover.jpg);
+  background-color: rgb(255, 255, 255);
   background-repeat: no-repeat;
   background-size: cover;
   transition: all 0.2s 0.1s linear;
@@ -321,7 +483,7 @@ export default {
   left: 0%;
   width: 220px;
   height: 220px;
-  background: url(../../assets/fin.jpg) no-repeat;
+  background: url(../../assets/defCover.jpg) no-repeat;
   background-size: 100% 100%;
   transform: scale(1.25);
   filter: blur(25px) brightness(80%) opacity(0.8);
