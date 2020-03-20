@@ -83,7 +83,7 @@ export default {
     init: function() {
       this.$data.album_id = this.$route.params.album_id;
       this.$http
-        .get("http://localhost:3200/getSongListDetail?disstid=" + this.album_id)
+        .get("http://39.108.229.8:3200/getSongListDetail?disstid=" + this.album_id)
         .then(response => {
           this.cdlist = response.data.response.cdlist[0];
           this.isloading_Box = false;

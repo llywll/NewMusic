@@ -199,7 +199,7 @@ export default {
   },
   mounted() {
     this.$http
-      .get("http://localhost:3200/getHotkey")
+      .get("http://39.108.229.8:3200/getHotkey")
       .then(res => {
         this.hotkey = res.data.response.data.hotkey;
       })
@@ -252,7 +252,7 @@ export default {
     inText() {
       if (this.inText.length > 0 && this.isfoucs) {
         this.$http
-          .get("http://localhost:3200/getSmartbox?key=" + this.inText)
+          .get("http://39.108.229.8:3200/getSmartbox?key=" + this.inText)
           .then(res => {
             if (
               res.data.response.data.song.count == 0 &&

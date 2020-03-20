@@ -139,7 +139,7 @@ export default {
   },
   mounted: function() {
     this.$http
-      .get("http://localhost:3200/getRecommend")
+      .get("http://39.108.229.8:3200/getRecommend")
       .then(response => {
         this.$data.v_hot = response.data.response.recomPlaylist.data.v_hot;
 
@@ -161,7 +161,7 @@ export default {
         console.log(error);
       });
     this.$http
-      .get("http://localhost:3200/getMvByTag")
+      .get("http://39.108.229.8:3200/getMvByTag")
       .then(response => {
         this.mv_list = response.data.response.data.mvlist;
       })

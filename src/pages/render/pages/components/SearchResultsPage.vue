@@ -121,7 +121,7 @@ export default {
       this.searchResults = [];
       this.$http
         .get(
-          `http://localhost:3200/getSearchByKey?key= ${stext}&&page=${this.page}&&limit=${this.limit}`
+          `http://39.108.229.8:3200/getSearchByKey?key= ${stext}&&page=${this.page}&&limit=${this.limit}`
         )
         .then(res => {
           let temp = res.data.response.data.song.list;
@@ -164,7 +164,7 @@ export default {
     },
     playOne(mid) {
       this.$http
-        .get(`http://localhost:3200/getSongInfo?songmid=${mid}`)
+        .get(`http://39.108.229.8:3200/getSongInfo?songmid=${mid}`)
         .then(res => {
           console.log(res.data.response.songinfo.data.track_info);
           let tempItem = res.data.response.songinfo.data.track_info;

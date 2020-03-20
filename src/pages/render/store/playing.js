@@ -28,13 +28,13 @@ const playing = {
             let playing = playingObj.tempList
             let actIndex = playingObj.actIndex
             if (playing.songMid != store.state.playing.songMid) {
-                await http.get('http://localhost:3200/getMusicVKey?songmid=' + playing.songMid)
+                await http.get('http://39.108.229.8:3200/getMusicVKey?songmid=' + playing.songMid)
                     .then(response => {
                         playing.playLists = response.data.response.playLists
                         if (playing.playLists[0].length - playing.playLists[0].lastIndexOf('.com') <= 5)
                             store.commit('chageErrorState', 4)
                     }).catch(error => console.log(error))
-                await http.get('http://localhost:3200/getLyric?songmid=' + playing.songMid)
+                await http.get('http://39.108.229.8:3200/getLyric?songmid=' + playing.songMid)
                     .then(response => {
                         let lyricStr = response.data.response.lyric.split("\n");
                         let lyricArr = [];
