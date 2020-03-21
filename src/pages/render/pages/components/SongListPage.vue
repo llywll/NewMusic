@@ -11,21 +11,17 @@
         </div>
         <div class="desc_box">
           <span class="span_jianjie">简介</span>
-          <span class="span_desc">
-            世界上有两个可贵的词，一个叫认真，一个叫坚持。认真的人改变了自己，坚持的人改变了命运。很多人说单身久了，别说拧瓶盖了，消防栓我都能拧开。确实如此，宁缺毋滥，好过随便找个人相处一生。
-            今天推荐的情歌，适合一个人安静聆听，或许感伤，或许孤单，或许寂寞，但是总有一首是你想要的情感，诉说着你的故事。
-            一起来听歌！封面来源于网络，侵删！
-          </span>
+          <span class="span_desc" v-html="listInfo.lDesc"></span>
         </div>
       </div>
       <div class="info_songlist_box">
         <div class="text_info">
           <div class="title_box">
-            <span class="span_title">我喜欢</span>
+            <span class="span_title" v-html=" listInfo.lListname"></span>
           </div>
           <div class="at_box">
             <i class="im im-user-circle"></i>
-            <span class="span_at">迪丽热巴</span>
+            <span class="span_at" v-html="listInfo.lCreator"></span>
           </div>
           <div class="at_box">
             <span class="span_at">2019年3月27日创建</span>
@@ -56,21 +52,21 @@
               <span>时长</span>
             </div>
           </li>
-          <li class="s_list_item s_td">
+          <li class="s_list_item s_td" v-for="(item,index) in listInfo.songs" :key="index">
             <div class="song_index">
-              <span>1</span>
+              <span>{{ index + 1 }}</span>
             </div>
             <div class="song_name">
-              <span>Mine</span>
+              <span>{{item.sName}}</span>
             </div>
             <div class="song_singer">
-              <span>周杰伦</span>
+              <span>{{ item.sSinger }}</span>
             </div>
             <div class="song_album">
-              <span>新十二新作</span>
+              <span>{{ item.sAlbumName }}</span>
             </div>
             <div class="song_time">
-              <span>04:30</span>
+              <span>{{ item.sTime }}</span>
             </div>
           </li>
         </ul>
@@ -83,24 +79,77 @@ export default {
   name: "SonglistPage",
   data() {
     return {
-      list_id: ""
+      list_id: "",
+      listInfo: {}
     };
+  },
+  mounted() {
+    this.init();
+  },
+  watch: {
+    "$store.state.state.songListId"() {
+      this.init();
+    },
+    "$store.state.suser.collectionSonglist"() {
+      this.init();
+    }
+  },
+  computed: {},
+  beforeRouteLeave(to, from, next) {
+    console.log(to, from);
+    next();
   },
   methods: {
     init: function() {
-      this.list_id = this.$route.params.list_id;
-      this.$http
-        .get(
-          "http://39.108.229.8:3200/getSongListDetail?disstid=" + this.album_id
-        )
-        .then(response => {
-          console.log(response);
-          //   this.cdlist = response.data.response.cdlist[0];
-          //   this.isloading_Box = false;
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      this.list_id = this.$store.state.state.songListId;
+      let collectionSonglist = this.$store.state.suser.collectionSonglist;
+      
+      if (
+        collectionSonglist !== null &&
+        collectionSonglist !== undefined &&
+        collectionSonglist !== "" &&
+        collectionSonglist.length > 0
+      ) {
+        for (let i = 0; i < Object.keys(collectionSonglist).length; i++) {
+          console.log(i,this.$store.state.state.songListId , collectionSonglist[i].lId)
+          if (this.$store.state.state.songListId == collectionSonglist[i].lId) {
+            
+            this.listInfo = collectionSonglist[i];
+            return;
+          }
+        }
+        console.log("collectionSonglist中没找到", this.list_id);
+        this.$httpV
+          .get(
+            `http://localhost:9649/songList/getSongListInfo?lId= ${this.list_id}`
+          )
+          .then(response => {
+            console.log(response.data.data[0]);
+            this.$store.dispatch(
+              "changeCollectionSonglist",
+              response.data.data[0]
+            );
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        console.log("collectionSonglist为空", this.list_id);
+        this.$httpV
+          .get(
+            `http://localhost:9649/songList/getSongListInfo?lId= ${this.list_id}`
+          )
+          .then(response => {
+            console.log(response.data.data[0]);
+            this.$store.dispatch(
+              "changeCollectionSonglist",
+              response.data.data[0]
+            );
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
     }
   }
 };
@@ -237,7 +286,7 @@ export default {
 .s_btn_1 {
   margin-right: 8px;
 }
-.s_btn_1 .im{ 
+.s_btn_1 .im {
   position: relative;
   top: 2px;
 }
@@ -276,7 +325,7 @@ export default {
   padding: 10px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.116);
 }
-.song_index span{
+.song_index span {
   position: relative;
   top: 2px;
 }
@@ -286,13 +335,13 @@ export default {
 }
 .s_list_item span {
   font-size: 12px;
-  color: rgb(107, 107, 107)
+  color: rgb(107, 107, 107);
 }
 .s_list_item .song_name {
   width: 50%;
 }
-.s_td .song_name span{
-  color: black ;
+.s_td .song_name span {
+  color: black;
 }
 .s_list_item .song_singer,
 .s_list_item .song_album {

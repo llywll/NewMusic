@@ -3,9 +3,11 @@ const state = {
         count: 0,
         isThePlaybackPageAlreadyOpen: false,
         cycleState: "",
-        loginWindowIsShow: false
+        loginWindowIsShow: false,
+        songListId: ""
     },
     mutations: {
+        changeSongId: (state, lId = -1) => state.songListId = lId,
         chageRement: state => state.count += 1,
         closePlayPage: state => state.isThePlaybackPageAlreadyOpen = false,
         openPlayPage: state => state.isThePlaybackPageAlreadyOpen = true,

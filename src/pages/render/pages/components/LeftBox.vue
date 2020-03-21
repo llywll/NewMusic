@@ -43,7 +43,7 @@
       <ul class="s_menu" id="song_nav" v-show="suser.isLogin">
         <li
           class="s3_li"
-          v-for="(item,index) in collectionSonglist"
+          v-for="(item,index) in songlistre"
           :key="index"
           @click="intoSongListPage(item.lId)"
         >
@@ -115,7 +115,8 @@ export default {
       isOpenNewListPapel: false,
       isCreateInputFoucs: false,
       isLoading: false,
-      cre_text: ""
+      cre_text: "",
+      songlistre: {}
     };
   },
   watch: {
@@ -125,15 +126,11 @@ export default {
           .get("http://localhost:9649/songList/getSongList")
           .then(res => {
             console.log(res.data);
-            if (res.data.state == "success") {
-              this.$store.dispatch(
-                "changeCollectionSonglist",
-                res.data.data[0]
-              );
+            if (res.data.state == "success") {              
+              this.songlistre = res.data.data[0];
             }
           })
           .catch(err => console.log(err));
-      else this.$store.commit("setCollectionSonglist");
     }
   },
   computed: {
@@ -158,9 +155,6 @@ export default {
         ? "新音乐，聆听生活"
         : this.$store.state.playing.playing.lyric;
     },
-    collectionSonglist() {
-      return this.$store.state.suser.collectionSonglist;
-    },
     suser() {
       console.log(this.$store.state.suser.suser);
       return this.$store.state.suser.suser;
@@ -181,8 +175,8 @@ export default {
       }
     },
     intoSongListPage(akey) {
-      this.$router.push("/SonglistPage/" + akey)
-      console.log(akey);
+      this.$router.push("/SonglistPage/" + akey);
+      this.$store.commit("changeSongId", akey);
     },
     downplay: function() {
       this.$store.commit("closePlayPage");
@@ -216,10 +210,7 @@ export default {
               console.log(res.data.data[0]);
               this.isOpenNewListPapel = false;
               this.cre_text = "";
-              this.$store.dispatch(
-                "changeCollectionSonglist",
-                res.data.data[0]
-              );
+              this.songlistre = res.data.data[0];
             }
             this.isLoading = false;
           })

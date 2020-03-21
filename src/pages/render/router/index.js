@@ -10,6 +10,7 @@ import SearchResultsPage from '../pages/components/SearchResultsPage'
 
 import NotFoundComponent from '../pages/NotFoundComponent'
 
+import store from './../store/store'
 Vue.use(Router)
 
 const originalPush = Router.prototype.push
@@ -36,7 +37,7 @@ const router = new Router({
           isUseCache: false,
           keepAlive: true
         }
-      },{
+      }, {
         path: '/SonglistPage/:list_id',
         name: 'SonglistPage',
         component: songlistPage,
@@ -61,8 +62,16 @@ const router = new Router({
   ]
 })
 router.beforeEach((to, from, next) => {
-  console.log("路由检测to：",to)
-  console.log("路由检测from：",from)
+  console.log("路由检测to：", to)
+  if (to.name === "SonglistPage" &&
+    to.params.list_id !== null &&
+    to.params.list_id !== undefined &&
+    to.params.list_id !== "" &&
+    to.params.list_id !== from.params.list_id) {
+      console.log("???")
+    store.commit("changeSongId", to.params.list_id)
+  }
+  console.log("路由检测from：", from)
   next()
 })
 export default router
