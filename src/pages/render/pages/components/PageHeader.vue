@@ -402,7 +402,7 @@ export default {
 #page-header {
   height: 40px;
   width: calc(100% - 240px);
-  background: white;
+  /* background: white; */
   position: fixed;
   padding: 20px 0;
   right: 0;
