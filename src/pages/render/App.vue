@@ -25,7 +25,10 @@ export default {
                 name: "user"
               },
               (err, res) => {
-                if (!err) if (res) this.$store.dispatch("loginIn", res.user);
+                if (!err)
+                  if (res) {
+                    this.$store.dispatch("loginIn", res.user);
+                  }
               }
             );
           }

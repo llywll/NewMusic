@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="song_func_btns">
-          <button class="s_btn s_btn_1">
+          <button class="s_btn s_btn_1" v-show="Object.keys(listInfo.songs).length>0">
             <i class="im im-play"></i>
             <span>播放全部</span>
           </button>
@@ -36,7 +36,7 @@
             <i class="im im-menu-dot-v"></i>
           </button>
         </div>
-        <ul class="s_list_ul">
+        <ul class="s_list_ul" v-if="Object.keys(listInfo.songs).length>0">
           <li class="s_list_item s_th">
             <div class="song_index"></div>
             <div class="song_name">
@@ -67,6 +67,29 @@
             </div>
             <div class="song_time">
               <span>{{ item.sTime }}</span>
+            </div>
+          </li>
+        </ul>
+        <ul class="s_list_ul" v-else>
+          <li class="s_list_item s_th">
+            <div class="song_index"></div>
+            <div class="song_name">
+              <span>歌曲</span>
+            </div>
+            <div class="song_singer">
+              <span>艺人</span>
+            </div>
+            <div class="song_album">
+              <span>专辑</span>
+            </div>
+            <div class="song_time">
+              <span>时长</span>
+            </div>
+          </li>
+          <li class="s_list_item s_td null_td">
+            <img class="tip_ani" src="./../../assets/blank.gif" />
+            <div class="null_tip_box">
+              <span class="null_title">啊哦，空空如也！</span>
             </div>
           </li>
         </ul>
@@ -103,7 +126,7 @@ export default {
     init: function() {
       this.list_id = this.$store.state.state.songListId;
       let collectionSonglist = this.$store.state.suser.collectionSonglist;
-      
+
       if (
         collectionSonglist !== null &&
         collectionSonglist !== undefined &&
@@ -111,9 +134,12 @@ export default {
         collectionSonglist.length > 0
       ) {
         for (let i = 0; i < Object.keys(collectionSonglist).length; i++) {
-          console.log(i,this.$store.state.state.songListId , collectionSonglist[i].lId)
+          console.log(
+            i,
+            this.$store.state.state.songListId,
+            collectionSonglist[i].lId
+          );
           if (this.$store.state.state.songListId == collectionSonglist[i].lId) {
-            
             this.listInfo = collectionSonglist[i];
             return;
           }
@@ -188,13 +214,6 @@ export default {
   backdrop-filter: blur(20px);
   padding-top: 100px;
 }
-.list_info {
-  /* background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px); */
-  display: flex;
-  flex-direction: row;
-  padding-top: 100px;
-}
 .list_img_box {
   margin: 20px;
   width: 340px;
@@ -202,6 +221,7 @@ export default {
 .list_img {
   width: 340px;
   border-radius: 10px;
+  pointer-events: none;
   border: 1px solid rgba(0, 0, 0, 0.103);
   /* box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.212); */
 }
@@ -288,7 +308,6 @@ export default {
 }
 .s_btn_1 .im {
   position: relative;
-  top: 2px;
 }
 .s_btn_2 {
   padding: 18px;
@@ -320,10 +339,22 @@ export default {
   border-top: 1px solid rgba(0, 0, 0, 0.055);
   border-bottom: 1px solid rgba(0, 0, 0, 0.116);
   padding: 5px 0;
+  transition: all 0.2s linear;
 }
 .s_td {
   padding: 10px 0;
+  transition: background 0.1s linear;
+  padding-left: 10px;
+  padding-right: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.116);
+}
+
+.s_td:hover {
+  background: rgb(49, 112, 255);
+  border-radius: 5px;
+}
+.s_td:hover span{
+  color: white;
 }
 .song_index span {
   position: relative;
@@ -336,6 +367,7 @@ export default {
 .s_list_item span {
   font-size: 12px;
   color: rgb(107, 107, 107);
+  transition: all 0.1s linear;
 }
 .s_list_item .song_name {
   width: 50%;
@@ -343,8 +375,35 @@ export default {
 .s_td .song_name span {
   color: black;
 }
+.s_td:hover .song_name span{
+  color: white;
+}
 .s_list_item .song_singer,
 .s_list_item .song_album {
   width: 20%;
+}
+.null_td {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.null_td:hover{
+  background: unset;
+}
+.null_td:hover span{
+  color: unset;
+}
+.tip_ani {
+  margin-top: 150px;
+  width: 200px;
+  pointer-events: none;
+}
+.null_tip_box {
+  /* margin-top: 350px; */
+}
+.null_td span {
+  font-size: 14px;
 }
 </style>

@@ -31,6 +31,7 @@
             class="pwd_input"
             @focus="focusAct('pwd',true)"
             @blur="focusAct('pwd',false)"
+            @keyup.enter="enterLogin()"
             v-model="inPwd"
           />
         </div>
@@ -76,7 +77,7 @@ export default {
         if (res) {
           console.log("自主查询", res);
           this.isCheck = res.autoLogin;
-        }else{
+        } else {
           console.log("autologin为空", res);
           this.$ipc.send("autoLogin", false);
         }
@@ -111,6 +112,14 @@ export default {
       this.isCheck = !this.isCheck;
       console.log(this.isCheck);
       this.$ipc.send("autoLogin", this.isCheck);
+    },
+    enterLogin() {
+      if (this.isfocus) {
+        this.isfocus = !this.isfocus;
+        this.$refs.pwd_box.className = "t_box user_pwd_box";
+        this.$refs.pwd_box.blur()
+        this.login();
+      }
     },
     login() {
       if (this.inName.length == 0) {

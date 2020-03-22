@@ -355,12 +355,12 @@ export default {
     },
     refreshPage: function() {
       vbus.$emit("refresh");
-      this.$db.remove({}, { multi: true }, (err, ret) => {
-        if (!err) console.log(ret);
-      });
-      this.$db.find({}, (err, ret) => {
-        if (!err) console.log(ret);
-      });
+      // this.$db.remove({}, { multi: true }, (err, ret) => {
+      //   if (!err) console.log(ret);
+      // });
+      // this.$db.find({}, (err, ret) => {
+      //   if (!err) console.log(ret);
+      // });
     },
     showLogin: function(val) {
       this.$store.commit("changeLoginWindwState", val);
@@ -384,7 +384,7 @@ export default {
       })
         .then(res => {
           console.log(res);
-          this.$userDb.remove({}, { multi: true }, (err, res) => {
+          this.$userDb.remove({name :"user"}, { multi: true }, (err, res) => {
             if (!err) if (res > 0) this.$store.commit("destructionUser");
           });
           this.$userDb.find({}, (err, res) => {

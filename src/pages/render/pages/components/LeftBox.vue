@@ -34,7 +34,7 @@
           <i class="im im-download"></i>
           <span>下载歌曲</span>
         </li>
-        <li class="s2_li">
+        <li class="s2_li" @click="intoPlayHistory()">
           <i class="im im-history"></i>
           <span>播放历史</span>
         </li>
@@ -46,6 +46,7 @@
           v-for="(item,index) in songlistre"
           :key="index"
           @click="intoSongListPage(item.lId)"
+          @contextmenu="listRightMenu(item.lId,item.lListname)"
         >
           <i class="im_icon"></i>
           <span v-html="item.lListname"></span>
@@ -120,13 +121,13 @@ export default {
     };
   },
   watch: {
-    suser() {
+    "$store.state.suser.suser"() {
       if (this.$store.state.suser.suser.isLogin)
         this.$httpV
           .get("http://localhost:9649/songList/getSongList")
           .then(res => {
             console.log(res.data);
-            if (res.data.state == "success") {              
+            if (res.data.state == "success") {
               this.songlistre = res.data.data[0];
             }
           })
@@ -178,6 +179,9 @@ export default {
       this.$router.push("/SonglistPage/" + akey);
       this.$store.commit("changeSongId", akey);
     },
+    intoPlayHistory() {
+      this.$router.push("/playHistoryPage");
+    },
     downplay: function() {
       this.$store.commit("closePlayPage");
       if (!this.$store.state.state.isThePlaybackPageAlreadyOpen) {
@@ -218,6 +222,64 @@ export default {
             this.isLoading = false;
             console.log(err);
           });
+    },
+    listRightMenu: function(lId, lListName) {
+      console.log(lListName);
+      const menuTempList = [
+        {
+          label: "播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "重命名",
+          click: () => {
+            console.log(require("electron"));
+            // this.$ipc.send("getWindowId",{name:"win"})
+            this.$MainWinodw.send("textipc", "true");
+          }
+        },
+        {
+          label: "编辑歌单",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "删除此歌单",
+          click: () => {
+            console.log(lId, lListName);
+            this.$ipc.once("listQuestionResult", (e, val) => {
+              if (val)
+                this.$httpV
+                  .get(
+                    `http://localhost:9649/songList/delUserSongList?lId=${lId}`
+                  )
+                  .then(res => {
+                    console.log(res.data);
+                    if (res.data.state == "success") {
+                      this.songlistre = res.data.data[0];
+                    }
+                  })
+                  .catch(err => console.log(err));
+            });
+            this.$MainWinodw.send("ShowAlertBox", {
+              type: "warning",
+              text: `确认要删除歌单"${lListName}"吗？`,
+              caller: "listQuestionResult"
+            });
+          }
+        }
+      ];
+      const menu = this.$Menu.buildFromTemplate(menuTempList);
+      menu.popup(this.$remote.getCurrentWindow());
     },
     cancelEdit: function() {
       if (this.isOpenNewListPapel) {
@@ -307,11 +369,14 @@ export default {
   /***发现音乐列表 */
   display: flex;
   align-items: center;
-  margin: 10px 0;
+  padding: 6px 0;
   padding-left: 24px;
+  cursor: pointer;
   /* padding-left: 7px; */
 }
-
+.s2_li:hover {
+  background: rgba(255, 255, 255, 0.308);
+}
 .s2_li i {
   color: rgb(177, 177, 177);
   font-size: 12px;

@@ -89,6 +89,32 @@ export default {
   watch: {
     playing() {
       this.$refs.music_player.load();
+      this.$db.remove(
+        {
+          name: "playHistory",
+          songMid: this.$store.state.playing.playing.songMid
+        },
+        { multi: true },
+        (removeERR, removeRES) => {
+          if (!removeERR) {
+            console.log(removeRES);
+            let pl = this.$store.state.playing.playing;
+            this.$db.insert(
+              {
+                ...pl,
+                name: "playHistory",
+                time: Number(new Date())
+              },
+              (inserr, insres) => {
+                if (!inserr) console.log(insres);
+                this.$db.find({ name: "playHistory" }, (err, res) => {
+                  if (!err) console.log(res);
+                });
+              }
+            );
+          }
+        }
+      );
     },
     is_p() {
       if (this.is_p) {
@@ -210,7 +236,7 @@ export default {
       if (Object.keys(this.$store.state.playing.playing.lyric).length > 1) {
         if (
           this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
-            this.$refs.music_player.currentTime +0.5 &&
+            this.$refs.music_player.currentTime + 0.5 &&
           this.lyric_line_Act <
             Object.keys(this.$store.state.playing.playing.lyric).length
         ) {

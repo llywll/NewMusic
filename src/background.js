@@ -104,10 +104,15 @@ function createLoginWindw() {
   loginWindow.on('closed', () => { loginWindow = null })
 
 }
+
 ipc.on("showLoginWindow", (e, val) => {
   if (loginWindow)
     val ? loginWindow.show() : loginWindow.hide()
   else createLoginWindw()
+})
+ipc.on("getWindowId", (e, val) => {
+  if(val.name=="win")console.log(win.id)
+  // win.webContents.send("WindowIdRes",win.id)
 })
 
 

@@ -8,6 +8,8 @@ import songlistPage from '../pages/components/SongListPage'
 
 import SearchResultsPage from '../pages/components/SearchResultsPage'
 
+import playHistoryPage from './../pages/components/PlayHistoryPage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -53,6 +55,10 @@ const router = new Router({
         name: 'SearchResultsPage',
         component: SearchResultsPage,
         props: { default: true, sidebar: false }
+      }, {
+        path: '/playHistoryPage',
+        name: 'playHistoryPage',
+        component: playHistoryPage,
       },
       {
         path: '*', component: NotFoundComponent
@@ -68,7 +74,7 @@ router.beforeEach((to, from, next) => {
     to.params.list_id !== undefined &&
     to.params.list_id !== "" &&
     to.params.list_id !== from.params.list_id) {
-      console.log("???")
+    console.log("???")
     store.commit("changeSongId", to.params.list_id)
   }
   console.log("路由检测from：", from)
