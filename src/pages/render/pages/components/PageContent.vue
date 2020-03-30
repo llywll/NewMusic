@@ -145,7 +145,7 @@ export default {
 
         this.$data.v_hot.forEach((item, index) => {
           if (index < 12)
-            item.cover = "background-image: url('" + item.cover + "')";
+            item.cover = `background-image: url(${item.cover})`;
         });
         let tempList = response.data.response.new_song.data.songlist;
         for (

@@ -2,20 +2,20 @@
   <nav :class="sidebar_a" ref="siderbar_a">
     <div id="menu_backgroud">
       <span class="list_title s1_title">懂你</span>
-      <ul class="s_menu" id="top_nav">
-        <li class="s1_li li_activity" @click="topage('PageContent')">
+      <ul class="s_menu" id="top_nav" ref="top_nav">
+        <li :class="isActive==0?'s1_li li_activity':'s1_li'" @click="topage(0,'PageContent')">
           精选
           <span>为你准备</span>
         </li>
-        <li class="s1_li">
+        <li :class="isActive==1?'s1_li li_activity':'s1_li'" @click="topage(1,'TopLists')">
           排行
           <span>今日榜单</span>
         </li>
-        <li class="s1_li">
+        <li :class="isActive==2?'s1_li li_activity':'s1_li'">
           歌单
           <span>歌单广场</span>
         </li>
-        <li class="s1_li">
+        <li :class="isActive==3?'s1_li li_activity':'s1_li'" @click="topage(3,'RadioLists')">
           电台
           <span>在线FM</span>
         </li>
@@ -116,6 +116,7 @@ export default {
       isOpenNewListPapel: false,
       isCreateInputFoucs: false,
       isLoading: false,
+      isActive: 0,
       cre_text: "",
       songlistre: {}
     };
@@ -162,7 +163,8 @@ export default {
     }
   },
   methods: {
-    topage: function(page) {
+    topage: function(index, page) {
+      if (index >= 0 && index < 4) this.isActive = index;
       this.$router.push("/" + page);
     },
 

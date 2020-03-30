@@ -163,6 +163,8 @@ export default {
 <style scoped>
 .playHistoryPage {
   margin-top: 80px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .history_info_box {
   margin: 0 30px;
@@ -190,13 +192,13 @@ export default {
   background: rgb(49, 112, 255);
   color: white;
   border: 0;
-  padding: 8px 15px;
+  padding: 0px 15px;
   font-size: 12px;
   display: flex;
   align-items: center;
   border-radius: 25px;
   margin-right: 16px;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.212);
+  /* box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.212); */
 }
 .his_btn .im {
   font-size: 14px;
@@ -220,6 +222,7 @@ export default {
 
 .history_list_box {
   margin: 0 30px;
+  height: 71vh;
 }
 .history_list {
   padding: 0;
