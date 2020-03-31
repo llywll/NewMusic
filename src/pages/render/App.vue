@@ -149,6 +149,10 @@ body {
   height: 100vh;
   -webkit-user-select: none;
   background: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 #region {
   /*background-color: rgba(255, 192, 203, 0.575);*/
@@ -163,10 +167,11 @@ body {
 }
 #app {
   background-color: white;
-  height: 100%;
+  height: 98%;
+  width: 98%;
   /* overflow: hidden; */
   border-radius: 5px;
-   /* box-shadow:8px 8px 10px grey; */
+   box-shadow:0px 0px 10px 0 rgba(0, 0, 0, 0.24);
 }
 .bg_video {
   display: none;

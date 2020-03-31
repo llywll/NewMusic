@@ -4,6 +4,7 @@ import axios from 'axios'
 import Vaxios from './../../util/ajax'
 import router from './router'
 import store from './store/store.js'
+import fs from 'fs'
 import { dataDb, userDb } from './../../util/nedb.js'
 
 
@@ -19,6 +20,8 @@ Vue.config.productionTip = false
 
 Vue.$ipc = Vue.prototype.$ipc = ipcRenderer
 Vue.$remote = Vue.prototype.$remote = remote
+Vue.$home =Vue.prototype.$home = remote.app.getPath('home')
+Vue.$fs = Vue.prototype.$fs = fs
 Vue.$MainWinodw =Vue.prototype.$MainWinodw =remote.BrowserWindow.fromId(1).webContents
 Vue.$Menu = Vue.prototype.$Menu = Menu
 Vue.$MenuItem = Vue.prototype.$MenuItem = MenuItem

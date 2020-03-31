@@ -59,7 +59,8 @@ export default {
 .mod_top_item {
   position: relative;
   overflow: hidden;
-  margin: 10px;
+  margin-right: 28px;
+  margin-bottom: 28px;
   cursor: pointer;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.199);
 }

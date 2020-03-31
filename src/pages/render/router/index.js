@@ -19,6 +19,10 @@ import RadioLists from './../pages/components/RadioLists'
 
 import LocalFilePage from './../pages/components/LocalFilePage'
 
+import DownloadMusicPage from './../pages/components/DownloadMusicPage'
+
+import SongSquarePage from './../pages/components/SongSquarePage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -36,57 +40,67 @@ const router = new Router({
         path: '/',
         component: Main,
         children: [{
-                path: '/',
-                redirect: '/PageContent'
-            },
-            {
-                path: '/PageContent',
-                name: 'PageContent',
-                component: PageContent,
-                meta: {
-                    isUseCache: false,
-                    keepAlive: true
-                }
-            }, {
-                path: '/SonglistPage/:list_id',
-                name: 'SonglistPage',
-                component: songlistPage,
-                props: { default: true, sidebar: false }
-            },
-            {
-                path: '/AlbumPage/:album_id',
-                name: 'AlbumPage',
-                component: AlbumPage,
-                props: { default: true, sidebar: false }
-            }, {
-                path: '/searchResultsPage',
-                name: 'SearchResultsPage',
-                component: SearchResultsPage,
-                props: { default: true, sidebar: false }
-            }, {
-                path: '/playHistoryPage',
-                name: 'playHistoryPage',
-                component: playHistoryPage,
-            },
-            {
-                path: '/TopLists',
-                name: 'TopLists',
-                component: TopLists
-            },
-            {
-                path: '/RadioLists',
-                name: 'RadioLists',
-                component: RadioLists
-            },
-            {
-                path:'LocalFilePage',
-                name:'LocalFilePage',
-                component:LocalFilePage
-            },
-            {
-                path: '*',
-                component: NotFoundComponent
+            path: '/',
+            redirect: '/PageContent'
+        },
+        {
+            path: '/PageContent',
+            name: 'PageContent',
+            component: PageContent,
+            meta: {
+                isUseCache: false,
+                keepAlive: true
             }
+        }, {
+            path: '/SonglistPage/:list_id',
+            name: 'SonglistPage',
+            component: songlistPage,
+            props: { default: true, sidebar: false }
+        },
+        {
+            path: '/AlbumPage/:album_id',
+            name: 'AlbumPage',
+            component: AlbumPage,
+            props: { default: true, sidebar: false }
+        }, {
+            path: '/searchResultsPage',
+            name: 'SearchResultsPage',
+            component: SearchResultsPage,
+            props: { default: true, sidebar: false }
+        }, {
+            path: '/playHistoryPage',
+            name: 'playHistoryPage',
+            component: playHistoryPage,
+        },
+        {
+            path: '/TopLists',
+            name: 'TopLists',
+            component: TopLists
+        },
+        {
+            path: '/RadioLists',
+            name: 'RadioLists',
+            component: RadioLists
+        },
+        {
+            path: 'LocalFilePage',
+            name: 'LocalFilePage',
+            component: LocalFilePage
+        },
+        {
+            path: 'DownloadMusicPage',
+            name: 'DownloadMusicPage',
+            component: DownloadMusicPage
+        },
+        {
+            path: 'SongSquarePage',
+            name: 'SongSquarePage',
+            component: SongSquarePage
+        },
+        {
+            path: '*',
+            component: NotFoundComponent
+        }
         ]
     }]
 })

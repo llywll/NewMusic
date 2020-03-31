@@ -1,10 +1,16 @@
 <template>
   <nav :class="sidebar_a" ref="siderbar_a">
     <div id="menu_backgroud">
-      <div class="win_btns">        
-      <button class="win_btn cx"><i class="im im-x-mark-circle"></i></button>
-      <button class="win_btn win_min"><i class="im im-minus-circle"></i></button>
-      <button class="win_btn win_max"><i class="im im-plus-circle"></i></button>
+      <div class="win_btns">
+        <button class="win_btn cx">
+          <i class="im im-x-mark-circle"></i>
+        </button>
+        <button class="win_btn win_min">
+          <i class="im im-minus-circle"></i>
+        </button>
+        <button class="win_btn win_max">
+          <i class="im im-plus-circle"></i>
+        </button>
       </div>
       <span class="list_title s1_title">懂你</span>
       <ul class="s_menu" id="top_nav" ref="top_nav">
@@ -16,7 +22,7 @@
           排行
           <span>今日榜单</span>
         </li>
-        <li :class="isActive==2?'s1_li li_activity':'s1_li'" @click="topage(2,'LocalFilePage')">
+        <li :class="isActive==2?'s1_li li_activity':'s1_li'" @click="topage(2,'SongSquarePage')">
           歌单
           <span>歌单广场</span>
         </li>
@@ -31,15 +37,15 @@
           <i class="im im-heart"></i>
           <span>我喜欢</span>
         </li>
-        <li class="s2_li">
+        <li class="s2_li" @click="intoFuncPage('LocalFilePage')">
           <i class="im im-monitor-o"></i>
           <span>本地歌曲</span>
         </li>
-        <li class="s2_li">
+        <li class="s2_li"  @click="intoFuncPage('DownloadMusicPage')">
           <i class="im im-download"></i>
           <span>下载歌曲</span>
         </li>
-        <li class="s2_li" @click="intoPlayHistory()">
+        <li class="s2_li"  @click="intoFuncPage('playHistoryPage')">
           <i class="im im-history"></i>
           <span>播放历史</span>
         </li>
@@ -172,7 +178,6 @@ export default {
       if (index >= 0 && index < 4) this.isActive = index;
       this.$router.push("/" + page);
     },
-
     intoPlayPage: function() {
       this.$store.commit("chageRement");
       this.$store.commit("openPlayPage");
@@ -186,8 +191,8 @@ export default {
       this.$router.push("/SonglistPage/" + akey);
       this.$store.commit("changeSongId", akey);
     },
-    intoPlayHistory() {
-      this.$router.push("/playHistoryPage");
+    intoFuncPage(page) {
+      this.$router.push(`/${page}`);
     },
     downplay: function() {
       this.$store.commit("closePlayPage");
@@ -298,28 +303,27 @@ export default {
 };
 </script>
 <style scoped>
-.win_btns{
+.win_btns {
   margin: 5px;
-
 }
-.win_btn{
+.win_btn {
   cursor: pointer;
   border: 0;
   /* margin: 0 5px; */
   padding: 0;
   outline: none;
 }
-.win_btn .im{
+.win_btn .im {
   color: red;
   font-size: 12px;
   pointer-events: none;
   padding: 0 5px;
   /* mix-blend-mode: luminosity; */
 }
-.win_min .im{
+.win_min .im {
   color: rgb(255, 255, 27);
 }
-.win_max .im{
+.win_max .im {
   color: rgb(1, 151, 1);
 }
 .sidebar_a {
@@ -634,11 +638,12 @@ export default {
 }
 .play_page {
   position: fixed;
-  bottom: 0;
-  left: 0;
+  bottom: 1%;
+  left: 1%;
   height: 0%;
-  width: 100vw;
+  width: 98%;
   z-index: 2;
+  border-radius: 5px;
 }
 .mubu {
   height: 100%;
@@ -663,18 +668,18 @@ export default {
   align-items: center;
 }
 .start_play_page {
+  height: 98%;
+  bottom: 1%;
   animation: start_op 0.3s ease-in-out forwards;
 }
 @keyframes start_op {
   0% {
     opacity: 0;
     background: rgba(0, 0, 0, 0);
-    height: 100%;
   }
   100% {
     opacity: 1;
     background: rgba(0, 0, 0, 0.46);
-    height: 100%;
   }
 }
 .start_play_page .song_play_page {
@@ -690,12 +695,12 @@ export default {
 }
 @keyframes over_op {
   0% {
-    height: 100%;
+    height: 98%;
     background: rgba(0, 0, 0, 0.46);
   }
   99% {
     background: rgba(0, 0, 0, 0);
-    height: 100%;
+    height: 98%;
   }
   100% {
     height: 0;

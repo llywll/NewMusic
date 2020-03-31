@@ -1,65 +1,41 @@
 <template>
-  <div id="RadioLists">
-    <div class="radio_list_box">
+  <div class="SongSquare">
       <ul
-        class="radio_songList"
-        ref="radio_list"
+        class="square_songList"
+        ref="square_list"
         v-for="(r_list,r_index) in radioList"
         :key="r_index"
       >
-        <li class="redio_type_title_li">
+        <li class="square_type_title_li">
           <span>{{ r_list.name }}</span>
         </li>
-        <li class="radioList_item" v-for="(item,index) in r_list.radioList" :key="index">
+        <li class="squareList_item" v-for="(item,index) in r_list.radioList" :key="index">
           <div class="item_cover" :data-album-id="item.content_id" :style="item.radioImg">
             <i class="im im-play"></i>
           </div>
           <div class="item_cover_after" :style="item.radioImg"></div>
-          <div class="radio_info">
+          <div class="square_info">
             <span class="albums_title">{{item.radioName}}</span>
             <span class="albums_username">播放量：{{item.listenNum /10000 }} 万</span>
           </div>
         </li>
       </ul>
-    </div>
   </div>
 </template>
+
 <script>
 export default {
-  name: "RadioLists",
-  data() {
-    return {
-      radioList: []
-    };
-  },
-  mounted() {
-    this.$http
-      .get(`http://39.108.229.8:3200/getRadioLists`)
-      .then(res => {
-        this.radioList = res.data.response.data.data.groupList;
-        this.radioList.forEach((item, index) => {
-          item.radioList.forEach((r_item, r_index) => {
-              this.radioList[index].radioList[
-                r_index
-              ].radioImg = `background-image: url(${r_item.radioImg})`;
-          });
-        });
-        console.log(this.radioList);
-      })
-      .catch(err => console.log(err));
-  }
-};
+    name:"SongSquarePage"
+}
 </script>
+
 <style scoped>
-#RadioLists {
+#SongSquare {
   margin-top: 80px;
   overflow-y: auto;
   overflow-x: hidden;
 }
-.radio_list_box {
-  height: 71vh;
-}
-.radio_songList {
+.square_songList {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -70,12 +46,12 @@ export default {
   transition: all 0.5s ease-out;
   margin-left: 30px;
 }
-.redio_type_title_li {
+.square_type_title_li {
   width: 100%;
   margin-bottom: 20px;
   font-size: 24px;
 }
-.radioList_item {
+.squareList_item {
   margin-right: 28px;
   margin-bottom: 30px;
   position: relative;
@@ -119,7 +95,7 @@ export default {
   transform: scale(1.05);
 }
 
-.radio_info {
+.square_info {
   margin-top: 20px;
   display: flex;
   flex-direction: column;

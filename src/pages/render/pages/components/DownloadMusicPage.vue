@@ -1,28 +1,21 @@
 <template>
-  <div class="LocalFile">
-    <div class="local_title_box">
-      <span class="local_title">
-        本地歌曲
+  <div class="DownloadMusic">
+    <div class="down_title_box">
+      <span class="down_title">
+        下载歌曲
         <label>共{{ Object.keys(this.fileList).length }}首</label>
       </span>
-      <div class="select_local">
-        <button class="local_btn">更換目錄</button>
-        <div class="local_sel_popel">
-          <span>當前目錄：C:/User/jocode/Music</span>
-          <button>選擇目錄</button>
-        </div>
-      </div>
     </div>
-    <div class="file_music_list_box">
-      <ul class="file_music_list">
-        <li class="f_m_item f_m_th">
+    <div class="down_music_list_box">
+      <ul class="down_music_list">
+        <li class="d_m_item d_m_th">
           <div class="song_index"></div>
           <div class="song_name">
             <span>文件名</span>
           </div>
         </li>
         <li
-          class="f_m_item f_m_td"
+          class="d_m_item d_m_td"
           v-for="(item,index) in fileList"
           :key="index"
         >
@@ -39,18 +32,18 @@
 </template>
 <script>
 export default {
-  name: "LocalFilePage",
+  name: "DownloadMusicPage",
   data() {
     return {
       fileList: []
     };
   },
   mounted() {
-    this.$fs.readdir(`${this.$home}\\Music`, (err, res) => {
+    this.$fs.readdir(`${this.$home}\\Music\\NewMusic`, (err, res) => {
       if (!err) {
         let musicList = [];
         res.forEach(item => {
-          if (this.$fs.lstatSync(`${this.$home}\\Music\\${item}`).isFile()) {
+          if (this.$fs.lstatSync(`${this.$home}\\Music\\NewMusic\\${item}`).isFile()) {
             if (item.lastIndexOf(".mp3") >= 0) musicList.push(item);
           }
         });
@@ -62,20 +55,20 @@ export default {
 };
 </script>
 <style scoped>
-.LocalFile {
+.DownloadMusic {
   margin-top: 80px;
   padding: 0 30px;
 }
-.local_title {
+.down_title {
   font-size: 24px;
   font-weight: bold;
 }
-.local_title label {
+.down_title label {
   font-weight: unset;
   font-size: 12px;
   margin-left: 5px;
 }
-.local_title_box {
+.down_title_box {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -127,20 +120,20 @@ export default {
   outline: none;
 }
 
-.file_music_list_box{
+.down_music_list_box{
     margin-top: 30px;
 }
-.file_music_list{
+.down_music_list{
     list-style: none;
     display: flex;
     flex-direction: column;
     padding: 0;
 }
-.f_m_item{
+.d_m_item{
     display: flex;
     flex-direction: row;
 }
-.f_m_item span {
+.d_m_item span {
   transition: color 0.1s linear;
   font-size: 12px;
 }
@@ -148,25 +141,25 @@ export default {
   font-size: 12px;
   margin-top: 2px;
 }
-.f_m_item .song_index {
+.d_m_item .song_index {
   width: 20px;
 }
-.f_m_item .song_name {
+.d_m_item .song_name {
   width: 40%;
 }
-.f_m_th span {
+.d_m_th span {
   color: rgb(102, 102, 102);
 }
-.f_m_td {
+.d_m_td {
   padding: 8px;
   /* border-bottom: 1px solid rgba(0, 0, 0, 0.11); */
   transition: background 0.1s linear;
 }
-.f_m_td:hover {
+.d_m_td:hover {
   background: rgb(49, 112, 255);
   border-radius: 5px;
 }
-.f_m_td:hover span {
+.d_m_td:hover span {
   color: white;
 }
 </style>
