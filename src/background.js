@@ -29,7 +29,10 @@ function createWindow() {
     minWidth: 1200,
     minHeight: 800,
     zoomFactor: 1,
-    titleBarStyle: "customButtonsOnHover",
+    titleBarStyle: "customButtonsOnHover", 
+    thickFrame : false,
+    transparent: true,
+    frame: false,
     show: false,
     webPreferences: {
       // webSecurity:false,

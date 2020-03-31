@@ -17,6 +17,8 @@ import TopLists from './../pages/components/TopLists'
 
 import RadioLists from './../pages/components/RadioLists'
 
+import LocalFilePage from './../pages/components/LocalFilePage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -75,6 +77,11 @@ const router = new Router({
                 path: '/RadioLists',
                 name: 'RadioLists',
                 component: RadioLists
+            },
+            {
+                path:'LocalFilePage',
+                name:'LocalFilePage',
+                component:LocalFilePage
             },
             {
                 path: '*',

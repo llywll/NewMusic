@@ -360,6 +360,7 @@ export default {
   z-index: 14;
   transition: all 0.3s linear;
   background: white;
+  border-bottom-right-radius: 5px;
 }
 .songInfo {
   position: relative;

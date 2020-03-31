@@ -1,6 +1,11 @@
 <template>
   <nav :class="sidebar_a" ref="siderbar_a">
     <div id="menu_backgroud">
+      <div class="win_btns">        
+      <button class="win_btn cx"><i class="im im-x-mark-circle"></i></button>
+      <button class="win_btn win_min"><i class="im im-minus-circle"></i></button>
+      <button class="win_btn win_max"><i class="im im-plus-circle"></i></button>
+      </div>
       <span class="list_title s1_title">懂你</span>
       <ul class="s_menu" id="top_nav" ref="top_nav">
         <li :class="isActive==0?'s1_li li_activity':'s1_li'" @click="topage(0,'PageContent')">
@@ -11,7 +16,7 @@
           排行
           <span>今日榜单</span>
         </li>
-        <li :class="isActive==2?'s1_li li_activity':'s1_li'">
+        <li :class="isActive==2?'s1_li li_activity':'s1_li'" @click="topage(2,'LocalFilePage')">
           歌单
           <span>歌单广场</span>
         </li>
@@ -293,6 +298,30 @@ export default {
 };
 </script>
 <style scoped>
+.win_btns{
+  margin: 5px;
+
+}
+.win_btn{
+  cursor: pointer;
+  border: 0;
+  /* margin: 0 5px; */
+  padding: 0;
+  outline: none;
+}
+.win_btn .im{
+  color: red;
+  font-size: 12px;
+  pointer-events: none;
+  padding: 0 5px;
+  /* mix-blend-mode: luminosity; */
+}
+.win_min .im{
+  color: rgb(255, 255, 27);
+}
+.win_max .im{
+  color: rgb(1, 151, 1);
+}
 .sidebar_a {
   /*左边栏*/
   background-image: url(../../assets/IMG_0285.jpg);
@@ -300,6 +329,8 @@ export default {
   width: 240px;
   position: relative;
   overflow: hidden;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
   transition: overflow 0.1s 0.3s linear;
 }
 #menu_backgroud {
@@ -612,8 +643,10 @@ export default {
 .mubu {
   height: 100%;
   width: 100%;
+  border-radius: 5px;
 }
 .song_play_page {
+  border-radius: 5px;
   height: 0;
   border-radius: 8px;
   /* background: #ffffffe6; */

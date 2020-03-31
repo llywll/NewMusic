@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <div id="region"></div>
+    <div id="region">
+    </div>
     <router-view />
   </div>
 </template>
@@ -147,20 +148,25 @@ body {
   margin: 0;
   height: 100vh;
   -webkit-user-select: none;
+  background: rgba(0, 0, 0, 0);
 }
 #region {
   /*background-color: rgba(255, 192, 203, 0.575);*/
   position: absolute;
-  width: 100%;
-  height: 40px;
+  width: 94%;
+  right: 0;
+  height: 25px;
   -webkit-user-select: none;
   -webkit-app-region: drag;
-  z-index: 1000;
+  z-index: 30;
   pointer-events: none;
 }
 #app {
+  background-color: white;
   height: 100%;
-  overflow: hidden;
+  /* overflow: hidden; */
+  border-radius: 5px;
+   /* box-shadow:8px 8px 10px grey; */
 }
 .bg_video {
   display: none;
