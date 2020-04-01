@@ -144,8 +144,7 @@ export default {
         this.$data.v_hot = response.data.response.recomPlaylist.data.v_hot;
 
         this.$data.v_hot.forEach((item, index) => {
-          if (index < 12)
-            item.cover = `background-image: url(${item.cover})`;
+          if (index < 12) item.cover = `background-image: url(${item.cover})`;
         });
         let tempList = response.data.response.new_song.data.songlist;
         for (
@@ -169,40 +168,25 @@ export default {
         console.log(error);
       });
   },
-  computed: {
-    /*newSong_list() {
-      return this.newSong_list.map(key => ({
-
-      }));
-    }*/
-  },
   methods: {
     toUrl: function(albumId) {
       if (isNaN(albumId)) return "";
-      return (
-        "http://imgcache.qq.com/music/photo/album_300/" +
-        (albumId % 100) +
-        "/300_albumpic_" +
-        albumId +
-        "_0.jpg"
-      );
+      return `http://imgcache.qq.com/music/photo/album_300/${albumId %
+        100}/300_albumpic_${albumId}_0.jpg`;
     },
     toAlbumInfoPage: function(pef) {
       this.$router.push(
-        "/AlbumPage/" + pef.target.attributes["data-album-id"].value
+        `/AlbumPage/${pef.target.attributes["data-album-id"].value}`
       );
     },
     le_left: function() {
-      this.$refs.recomList.style =
-        "left:-" + this.$refs.recomList.children[0].offsetLeft + "px";
+      this.$refs.recomList.style = `left:-${this.$refs.recomList.children[0].offsetLeft}px`;
       this.$refs.tu_buts.children[0].children[0].style =
         "color: rgb(175, 175, 175);";
       this.$refs.tu_buts.children[1].children[0].style = "color: black";
     },
     ne_right: function() {
-      this.$refs.recomList.style =
-        "left:-" + this.$refs.recomList.children[6].offsetLeft + "px";
-
+      this.$refs.recomList.style = `left:- ${this.$refs.recomList.children[6].offsetLeft}px`;
       this.$refs.tu_buts.children[0].children[0].style = "color: black";
       this.$refs.tu_buts.children[1].children[0].style =
         "color: rgb(175, 175, 175);";

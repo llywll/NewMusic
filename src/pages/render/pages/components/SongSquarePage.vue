@@ -85,7 +85,12 @@
       </div>
     </div>
     <ul class="square_songList" ref="square_list">
-      <li class="squareList_item" v-for="(item,index) in songListres" :key="index">
+      <li
+        class="squareList_item"
+        v-for="(item,index) in songListres"
+        :key="index"
+        @click="toAlbumInfoPage(item.dissid)"
+      >
         <div class="item_cover" :data-diss-id="item.dissid" :style="item.imgurl">
           <i class="im im-play"></i>
         </div>
@@ -127,6 +132,9 @@ export default {
       this.showSelectText = categoryName;
       this.selectTypeId = categoryId;
       this.isOpenPapel = false;
+    },
+    toAlbumInfoPage: function(dissid) {
+      this.$router.push(`/AlbumPage/${dissid}`);
     }
   },
   watch: {
@@ -136,11 +144,13 @@ export default {
           .get(
             `http://39.108.229.8:3200/getSongLists?categoryId=${this.selectTypeId}`
           )
-          .then(res => {            
+          .then(res => {
             this.songListres = res.data.response.data.list;
             res.data.response.data.list.forEach((item, index) => {
-              this.songListres[index].imgurl = `background-image: url(${item.imgurl})`;
-          });
+              this.songListres[
+                index
+              ].imgurl = `background-image: url(${item.imgurl})`;
+            });
           })
           .catch(err => console.log(err));
       }

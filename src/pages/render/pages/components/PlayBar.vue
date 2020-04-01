@@ -451,23 +451,29 @@ export default {
   font-weight: bold;
 }
 .act {
-  position: relative;
-  top: -2px;
+  /* position: relative;
+  top: -2px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
-  padding: 20px;
+  padding: 10px;
   background-clip: border-box;
   background-color: rgb(49, 112, 255);
 }
 .act i {
-  position: absolute;
+  /* position: absolute;
   top: 35%;
-  left: 35%;
+  left: 35%; */
   z-index: 100;
   font-size: 16px;
+  font-weight: lighter;
+  position: relative;
+  left: 5%;
   color: white;
 }
 .act .im-pause {
-  left: 30%;
+  left: 2%;
 }
 /**** */
 #wrap {
