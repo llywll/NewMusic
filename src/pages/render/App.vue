@@ -171,6 +171,7 @@ body {
   width: 98%;
   /* overflow: hidden; */
   border-radius: 5px;
+  z-index: 12;
    box-shadow:0px 0px 10px 0 rgba(0, 0, 0, 0.24);
 }
 .bg_video {
