@@ -1,298 +1,375 @@
 <template>
-  <div class="albumPage">
-    <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
-      <loading></loading>
-    </div>
-    <div class="bg_text"  v-if="cdlist">
-      <span v-html="cdlist.dissname"></span>
-    </div>
-    <div class="album_info" v-if="cdlist">
-      <div class="album_name">
-        <span v-html="cdlist.dissname"></span>
+  <div class="AlbumPage">
+    <div class="album_head_box">
+      <div class="album_img_box" v-if="album_info">
+        <img class="album_img" :src="album_info.picUrl" />
+        <img class="def_img_bg" src="../../assets/album_cover.png" />
+        <div class="alubm_num">
+          <span>此专辑共有{{album_song_num}}首歌曲</span>
+        </div>
+        <div class="album_desc">
+          <span class="desc_title">简介</span>
+          <span class="desc_context">{{ album_info.desc}}</span>
+        </div>
       </div>
-      <div class="album_author"></div>
-      <div class="album_desc">
-        <p v-html="cdlist.desc"></p>
+      <div class="album_info_box" v-if="album_info">
+        <div class="album_title">
+          <span>{{album_info.name}}</span>
+        </div>
+        <div class="album_singer_name" v-for="(albumItem,index) in album_info.ar" :key="index">
+          <a @click="intoSingerPage(albumItem.mid)">
+            <i class="im im-user-settings"></i>
+            <span>{{ albumItem.name }}</span>
+          </a>
+          <span v-if="index==album_info.ar.length-1"></span>
+          <span v-else>/</span>
+        </div>
+        <div class="album_publishTime">
+          <span>发行时间：{{ album_info.publishTime}}</span>
+        </div>
+        <div class="album_company">
+          <span>唱片公司：{{ album_info.company}}</span>
+        </div>
+        <div class="album_func_btns">
+          <button class="func_btn play_all_song">
+            <i class="im im-play"></i>
+            <span>播放全部</span>
+          </button>
+          <button class="func_btn sc_all_song">
+            <i class="im im-heart"></i>
+            <span>收藏</span>
+          </button>
+          <button class="func_btn more_func">
+            <i class="im im-menu-dot-h"></i>
+            <span>更多</span>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="song_list_box" v-if="cdlist">
-      <ul class="song_list" ref="songList">
-        <li class="songlist_item_th">
+    <div class="album_song_list_box">
+      <ul class="s_list_ul" v-if="Object.keys(album_song_list).length>0">
+        <li class="s_list_item s_th">
           <div class="song_index"></div>
-          <div class="song_Name">
-            <span>歌名</span>
+          <div class="song_name">
+            <span>歌曲</span>
           </div>
-          <div class="song_songer">
-            <span>歌手</span>
-          </div>
-          <div class="song_album">
-            <span>专辑</span>
+          <div class="song_singer">
+            <span>艺人</span>
           </div>
           <div class="song_time">
             <span>时长</span>
           </div>
         </li>
-        <li class="songlist_item" v-for="(songlist,index) in cdlist.songlist" :key="index">
-          <div class="song_index">{{index + 1}}.</div>
-          <div class="song_Name" @click="playMusic($event)">
-            <a :data-song-id="songlist.mid">{{songlist.title}}</a>
+        <li class="s_list_item s_td" v-for="(item,index) in album_song_list" :key="index">
+          <div class="song_index">
+            <span>{{ index + 1 }}</span>
           </div>
-          <div class="song_songer">
-            <a>{{songlist.singer[0].title}}</a>
+          <div class="song_name">
+            <span>{{item.songInfo.title}}</span>
           </div>
-          <div class="song_album">
-            <a>{{songlist.title}}</a>
+          <div class="song_singer">
+            <div v-for="(al_singer,al_index) in item.songInfo.singer" :key="al_index">
+              <a @click="intoSingerPage(al_singer.mid)">{{ al_singer.title }}</a>
+              <span v-if="al_index== item.songInfo.singer.length-1"></span>
+              <span v-else>/</span>
+            </div>
           </div>
           <div class="song_time">
             <span
-              v-if="songlist.interval % 60 < 10"
-            >0{{parseInt(songlist.interval / 60)}}:0{{songlist.interval % 60}}</span>
-            <span v-else>0{{parseInt(songlist.interval / 60)}}:{{songlist.interval % 60}}</span>
+              v-if="item.songInfo.interval % 60 < 10"
+            >0{{parseInt(item.songInfo.interval / 60)}}:0{{item.songInfo.interval % 60}}</span>
+            <span v-else>0{{parseInt(item.songInfo.interval / 60)}}:{{item.songInfo.interval % 60}}</span>
+            
+          </div>
+        </li>
+      </ul>
+      <ul class="s_list_ul" v-else>
+        <li class="s_list_item s_th">
+          <div class="song_index"></div>
+          <div class="song_name">
+            <span>歌曲</span>
+          </div>
+          <div class="song_singer">
+            <span>艺人</span>
+          </div>
+          <div class="song_time">
+            <span>时长</span>
+          </div>
+        </li>
+        <li class="s_list_item s_td null_td">
+          <img class="tip_ani" src="./../../assets/blank.gif" />
+          <div class="null_tip_box">
+            <span class="null_title">啊哦，空空如也！</span>
           </div>
         </li>
       </ul>
     </div>
   </div>
 </template>
+
 <script>
-import loading from "./../loading";
 export default {
   name: "AlbumPage",
-  data: function() {
+  data() {
     return {
       album_id: "",
-      cdlist: [],
-      isloading_Box: true
+      album_info: {},
+      album_song_list: [],
+      album_song_num: -1
     };
   },
-  components: {
-    loading
-  },
-  created() {
-    // this.isloading_Box = true;
+  mounted() {
+    this.init();
   },
   watch: {
     $route() {
-      this.init();
+      console.log(this.$route);
+      if (this.$route.name == "AlbumPage") this.init();
     }
-  },
-  mounted: function() {
-    this.init();
   },
   methods: {
     init: function() {
-      this.$data.album_id = this.$route.params.album_id;
+      this.album_id = this.$route.params.album_id;
       this.$http
-        .get("http://39.108.229.8:3200/getSongListDetail?disstid=" + this.album_id)
-        .then(response => {
-          this.cdlist = response.data.response.cdlist[0];
-          this.isloading_Box = false;
+        .get(`http://39.108.229.8:3300/album?albummid=${this.album_id}&raw=1`)
+        .then(res => {
+          console.log(res);
+          this.album_info = res.data.data;
         })
-        .catch(error => {
-          console.log(error);
-        });
+        .catch(err => console.log(err));
+      this.$http
+        .get(
+          `http://39.108.229.8:3300/album/songs?albummid=${this.album_id}&raw=1`
+        )
+        .then(res => {
+          console.log(res);
+          this.album_song_num = res.data.albumSonglist.data.totalNum;
+          this.album_song_list = res.data.albumSonglist.data.songList;
+        })
+        .catch(err => console.log(err));
     },
-
-    playMusic: async function(el) {
-      let p_list = [];
-      let smid = el.target.attributes["data-song-id"].value;
-      let actIndex = -1;
-      for (let i = 0; i < this.cdlist.songlist.length; i++) {
-        if (this.cdlist.songlist[i].mid == smid) actIndex = i;
-        await p_list.push({
-          title: this.cdlist.songlist[i].title,
-          singer: this.cdlist.songlist[i].singer[0].title,
-          songMid: this.cdlist.songlist[i].mid,
-          interval: this.cdlist.songlist[i].interval,
-          albumMid: this.cdlist.songlist[i].album.id
-        });
-      }
-      this.$store.commit("replacePlayList", p_list);
-      let tempList = p_list[actIndex];
-      this.$store.dispatch("chageplayingStateAsync", {
-        tempList: tempList,
-        actIndex: actIndex
-      });
+    intoSingerPage(singer_id) {
+      this.$router.push(`/SingerInfoPage/${singer_id}`);
     }
-  },
-  beforeRouteLeave(to, from, next) {
-    if (to.name === "PageContent") {
-      to.meta.keepAlive = true;
-      this.isloading_Box = true;
-      this.cdlist = [];
-    }
-    next();
   }
 };
 </script>
-<style scoped>
-.albumPage {
-  width: 100%;
-  height: calc(100% - 160px);
-  position: relative;
-  top: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.bg_text {
-  position: absolute;
-  left: -10%;
-  z-index: -1;
-  top: 12%;
-  width: 1000%;
-}
-.bg_text span {
-  font-family: "宋体-简";
-  font-size: 172px;
-  font-weight: bold;
-  color: rgba(0, 0, 0, 0.01);
-}
-.loading_Box {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  background: white;
-  font-size: 72px;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-.overloading_Box {
-  animation: overloading_BoxAni 0.2s linear forwards;
-}
-@keyframes overloading_BoxAni {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-    display: none;
-    height: 0;
-  }
-}
-.album_info {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-.album_name span {
-  font-size: 40px;
-  font-weight: bold;
-  letter-spacing: 3px;
+<style scoped>
+.AlbumPage {
+  margin-top: 100px;
+  margin-left: 30px;
+  height: 76vh;
   position: relative;
+  overflow-y: auto;
 }
-.album_name {
-  position: relative;
-}
-.album_author {
+.album_head_box {
   display: flex;
-  align-items: center;
-  margin-top: 5px;
 }
-.album_author .im {
-  font-size: 14px;
-  margin: 0 5px;
+.album_img_box {
+  position: relative;
 }
-.album_author a {
-  color: #414141;
-  mix-blend-mode: exclusion;
-  cursor: pointer;
+.album_img {
+  height: 250px;
+  border: 1px solid rgba(0, 0, 0, 0.137);
+  /* border-radius: 5px; */
 }
-.album_desc {
-  width: 700px;
-  margin-top: 20px;
-  letter-spacing: 3px;
-  text-indent: 2em;
-  text-align: center;
-  line-height: 1.5em;
-}
-.album_page_backfround {
-  width: 100%;
-  height: 100%;
+.def_img_bg {
+  height: 250px;
+  position: absolute;
+  z-index: -1;
   left: 0;
   top: 0;
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  padding-top: 200px;
+  box-shadow: -20px 0 20px -10px rgba(0, 0, 0, 0.411);
 }
-.album_image {
-  width: 700px;
+.album_info_box {
+  margin-left: 50px;
+  height: 250px;
 }
-.song_list_box {
-  padding-top: 40px;
-  width: 700px;
-  height: 400px;
-}
-.song_list {
-  list-style: none;
-  padding-left: 20px;
-}
-.songlist_item,
-.songlist_item_th {
-  display: flex;
-  padding: 10px 0;
-  /* background: white; */
-  align-items: baseline;
-}
-.songlist_item {
-  transition: all 0.1s ease-in-out;
-  border-radius: 8px;
-  padding: 10px 10px;
-}
-.songlist_item_th .song_index {
-  margin-right: 36px;
-}
-.songlist_item_th span {
-  color: rgb(119, 119, 119);
+.alubm_num {
   font-size: 12px;
+  margin-top: 10px;
+  color: rgba(0, 0, 0, 0.685);
 }
-.songlist_item a {
+.album_title {
+  font-size: 26px;
+}
+.album_singer_name {
+  font-size: 12px;
+  margin: 10px 0;
+}
+.album_singer_name a {
   cursor: pointer;
-  color: rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  transition: all 0.2s linear;
+}
+.album_singer_name a:hover {
+  color: rgb(49, 115, 225);
+}
+.album_singer_name .im {
+  font-size: 12px;
+  margin: 0 5px;
+}
+.album_desc {
+  border-top: 1px solid rgba(0, 0, 0, 0.192);
+  margin-top: 15px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+.desc_title {
+  font-size: 22px;
+  margin: 10px 0;
+}
+.desc_context {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
   font-size: 14px;
-  transition: all 0.1s ease-in-out;
 }
-.song_index {
+.album_publishTime,
+.album_company {
+  font-size: 12px;
+  margin: 10px;
+  margin-left: 0;
+}
+.album_func_btns {
+  display: flex;
+  margin-top: 100px;
+}
+.func_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px;
+  width: 130px;
+  padding: 5px 0;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.418);
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+.func_btn .im {
+  font-size: 16px;
+  margin: 0 5px;
+  padding: 3px;
+  padding-left: 0;
+  position: relative;
+  top: 1px;
+}
+.func_btn span {
   font-size: 14px;
-  margin-right: 25px;
-  color: rgb(119, 119, 119);
-  transition: all 0.1s ease-in-out;
 }
-.song_time {
-  font-size: 14px;
-  color: rgb(119, 119, 119);
-  width: 40px;
-  text-align: center;
-  transition: all 0.1s ease-in-out;
+.play_all_song {
+  background: rgb(49, 115, 225);
+  border: 0;
 }
-.song_Name {
-  width: 200px;
-}
-.song_songer {
-  width: 200px;
-}
-.song_album {
-  width: 200px;
-}
-.songlist_item:hover {
-  background-color: rgb(49, 122, 255);
-}
-.songlist_item:hover a,
-.songlist_item:hover span,
-.songlist_item:hover .song_index {
+.play_all_song .im,
+.play_all_song span {
   color: white;
+}
+
+/*** */
+
+.album_song_list_box {
+  width: calc(100% - 250px);
+  position: absolute;
+  right: 0;
+  top: 249px;
+}
+.s_list_ul {
+  list-style: none;
+  margin-right: 50px;
+  padding-left: 20px;
+  height: 38vh;
+}
+.s_list_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.s_th {
+  border-top: 1px solid rgba(0, 0, 0, 0.055);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.116);
+  padding: 5px 0;
+  transition: all 0.2s linear;
+}
+.s_td {
+  padding: 10px 0;
+  transition: background 0.1s linear;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.116);
+}
+
+.s_td:hover {
+  background: rgb(49, 112, 255);
+  border-radius: 5px;
+}
+.s_td:hover span,
+.s_td:hover a {
+  color: white;
+}
+.song_index span {
+  position: relative;
+  top: 2px;
+}
+.s_list_item .song_index {
+  width: 10px;
+  font-size: 14px;
+}
+.s_list_item span {
+  font-size: 12px;
+  color: rgb(107, 107, 107);
+  transition: all 0.1s linear;
+}
+.s_list_item .song_name {
+  width: 50%;
+}
+.s_td .song_name span {
+  color: black;
+}
+.s_td:hover .song_name span {
+  color: white;
+}
+.s_list_item .song_singer,
+.s_list_item .song_album {
+  width: 20%;
+}
+.song_singer {
+  display: flex;
+}
+.song_singer a {
+  transition: all 0.1s linear;
+  color: black;
+  font-size: 12px;
+  cursor: pointer;
+}
+.null_td {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.null_td:hover {
+  background: unset;
+}
+.null_td:hover span {
+  color: unset;
+}
+.tip_ani {
+  margin-top: 150px;
+  width: 200px;
+  pointer-events: none;
+}
+.null_tip_box {
+  /* margin-top: 350px; */
+}
+.null_td span {
+  font-size: 14px;
 }
 </style>

@@ -134,7 +134,7 @@ export default {
       this.isOpenPapel = false;
     },
     toAlbumInfoPage: function(dissid) {
-      this.$router.push(`/AlbumPage/${dissid}`);
+      this.$router.push(`/SongSheetPage/${dissid}`);
     }
   },
   watch: {

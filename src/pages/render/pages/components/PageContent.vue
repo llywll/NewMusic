@@ -176,7 +176,7 @@ export default {
     },
     toAlbumInfoPage: function(pef) {
       this.$router.push(
-        `/AlbumPage/${pef.target.attributes["data-album-id"].value}`
+        `/SongSheetPage/${pef.target.attributes["data-album-id"].value}`
       );
     },
     le_left: function() {

@@ -1,9 +1,12 @@
 import Vue from 'vue'
+
 import Router from 'vue-router'
 
 import Main from '../pages/MainPage'
 
 import PageContent from '../pages/components/PageContent'
+
+import SongSheetPage from '../pages/components/SongSheetPage'
 
 import AlbumPage from '../pages/components/AlbumPage'
 
@@ -22,6 +25,8 @@ import LocalFilePage from './../pages/components/LocalFilePage'
 import DownloadMusicPage from './../pages/components/DownloadMusicPage'
 
 import SongSquarePage from './../pages/components/SongSquarePage'
+
+import SingerInfoPage from './../pages/components/SingerInfoPage'
 
 import NotFoundComponent from '../pages/NotFoundComponent'
 
@@ -55,6 +60,12 @@ const router = new Router({
             path: '/SonglistPage/:list_id',
             name: 'SonglistPage',
             component: songlistPage,
+            props: { default: true, sidebar: false }
+        },
+        {
+            path: '/SongSheetPage/:sheet_id',
+            name: 'SongSheetPage',
+            component: SongSheetPage,
             props: { default: true, sidebar: false }
         },
         {
@@ -96,6 +107,13 @@ const router = new Router({
             path: 'SongSquarePage',
             name: 'SongSquarePage',
             component: SongSquarePage
+        },
+        
+        {
+            path: 'SingerInfoPage/:singerId',
+            name: 'SingerInfoPage',
+            component: SingerInfoPage,
+            props: { default: true, sidebar: false }
         },
         {
             path: '*',

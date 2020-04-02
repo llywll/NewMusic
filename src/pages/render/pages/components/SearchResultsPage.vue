@@ -4,17 +4,29 @@
       <span class="info_title">{{stext.trim()}}</span>
     </div>
     <div class="resulet_type">
-      <span class="type_tab act_tab">单曲</span>
-      <span class="type_tab">艺人</span>
-      <span class="type_tab">专辑</span>
-      <span class="type_tab">MV</span>
+      <span
+        :class="isSearchType=='song'?'type_tab act_tab':'type_tab'"
+        @click="changeSreachType('song')"
+      >单曲</span>
+      <span
+        :class="isSearchType=='songSheet'?'type_tab act_tab':'type_tab'"
+        @click="changeSreachType('songSheet')"
+      >歌单</span>
+      <span
+        :class="isSearchType=='album'?'type_tab act_tab':'type_tab'"
+        @click="changeSreachType('album')"
+      >专辑</span>
+      <span
+        :class="isSearchType=='mv'?'type_tab act_tab':'type_tab'"
+        @click="changeSreachType('mv')"
+      >MV</span>
     </div>
-
+'
     <div class="resulet_list_box">
       <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
         <loading></loading>
       </div>
-      <ul class="resulet_list_ul" v-if="searchResults">
+      <ul class="resulet_list_ul song_list" v-if="searchSongResults && isSearchType=='song'">
         <li class="res_list_th">
           <div class="d_th song_name">
             <span>歌名</span>
@@ -29,22 +41,81 @@
             <span>时长</span>
           </div>
         </li>
-        <li class="res_list_item" v-for="(item,index) in searchResults" :key="index">
+        <li class="res_list_item" v-for="(item,index) in searchSongResults" :key="index">
           <div class="d_li song_name" :data-id="item.mid" @click="playOne(item.mid)">
             <span v-html="item.title_hilight"></span>
           </div>
+
           <div class="d_li song_singer">
-            <span v-html="item.singer[0].title_hilight"></span>
+            <div v-for="(s_singer,index) in item.singer" :key="index">
+              <a @click="intoSingerPage(s_singer.mid)">
+                <span>{{s_singer.title_hilight}}</span>
+              </a>
+              <label v-if="index!=item.singer.length - 1">/</label>
+            </div>
           </div>
           <div class="d_li song_album">
-            <span v-html="item.album.title_hilight"></span>
+            <span v-html="item.album.title_hilight" @click="intoAlbumPage(item.album.mid)"></span>
           </div>
           <div class="d_li song_time">
             <span>{{ item.interval }}</span>
           </div>
         </li>
       </ul>
-      <!-- <ul class="resulet_list_ul" v-else>
+      <ul class="resulet_list_ul album_list" v-if="searchAlbumResults && isSearchType=='album'">
+        <li class="res_list_th">
+          <div class="d_th song_album">
+            <span>专辑</span>
+          </div>
+          <div class="d_th song_singer">
+            <span>艺人</span>
+          </div>
+          <div class="d_th album_publishTime">
+            <span>发行时间</span>
+          </div>
+        </li>
+        <li class="res_list_item" v-for="(item,index) in searchAlbumResults" :key="index">
+          <div class="d_li song_album">
+            <span v-html="item.albumName_hilight" @click="intoAlbumPage(item.albumMID)"></span>
+          </div>
+          <div class="d_li song_singer">
+            <div v-for="(s_singer,index) in item.singer_list" :key="index">
+              <a @click="intoSingerPage(s_singer.mid)">
+                <span>{{s_singer.name_hilight}}</span>
+              </a>
+              <label v-if="index!=item.singer_list.length - 1">/</label>
+            </div>
+          </div>
+          <div class="d_li album_publishTime">
+            <span>{{ item.publicTime }}</span>
+          </div>
+        </li>
+      </ul>
+      <ul class="resulet_list_ul songSheet_list" v-if="searchSongSheetResults  && isSearchType=='songSheet'">
+        <li class="res_list_th">
+          <div class="d_th song_album">
+            <span>歌单</span>
+          </div>
+          <div class="d_th song_singer">
+            <span>创建者</span>
+          </div>
+          <div class="d_th album_publishTime">
+            <span>关注量</span>
+          </div>
+        </li>
+        <li class="res_list_item" v-for="(item,index) in searchSongSheetResults" :key="index">
+          <div class="d_li song_album">
+            <span v-html="item.introduction" @click="intoSongSheetPage(item.dissid)"></span>
+          </div>
+          <div class="d_li song_singer">
+                <span v-html="item.creator.name"></span>
+          </div>
+          <div class="d_li album_publishTime">
+            <span>{{ item.listennum /10000 }}万</span>
+          </div>
+        </li>
+      </ul>
+      <ul class="resulet_list_ul" v-if="searchMVResults && isSearchType=='mv'">
         <li class="res_list_th">
           <div class="d_th song_name">
             <span>歌名</span>
@@ -59,21 +130,27 @@
             <span>时长</span>
           </div>
         </li>
-        <li class="res_list_item" v-for="(item,index) in searchResults" :key="index">
-          <div class="d_li song_name" :data-id="item.mid">
+        <li class="res_list_item" v-for="(item,index) in searchMVResults" :key="index">
+          <div class="d_li song_name" :data-id="item.mid" @click="playOne(item.mid)">
             <span v-html="item.title_hilight"></span>
           </div>
+
           <div class="d_li song_singer">
-            <span v-html="item.singer[0].title_hilight"></span>
+            <div v-for="(s_singer,index) in item.singer" :key="index">
+              <a @click="intoSingerPage(s_singer.mid)">
+                <span>{{s_singer.title_hilight}}</span>
+              </a>
+              <label v-if="index!=item.singer.length - 1">/</label>
+            </div>
           </div>
           <div class="d_li song_album">
-            <span v-html="item.album.title_hilight"></span>
+            <span v-html="item.album.title_hilight" @click="intoAlbumPage(item.album.mid)"></span>
           </div>
           <div class="d_li song_time">
             <span>{{ item.interval }}</span>
           </div>
         </li>
-      </ul>-->
+      </ul>
     </div>
   </div>
 </template>
@@ -83,30 +160,63 @@ export default {
   name: "SearchResultsPage",
   data: function() {
     return {
-      searchResults: [],
+      searchSongResults: [],
+      searchAlbumResults: [],
+      searchSongSheetResults: [],
+      searchMVResults: [],
       isloading_Box: true,
       page: 1,
-      limit: 50
+      limit: 50,
+      isSearchType: "album"
     };
   },
   components: {
     loading
   },
   mounted() {
-    if (Object.keys(this.searchResults).length < 1) {
-      this.getResults(false, this.$store.state.search.searchKey);
+    if (Object.keys(this.searchSongResults).length < 1) {
+      this.getSongResults(false, this.$store.state.search.searchKey);
     }
   },
   watch: {
     stext() {
+      this.searchSongResults= [],
+      this.searchAlbumResults= [],
+      this.searchSongSheetResults= [],
       this.isloading_Box = true;
-      this.getResults(false, this.$store.state.search.searchKey);
+      switch (this.isSearchType) {
+        case "song":
+          this.getSongResults(false, this.$store.state.search.searchKey);
+          break;
+        case "album":
+          this.getAlbumResults(false, this.$store.state.search.searchKey);
+          break;
+        case "songSheet" :
+          this.getSongSheetResults(false, this.$store.state.search.searchKey);
+          break;
+      }
+    },
+    isSearchType(){
+       switch (this.isSearchType) {
+        case "song":
+          if(Object.keys(this.searchSongResults).length<1)
+          this.getSongResults(false, this.$store.state.search.searchKey);
+          break;
+        case "album":
+          if(Object.keys(this.searchAlbumResults).length<1)
+          this.getAlbumResults(false, this.$store.state.search.searchKey);
+          break;
+        case "songSheet" :
+          if(Object.keys(this.searchSongSheetResults).length<1)
+          this.getSongSheetResults(false, this.$store.state.search.searchKey);
+          break;
+      }
     },
     page() {
       if (this.$store.state.search.searchKey.length > 0) {
-        if (Object.keys(this.searchResults).length > 0) {
+        if (Object.keys(this.searchSongResults).length > 0) {
           if (this.page > 0)
-            this.getResults(false, this.$store.state.search.searchKey);
+            this.getSongResults(false, this.$store.state.search.searchKey);
         }
       }
     }
@@ -117,8 +227,8 @@ export default {
     }
   },
   methods: {
-    getResults: function(isloadingbox = false, stext) {
-      this.searchResults = [];
+    getSongResults: function(isloadingbox = false, stext) {
+      this.searchSongResults = [];
       this.$http
         .get(
           `http://39.108.229.8:3200/getSearchByKey?key= ${stext}&&page=${this.page}&&limit=${this.limit}`
@@ -155,12 +265,89 @@ export default {
               );
             }
           }
-          this.searchResults = temp;
+          this.searchSongResults = temp;
           this.isloading_Box = isloadingbox;
         })
         .catch(err => {
           console.log("axios:", err);
         });
+    },
+    getAlbumResults: function(isloadingbox = false, stext) {
+      this.searchAlbumResults = [];
+      this.$http
+        .get(
+          `http://39.108.229.8:3300/search?key=${stext}&pageNo=${this.page}&pageSize=${this.limit}&t=8&raw=1`
+        )
+        .then(res => {
+          console.log(res)
+          this.searchAlbumResults= res.data.data.album.list
+          // let temp = res.data.response.data.song.list;
+          for (let i = 0; i < Object.keys(this.searchAlbumResults).length; i++) {
+            if (this.searchAlbumResults[i].albumName_hilight) {
+              this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
+                /<\s?em/,
+                "<span class='emt'"
+              );
+              this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
+                /<\/\s?em/,
+                "</span"
+              );
+            }
+            if (this.searchAlbumResults[i].singer_list[0]) {
+              this.searchAlbumResults[i].singer_list[0].title_hilight = this.searchAlbumResults[
+                i
+              ].singer_list[0].title_hilight.replace(/<\s?em/, "<span class='emt'");
+              this.searchAlbumResults[i].singer_list[0].title_hiligh = this.searchAlbumResults[
+                i
+              ].singer_list[0].title_hilight.replace(/<\/\s?em/, "</span");
+            }
+          }
+          // this.searchSongResults = temp;
+          this.isloading_Box = isloadingbox;
+        })
+        .catch(err => {
+          console.log("axios:", err);
+        });
+    },
+    getSongSheetResults: function(isloadingbox = false, stext) {
+      this.searchSongSheetResults = [];
+      this.$http
+        .get(
+          `http://39.108.229.8:3300/search?key=${stext}&pageNo=${this.page}&pageSize=${this.limit}&t=2&raw=1`
+        )
+        .then(res => {
+          console.log(res)
+          this.searchSongSheetResults= res.data.data.list
+          // let temp = res.data.response.data.song.list;
+          // for (let i = 0; i < Object.keys(this.searchAlbumResults).length; i++) {
+          //   if (this.searchAlbumResults[i].albumName_hilight) {
+          //     this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
+          //       /<\s?em/,
+          //       "<span class='emt'"
+          //     );
+          //     this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
+          //       /<\/\s?em/,
+          //       "</span"
+          //     );
+          //   }
+          //   if (this.searchAlbumResults[i].singer_list[0]) {
+          //     this.searchAlbumResults[i].singer_list[0].title_hilight = this.searchAlbumResults[
+          //       i
+          //     ].singer_list[0].title_hilight.replace(/<\s?em/, "<span class='emt'");
+          //     this.searchAlbumResults[i].singer_list[0].title_hiligh = this.searchAlbumResults[
+          //       i
+          //     ].singer_list[0].title_hilight.replace(/<\/\s?em/, "</span");
+          //   }
+          // }
+          // this.searchSongResults = temp;
+          this.isloading_Box = isloadingbox;
+        })
+        .catch(err => {
+          console.log("axios:", err);
+        });
+    },
+    changeSreachType(type) {
+      this.isSearchType = type;
     },
     playOne(mid) {
       this.$http
@@ -184,11 +371,18 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    intoSingerPage(mid) {
+      this.$router.push(`/SingerInfoPage/${mid}`);
+    },
+    intoAlbumPage(mid) {
+      this.$router.push(`/AlbumPage/${mid}`);
     }
   },
   activated() {
-    if (Object.keys(this.searchResults).length < 1) {
-      this.getResults(false, this.$store.state.search.searchKey);
+    if (Object.keys(this.searchSongResults).length < 1) {
+      this.isSearchType = "song";
+      this.getSongResults(false, this.$store.state.search.searchKey);
     }
   }
 };
@@ -271,6 +465,22 @@ export default {
 .song_singer,
 .song_album {
   width: 20%;
+  cursor: pointer;
+}
+
+.album_list .song_album,.album_list .song_singer,
+.songSheet_list .song_album,.songSheet_list .song_singer{
+  width: 40%;
+}
+.song_singer {
+  display: flex;
+  cursor: pointer;
+  flex-direction: row;
+}
+.song_singer div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .song_time {
   width: 50px;
@@ -297,10 +507,14 @@ export default {
   word-break: break-all;
   display: block;
 }
-.res_list_item:hover .d_li span {
+.res_list_item:hover .d_li span,
+.res_list_item:hover label {
   color: white;
 }
 
+.album_list .album_publishTime{
+  width: 150px;
+}
 span >>> .emt {
   color: rgb(49, 122, 255);
 }
