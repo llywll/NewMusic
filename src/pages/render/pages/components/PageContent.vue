@@ -134,6 +134,34 @@
         </div>
       </div>
     </div>
+    <div class="singer_mod_box">
+      <div class="singer_info_mod_box">
+        <div class="recom_info_box">
+          <span class="recom_title_sub">有些歌手在偷偷喵你哟</span>
+          <span class="recom_title">歌手推荐~</span>
+        </div>
+        <div class="more_singer" @click="intoCategorySingerPage()">
+          <span>全部</span>
+          <i class="im im-angle-right"></i>
+        </div>
+      </div>
+      <div class="singer_mod_list_box">
+        <ul class="singer_mod_list">
+          <li
+            class="similar_item"
+            v-for="(singer_item,singer_index) in singer_list"
+            :key="singer_index"
+          >
+            <div class="item_cover" @click="intoSingerPage(singer_item.singer_mid)">
+              <img class="similar_pic" :src="singer_item.singer_pic" />
+            </div>
+            <div class="similar_info">
+              <span class="similar_title">{{ singer_item.singer_name }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -143,7 +171,8 @@ export default {
     return {
       v_hot: [],
       newSong_list: [],
-      mv_list: []
+      mv_list: [],
+      singer_list: []
     };
   },
   mounted: function() {
@@ -176,6 +205,9 @@ export default {
       .catch(error => {
         console.log(error);
       });
+    this.$http.get(`http://39.108.229.8:3300/singer/list?raw=1`).then(res => {
+      this.singer_list = res.data.singerList.data.singerlist.slice(0, 10);
+    });
   },
   methods: {
     toUrl: function(albumId) {
@@ -205,6 +237,9 @@ export default {
       this.$refs.tu_buts.children[0].children[0].style = "color: black";
       this.$refs.tu_buts.children[1].children[0].style =
         "color: rgb(175, 175, 175);";
+    },
+    intoCategorySingerPage(){
+      this.$router.push('/CategorySingerPage')
     }
   }
 };
@@ -219,7 +254,8 @@ export default {
   overflow-x: hidden;
 }
 
-.recom_list_box {
+.recom_list_box,
+.singer_mod_box {
   margin: 20px 35px 5px 35px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgb(233, 233, 233);
@@ -533,5 +569,126 @@ export default {
 .mv_song_name span:last-child {
   color: rgba(255, 255, 255, 0.603);
   font-size: 12px;
+}
+.singer_mod_list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  list-style: none;
+  padding-left: 0;
+  position: relative;
+  left: 0;
+  transition: all 0.5s ease-out;
+  margin-top: 30px;
+  /* margin-left: 30px; */
+}
+.singer_info_mod_box{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.more_singer{
+  display: flex;
+  align-items: center;
+}
+.more_singer span{
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  transition: all .2s linear;
+}
+.more_singer .im{
+  font-size: 12px;
+  margin-left: 3px;  transition: all .2s linear;
+
+  
+}
+.more_singer:hover span,.more_singer:hover .im{
+  color: rgb(49, 122, 255);
+}
+.similar_title_li {
+  width: 100%;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+.similar_item {
+  /* background: rgb(241, 241, 241); */
+  margin-right: 8px;
+  padding: 20px 5px 15px 5px;
+  position: relative;
+}
+.item_cover {
+  background-size: cover;
+  width: 130px;
+  height: 130px;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+  margin: 0 auto;
+  transition: all 0.2s linear;
+}
+.similar_info {
+  width: 150px;
+  display: flex;
+  height: 50px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.similar_pic {
+  width: 130px;
+  border-radius: 50%;
+}
+.item_cover_after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  content: "";
+  top: 15%;
+  left: 5%;
+  background-size: cover;
+  width: 130px;
+  height: 130px;
+  transform: scale(1.25);
+  filter: blur(15px) brightness(100%) opacity(0.4);
+  z-index: -1;
+}
+
+.item_cover .im {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.item_cover:hover {
+  transform: scale(1.05);
+}
+
+.album_info {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  padding-left: 5px;
+  /* justify-content: space-between; */
+  height: 50px;
+}
+
+.similar_title {
+  font-weight: bold;
+  font-size: 12px;
+  width: 130px;
+  color: rgb(43, 43, 43);
+}
+.similar_info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.similar_title {
+  text-align: center;
+  font-size: 14px;
 }
 </style>

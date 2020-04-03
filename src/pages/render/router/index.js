@@ -30,6 +30,8 @@ import SingerInfoPage from './../pages/components/SingerInfoPage'
 
 import TopListInfoPage from './../pages/components/TopListInfoPage'
 
+import CategorySingerPage from './../pages/components/CategorySingerPage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -115,6 +117,12 @@ const router = new Router({
             path: 'SongSquarePage',
             name: 'SongSquarePage',
             component: SongSquarePage
+        },
+        
+        {
+            path: 'CategorySingerPage',
+            name: 'CategorySingerPage',
+            component: CategorySingerPage
         },
         
         {

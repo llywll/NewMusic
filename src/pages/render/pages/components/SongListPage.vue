@@ -219,7 +219,7 @@ export default {
   width: 340px;
 }
 .list_img {
-  width: 340px;
+  width: 240px;
   border-radius: 10px;
   pointer-events: none;
   border: 1px solid rgba(0, 0, 0, 0.103);
