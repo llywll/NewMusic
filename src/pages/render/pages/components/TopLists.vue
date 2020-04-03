@@ -5,7 +5,7 @@
     </div>
     <div class="topList_box">
       <div class="mod_top_item" v-for="(item,index) in topLists" :key="index">
-        <div class="bg_cover">
+        <div class="bg_cover" @click="intoTopListInfoPage(item.id)">
           <img class="bg_cover_img" :src="item.picUrl" />
         </div>
       </div>
@@ -29,8 +29,8 @@ export default {
       .catch(err => console.log(err));
   },
   methods:{
-      intoTopInfoPage(){
-
+      intoTopListInfoPage(list_id){
+        this.$router.push(`/TopListInfoPage/${list_id}`);
       }
   }
 };

@@ -20,8 +20,7 @@
         :class="isSearchType=='mv'?'type_tab act_tab':'type_tab'"
         @click="changeSreachType('mv')"
       >MV</span>
-    </div>
-'
+    </div>'
     <div class="resulet_list_box">
       <div class="loading_Box" ref="loading_Box" v-show="isloading_Box">
         <loading></loading>
@@ -81,7 +80,7 @@
           <div class="d_li song_singer">
             <div v-for="(s_singer,index) in item.singer_list" :key="index">
               <a @click="intoSingerPage(s_singer.mid)">
-                <span>{{s_singer.name_hilight}}</span>
+                <span v-html="s_singer.name_hilight"></span>
               </a>
               <label v-if="index!=item.singer_list.length - 1">/</label>
             </div>
@@ -91,7 +90,10 @@
           </div>
         </li>
       </ul>
-      <ul class="resulet_list_ul songSheet_list" v-if="searchSongSheetResults  && isSearchType=='songSheet'">
+      <ul
+        class="resulet_list_ul songSheet_list"
+        v-if="searchSongSheetResults  && isSearchType=='songSheet'"
+      >
         <li class="res_list_th">
           <div class="d_th song_album">
             <span>歌单</span>
@@ -105,10 +107,10 @@
         </li>
         <li class="res_list_item" v-for="(item,index) in searchSongSheetResults" :key="index">
           <div class="d_li song_album">
-            <span v-html="item.introduction" @click="intoSongSheetPage(item.dissid)"></span>
+            <span v-html="item.dissname" @click="intoSongSheetPage(item.dissid)"></span>
           </div>
           <div class="d_li song_singer">
-                <span v-html="item.creator.name"></span>
+            <span v-html="item.creator.name"></span>
           </div>
           <div class="d_li album_publishTime">
             <span>{{ item.listennum /10000 }}万</span>
@@ -180,10 +182,10 @@ export default {
   },
   watch: {
     stext() {
-      this.searchSongResults= [],
-      this.searchAlbumResults= [],
-      this.searchSongSheetResults= [],
-      this.isloading_Box = true;
+      (this.searchSongResults = []),
+        (this.searchAlbumResults = []),
+        (this.searchSongSheetResults = []),
+        (this.isloading_Box = true);
       switch (this.isSearchType) {
         case "song":
           this.getSongResults(false, this.$store.state.search.searchKey);
@@ -191,24 +193,24 @@ export default {
         case "album":
           this.getAlbumResults(false, this.$store.state.search.searchKey);
           break;
-        case "songSheet" :
+        case "songSheet":
           this.getSongSheetResults(false, this.$store.state.search.searchKey);
           break;
       }
     },
-    isSearchType(){
-       switch (this.isSearchType) {
+    isSearchType() {
+      switch (this.isSearchType) {
         case "song":
-          if(Object.keys(this.searchSongResults).length<1)
-          this.getSongResults(false, this.$store.state.search.searchKey);
+          if (Object.keys(this.searchSongResults).length < 1)
+            this.getSongResults(false, this.$store.state.search.searchKey);
           break;
         case "album":
-          if(Object.keys(this.searchAlbumResults).length<1)
-          this.getAlbumResults(false, this.$store.state.search.searchKey);
+          if (Object.keys(this.searchAlbumResults).length < 1)
+            this.getAlbumResults(false, this.$store.state.search.searchKey);
           break;
-        case "songSheet" :
-          if(Object.keys(this.searchSongSheetResults).length<1)
-          this.getSongSheetResults(false, this.$store.state.search.searchKey);
+        case "songSheet":
+          if (Object.keys(this.searchSongSheetResults).length < 1)
+            this.getSongSheetResults(false, this.$store.state.search.searchKey);
           break;
       }
     },
@@ -279,25 +281,38 @@ export default {
           `http://39.108.229.8:3300/search?key=${stext}&pageNo=${this.page}&pageSize=${this.limit}&t=8&raw=1`
         )
         .then(res => {
-          console.log(res)
-          this.searchAlbumResults= res.data.data.album.list
+          console.log(res);
+          this.searchAlbumResults = res.data.data.album.list;
           // let temp = res.data.response.data.song.list;
-          for (let i = 0; i < Object.keys(this.searchAlbumResults).length; i++) {
+          for (
+            let i = 0;
+            i < Object.keys(this.searchAlbumResults).length;
+            i++
+          ) {
             if (this.searchAlbumResults[i].albumName_hilight) {
-              this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
+              this.searchAlbumResults[
+                i
+              ].albumName_hilight = this.searchAlbumResults[
+                i
+              ].albumName_hilight.replace(/<\s?em/, "<span class='emt'");
+              this.searchAlbumResults[
+                i
+              ].albumName_hilight = this.searchAlbumResults[
+                i
+              ].albumName_hilight.replace(/<\/\s?em/, "</span");
+            }
+            if (this.searchAlbumResults[i].singer_list[0]) {
+              this.searchAlbumResults[
+                i
+              ].singer_list[0].title_hilight = this.searchAlbumResults[
+                i
+              ].singer_list[0].title_hilight.replace(
                 /<\s?em/,
                 "<span class='emt'"
               );
-              this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
-                /<\/\s?em/,
-                "</span"
-              );
-            }
-            if (this.searchAlbumResults[i].singer_list[0]) {
-              this.searchAlbumResults[i].singer_list[0].title_hilight = this.searchAlbumResults[
+              this.searchAlbumResults[
                 i
-              ].singer_list[0].title_hilight.replace(/<\s?em/, "<span class='emt'");
-              this.searchAlbumResults[i].singer_list[0].title_hiligh = this.searchAlbumResults[
+              ].singer_list[0].title_hiligh = this.searchAlbumResults[
                 i
               ].singer_list[0].title_hilight.replace(/<\/\s?em/, "</span");
             }
@@ -316,29 +331,8 @@ export default {
           `http://39.108.229.8:3300/search?key=${stext}&pageNo=${this.page}&pageSize=${this.limit}&t=2&raw=1`
         )
         .then(res => {
-          console.log(res)
-          this.searchSongSheetResults= res.data.data.list
-          // let temp = res.data.response.data.song.list;
-          // for (let i = 0; i < Object.keys(this.searchAlbumResults).length; i++) {
-          //   if (this.searchAlbumResults[i].albumName_hilight) {
-          //     this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
-          //       /<\s?em/,
-          //       "<span class='emt'"
-          //     );
-          //     this.searchAlbumResults[i].albumName_hilight = this.searchAlbumResults[i].albumName_hilight.replace(
-          //       /<\/\s?em/,
-          //       "</span"
-          //     );
-          //   }
-          //   if (this.searchAlbumResults[i].singer_list[0]) {
-          //     this.searchAlbumResults[i].singer_list[0].title_hilight = this.searchAlbumResults[
-          //       i
-          //     ].singer_list[0].title_hilight.replace(/<\s?em/, "<span class='emt'");
-          //     this.searchAlbumResults[i].singer_list[0].title_hiligh = this.searchAlbumResults[
-          //       i
-          //     ].singer_list[0].title_hilight.replace(/<\/\s?em/, "</span");
-          //   }
-          // }
+          console.log(res);
+          this.searchSongSheetResults = res.data.data.list;
           // this.searchSongResults = temp;
           this.isloading_Box = isloadingbox;
         })
@@ -362,6 +356,11 @@ export default {
             interval: tempItem.interval,
             albumMid: tempItem.album.id
           };
+
+          this.$store.commit("changeIsRadioState", {
+            radioId: -1,
+            isplay: false
+          });
           this.$store.commit("addToListHead", p_list);
           this.$store.dispatch("chageplayingStateAsync", {
             tempList: p_list,
@@ -377,6 +376,9 @@ export default {
     },
     intoAlbumPage(mid) {
       this.$router.push(`/AlbumPage/${mid}`);
+    },
+    intoSongSheetPage(dissid) {
+      this.$router.push(`/SongSheetPage/${dissid}`);
     }
   },
   activated() {
@@ -468,8 +470,10 @@ export default {
   cursor: pointer;
 }
 
-.album_list .song_album,.album_list .song_singer,
-.songSheet_list .song_album,.songSheet_list .song_singer{
+.album_list .song_album,
+.album_list .song_singer,
+.songSheet_list .song_album,
+.songSheet_list .song_singer {
   width: 40%;
 }
 .song_singer {
@@ -512,7 +516,7 @@ export default {
   color: white;
 }
 
-.album_list .album_publishTime{
+.album_list .album_publishTime {
   width: 150px;
 }
 span >>> .emt {

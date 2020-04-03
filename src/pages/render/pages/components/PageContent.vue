@@ -22,7 +22,7 @@
             class="recomList_item"
             v-for="(item,index) in v_hot.slice(0, 10)"
             :key="index"
-            @click="toAlbumInfoPage($event)"
+            @click="intoSongSheetPage($event)"
           >
             <div class="item_cover" :data-album-id="item.content_id" :style="item.cover">
               <i class="im im-play"></i>
@@ -72,10 +72,19 @@
                 <a>{{song.title}}</a>
               </div>
               <div class="newSong_songer">
-                <a>{{song.singer[0].title}}</a>
+                <div
+                  v-for="(songItem,songIndex) in song.singer"
+                  :key="songIndex"
+                  v-show="songIndex<2"
+                >
+                  <a @click="intoSingerPage(songItem.mid)">
+                    <span>{{songItem.title}}</span>
+                  </a>
+                  <span v-if="songIndex!=song.singer.length-1 && songIndex<1">/</span>
+                </div>
               </div>
               <div class="newSong_album">
-                <a>{{song.album.title}}</a>
+                <a @click="intoAlbumInfoPage(song.album.mid)">{{song.album.title}}</a>
               </div>
               <div
                 class="newSong_time"
@@ -174,10 +183,16 @@ export default {
       return `http://imgcache.qq.com/music/photo/album_300/${albumId %
         100}/300_albumpic_${albumId}_0.jpg`;
     },
-    toAlbumInfoPage: function(pef) {
+    intoSongSheetPage: function(pef) {
       this.$router.push(
         `/SongSheetPage/${pef.target.attributes["data-album-id"].value}`
       );
+    },
+    intoSingerPage: function(mid) {
+      this.$router.push(`/SingerInfoPage/${mid}`);
+    },
+    intoAlbumInfoPage: function(mid) {
+      this.$router.push(`/AlbumPage/${mid}`);
     },
     le_left: function() {
       this.$refs.recomList.style = `left:-${this.$refs.recomList.children[0].offsetLeft}px`;
@@ -444,6 +459,8 @@ export default {
 }
 .newSong_songer {
   width: 130px;
+  display: flex;
+  overflow: hidden;
 }
 .newSong_album {
   width: 130px;

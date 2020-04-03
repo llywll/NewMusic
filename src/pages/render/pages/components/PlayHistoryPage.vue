@@ -48,7 +48,7 @@
             <span>{{ item.singer }}</span>
           </div>
           <div class="song_album">
-            <span>{{ item.album }}</span>
+            <span @click="intoAlbumInfoPage(item.albumMid)">{{ item.album }}</span>
           </div>
           <div class="song_time">
             <span>{{ item.interval }}</span>

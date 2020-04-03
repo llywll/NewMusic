@@ -173,6 +173,13 @@ export default {
       return this.$store.state.suser.suser;
     }
   },
+  mounted(){
+     this.$ipc.on("upPlayPapel", (e, val) => {
+       if(!e)console.log(e)
+       if(!val)console.log(val)
+       this.intoPlayPage()
+     })
+  },
   methods: {
     topage: function(index, page) {
       if (index >= 0 && index < 4) this.isActive = index;

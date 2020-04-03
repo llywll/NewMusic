@@ -31,7 +31,10 @@
           <span>唱片公司：{{ album_info.company}}</span>
         </div>
         <div class="album_func_btns">
-          <button class="func_btn play_all_song">
+          <button
+            class="func_btn play_all_song"
+            @click="playMusic(album_song_list[0].songInfo.mid)"
+          >
             <i class="im im-play"></i>
             <span>播放全部</span>
           </button>
@@ -60,12 +63,17 @@
             <span>时长</span>
           </div>
         </li>
-        <li class="s_list_item s_td" v-for="(item,index) in album_song_list" :key="index">
+        <li
+          class="s_list_item s_td"
+          v-for="(item,index) in album_song_list"
+          :key="index"
+          :class="getPlaying.songMid == item.songInfo.mid?'s_list_item s_td isplay':'s_list_item s_td'"
+        >
           <div class="song_index">
             <span>{{ index + 1 }}</span>
           </div>
           <div class="song_name">
-            <span>{{item.songInfo.title}}</span>
+            <span @click="playMusic(item.songInfo.mid)">{{item.songInfo.title}}</span>
           </div>
           <div class="song_singer">
             <div v-for="(al_singer,al_index) in item.songInfo.singer" :key="al_index">
@@ -79,7 +87,6 @@
               v-if="item.songInfo.interval % 60 < 10"
             >0{{parseInt(item.songInfo.interval / 60)}}:0{{item.songInfo.interval % 60}}</span>
             <span v-else>0{{parseInt(item.songInfo.interval / 60)}}:{{item.songInfo.interval % 60}}</span>
-            
           </div>
         </li>
       </ul>
@@ -127,6 +134,11 @@ export default {
       if (this.$route.name == "AlbumPage") this.init();
     }
   },
+  computed: {
+    getPlaying() {
+      return this.$store.state.playing.playing;
+    }
+  },
   methods: {
     init: function() {
       this.album_id = this.$route.params.album_id;
@@ -147,6 +159,32 @@ export default {
           this.album_song_list = res.data.albumSonglist.data.songList;
         })
         .catch(err => console.log(err));
+    },
+    playMusic: async function(mid) {
+      let p_list = [];
+      let smid = mid;
+      let actIndex = -1;
+      for (let i = 0; i < this.album_song_list.length; i++) {
+        if (this.album_song_list[i].songInfo.mid == smid) actIndex = i;
+        await p_list.push({
+          title: this.album_song_list[i].songInfo.title,
+          singer: this.album_song_list[i].songInfo.singer[0].title,
+          songMid: this.album_song_list[i].songInfo.mid,
+          interval: this.album_song_list[i].songInfo.interval,
+          albumMid: this.album_song_list[i].songInfo.album.id
+        });
+      }
+
+      this.$store.commit("changeIsRadioState", {
+        radioId: -1,
+        isplay: false
+      });
+      this.$store.commit("replacePlayList", p_list);
+      let tempList = p_list[actIndex];
+      this.$store.dispatch("chageplayingStateAsync", {
+        tempList: tempList,
+        actIndex: actIndex
+      });
     },
     intoSingerPage(singer_id) {
       this.$router.push(`/SingerInfoPage/${singer_id}`);
@@ -328,6 +366,7 @@ export default {
 }
 .s_list_item .song_name {
   width: 50%;
+  cursor: pointer;
 }
 .s_td .song_name span {
   color: black;
@@ -371,5 +410,10 @@ export default {
 }
 .null_td span {
   font-size: 14px;
+}
+.isplay {
+  border-left: 5px solid rgb(49, 122, 255);
+  border-top-left-radius: unset;
+  border-bottom-left-radius: unset;
 }
 </style>

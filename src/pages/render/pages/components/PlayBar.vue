@@ -11,7 +11,7 @@
     </div>
     <div id="player">
       <div id="player_btns">
-        <span class="playbox" @click="lastSong()">
+        <span class="playbox" @click="lastSong()" v-if="!radioPlay">
           <i class="im im-previous"></i>
         </span>
         <span class="playbox act" @click="music_Play()">
@@ -57,7 +57,7 @@
         <img class="lyricIcon" v-if="isShow" src="./../../assets/ciblue.svg" />
         <img class="lyricIcon" v-else src="./../../assets/ciblack.svg" />
       </button>
-      <button class="view_list_btn" @click.stop="showListPage()">
+      <button class="view_list_btn" @click.stop="showListPage()" v-if="!radioPlay">
         <i class="im im-data"></i>
       </button>
     </div>
@@ -159,6 +159,9 @@ export default {
     },
     pause() {
       return this.$store.state.playing.pause;
+    },
+    radioPlay() {
+      return this.$store.state.playing.isRadio.isplay;
     }
   },
   methods: {
@@ -254,13 +257,8 @@ export default {
     toUrl: function(albumId) {
       if ((albumId === undefined) | isNaN(albumId) | (albumId == "0"))
         return "";
-      return (
-        "http://imgcache.qq.com/music/photo/album_300/" +
-        (albumId % 100) +
-        "/300_albumpic_" +
-        albumId +
-        "_0.jpg"
-      );
+      return `http://imgcache.qq.com/music/photo/album_300/
+        ${albumId % 100}/300_albumpic_${albumId}_0.jpg`;
     },
     showLyric: function() {
       this.isShow = !this.isShow;
@@ -284,7 +282,6 @@ export default {
       }
     },
     loading: function() {
-      console.log("音乐正在加载中");
       if (this.$store.state.playing.errorType > 0) {
         this.$store.commit("chageErrorState", -1);
         this.nextSong();

@@ -29,8 +29,8 @@ function createWindow() {
     minWidth: 1200,
     minHeight: 800,
     zoomFactor: 1,
-    titleBarStyle: "customButtonsOnHover", 
-    thickFrame : false,
+    titleBarStyle: "customButtonsOnHover",
+    thickFrame: false,
     transparent: true,
     frame: false,
     show: false,
@@ -48,8 +48,7 @@ function createWindow() {
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
-  }
-
+  } 
   win.on('closed', () => {
     win = null
   })
@@ -114,7 +113,7 @@ ipc.on("showLoginWindow", (e, val) => {
   else createLoginWindw()
 })
 ipc.on("getWindowId", (e, val) => {
-  if(val.name=="win")console.log(win.id)
+  if (val.name == "win") console.log(win.id)
   // win.webContents.send("WindowIdRes",win.id)
 })
 
@@ -135,11 +134,11 @@ ipc.on("showMainWindow", (e, message) => {
 ipc.on("offLoginWindow", (e, msg) => {
   loginWindow.hide()
 })
-ipc.on("autoLogin",(e,val)=>{
-  win.webContents.send("autoLogin",val)
+ipc.on("autoLogin", (e, val) => {
+  win.webContents.send("autoLogin", val)
 })
 ipc.on("loginIn", (e, obj) => {
-  win.webContents.send("loginIn",obj)
+  win.webContents.send("loginIn", obj)
 })
 ipc.on("showError", (e, obj) => {
   loginWindow.webContents.send("showError", obj)

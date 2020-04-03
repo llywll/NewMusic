@@ -28,6 +28,8 @@ import SongSquarePage from './../pages/components/SongSquarePage'
 
 import SingerInfoPage from './../pages/components/SingerInfoPage'
 
+import TopListInfoPage from './../pages/components/TopListInfoPage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -87,6 +89,12 @@ const router = new Router({
             path: '/TopLists',
             name: 'TopLists',
             component: TopLists
+        },
+        {
+            path: '/TopListInfoPage/:topList_id',
+            name: 'TopListInfoPage',
+            component: TopListInfoPage,
+            props: { default: true, sidebar: false }
         },
         {
             path: '/RadioLists',

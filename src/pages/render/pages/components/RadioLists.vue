@@ -10,8 +10,18 @@
         <li class="redio_type_title_li">
           <span>{{ r_list.name }}</span>
         </li>
-        <li class="radioList_item" v-for="(item,index) in r_list.radioList" :key="index">
-          <div class="item_cover" :data-album-id="item.content_id" :style="item.radioImg">
+        <li
+          class="radioList_item"
+          v-for="(item,index) in r_list.radioList"
+          :key="index"
+          v-show="item.radioId != 99"
+        >
+          <div
+            class="item_cover"
+            :data-album-id="item.radioId"
+            :style="item.radioImg"
+            @click="playRadio(item.radioId)"
+          >
             <i class="im im-play"></i>
           </div>
           <div class="item_cover_after" :style="item.radioImg"></div>
@@ -39,14 +49,65 @@ export default {
         this.radioList = res.data.response.data.data.groupList;
         this.radioList.forEach((item, index) => {
           item.radioList.forEach((r_item, r_index) => {
-              this.radioList[index].radioList[
-                r_index
-              ].radioImg = `background-image: url(${r_item.radioImg})`;
+            this.radioList[index].radioList[
+              r_index
+            ].radioImg = `background-image: url(${r_item.radioImg})`;
           });
         });
         console.log(this.radioList);
       })
       .catch(err => console.log(err));
+  },
+  methods: {
+    playRadio: function(radioId) {
+      this.$http
+        .get(`http://39.108.229.8:3300/radio?id=${radioId}&raw=1`)
+        .then(res => {
+          console.log(res.data.songlist.data.tracks);
+          let p_list = [];
+          let actIndex = 0;
+          for (let i = 0; i < res.data.songlist.data.tracks.length; i++) {
+            p_list.push({
+              title: res.data.songlist.data.tracks[i].title,
+              singer: res.data.songlist.data.tracks[i].singer[0].title,
+              songMid: res.data.songlist.data.tracks[i].mid,
+              interval: res.data.songlist.data.tracks[i].interval,
+              albumMid: res.data.songlist.data.tracks[i].album.id
+            });
+          }
+          this.$MainWinodw.send("upPlayPapel")
+          this.$store.commit("changeIsRadioState", {
+            radioId: radioId,
+            isplay: true
+          });
+          this.$store.commit("replacePlayList", p_list);
+          let tempList = p_list[actIndex];
+          this.$store.dispatch("chageplayingStateAsync", {
+            tempList: tempList,
+            actIndex: actIndex
+          });
+        })
+        .catch(err => console.log(err));
+      //  let p_list = [];
+      // let smid = mid;
+      // let actIndex = -1;
+      // for (let i = 0; i < this.album_song_list.length; i++) {
+      //   if (this.album_song_list[i].songInfo.mid == smid) actIndex = i;
+      //   await p_list.push({
+      //     title: this.album_song_list[i].songInfo.title,
+      //     singer: this.album_song_list[i].songInfo.singer[0].title,
+      //     songMid: this.album_song_list[i].songInfo.mid,
+      //     interval: this.album_song_list[i].songInfo.interval,
+      //     albumMid: this.album_song_list[i].songInfo.album.id
+      //   });
+      // }
+      // this.$store.commit("replacePlayList", p_list);
+      // let tempList = p_list[actIndex];
+      // this.$store.dispatch("chageplayingStateAsync", {
+      //   tempList: tempList,
+      //   actIndex: actIndex
+      // });
+    }
   }
 };
 </script>
@@ -57,7 +118,7 @@ export default {
   overflow-x: hidden;
 }
 .radio_list_box {
-  height: 71vh;
+  height: 78vh;
 }
 .radio_songList {
   display: flex;

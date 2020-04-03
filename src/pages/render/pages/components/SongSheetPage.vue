@@ -122,6 +122,11 @@ export default {
           albumMid: this.cdlist.songlist[i].album.id
         });
       }
+      
+      this.$store.commit("changeIsRadioState", {
+        radioId: -1,
+        isplay: false
+      });
       this.$store.commit("replacePlayList", p_list);
       let tempList = p_list[actIndex];
       this.$store.dispatch("chageplayingStateAsync", {
