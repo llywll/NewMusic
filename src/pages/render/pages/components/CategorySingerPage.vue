@@ -47,7 +47,7 @@
       <ul class="singer_catefory_list" v-if="singerList">
         <li class="category_singer_item" v-for="(item,index) in singerList" :key="index">
           <div class="item_cover" @click="intoSingerPage(item.singer_mid)" v-if="index<10">
-            <img class="category_pic" :src="item.singer_pic" />
+            <img class="category_pic" :src="item.singer_pic" @error="defImg()" />
           </div>
           <div class="category_info">
             <span
@@ -75,7 +75,8 @@ export default {
         index: -100,
         sex: -100,
         pageNo: 1
-      }
+      },
+      defaultImg: require("./../../assets/user.png")
     };
   },
   mounted() {
@@ -132,6 +133,12 @@ export default {
     },
     intoSingerPage: function(mid) {
       this.$router.push(`/SingerInfoPage/${mid}`);
+    },
+    defImg: function() {
+      let img = event.srcElement;
+      img.src = this.defaultImg;
+      img.style ="background-color:rgb(233,233,233)"
+      img.onerror = null;
     }
   }
 };
@@ -283,11 +290,10 @@ export default {
   text-align: center;
   font-size: 14px;
 }
-.cate_null_tip{
-    text-align: center;
-    font-size: 24px;
-    display: block;
-    margin-right: 50px;
-
+.cate_null_tip {
+  text-align: center;
+  font-size: 24px;
+  display: block;
+  margin-right: 50px;
 }
 </style>

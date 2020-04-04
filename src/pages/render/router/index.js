@@ -32,6 +32,10 @@ import TopListInfoPage from './../pages/components/TopListInfoPage'
 
 import CategorySingerPage from './../pages/components/CategorySingerPage'
 
+import MVPlayPage from './../pages/components/MVPlayPage'
+
+import SingerAlbumPage from './../pages/components/SingerAlbumPage'
+
 import NotFoundComponent from '../pages/NotFoundComponent'
 
 import store from './../store/store'
@@ -129,6 +133,19 @@ const router = new Router({
             path: 'SingerInfoPage/:singerId',
             name: 'SingerInfoPage',
             component: SingerInfoPage,
+            props: { default: true, sidebar: false }
+        },
+        
+        {
+            path: 'MVPlayPage/:vId',
+            name: 'MVPlayPage',
+            component: MVPlayPage,
+            props: { default: true, sidebar: false }
+        },
+        {
+            path: 'SingerAlbumPage/:singerId',
+            name: 'SingerAlbumPage',
+            component: SingerAlbumPage,
             props: { default: true, sidebar: false }
         },
         {

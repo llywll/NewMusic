@@ -7,6 +7,9 @@ import store from './store/store.js'
 import fs from 'fs'
 import { dataDb, userDb } from './../../util/nedb.js'
 
+import vp from "vue-video-player";
+require("video.js/dist/video-js.css");
+require("vue-video-player/src/custom-theme.css");
 
 const { remote } = require("electron");
 import { ipcRenderer } from 'electron'
@@ -26,7 +29,7 @@ Vue.$MainWinodw =Vue.prototype.$MainWinodw =remote.BrowserWindow.fromId(1).webCo
 Vue.$Menu = Vue.prototype.$Menu = Menu
 Vue.$MenuItem = Vue.prototype.$MenuItem = MenuItem
 
-
+Vue.use(vp)
 new Vue({
   router,
   store,

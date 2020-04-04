@@ -74,6 +74,11 @@
           </div>
           <div class="song_name">
             <span @click="playMusic(item.songInfo.mid)">{{item.songInfo.title}}</span>
+            <i
+              class="im_mv"
+              @click="intoMVPlayPage(item.songInfo.mv.vid)"
+              v-if="item.songInfo.mv.id !=0"
+            ></i>
           </div>
           <div class="song_singer">
             <div v-for="(al_singer,al_index) in item.songInfo.singer" :key="al_index">
@@ -126,12 +131,15 @@ export default {
     };
   },
   mounted() {
-    this.init();
+    this.album_id = this.$route.params.album_id;
   },
   watch: {
     $route() {
-      console.log(this.$route);
-      if (this.$route.name == "AlbumPage") this.init();
+      if (this.$route.name == "AlbumPage")
+        this.album_id = this.$route.params.album_id;
+    },
+    album_id() {
+      this.init();
     }
   },
   computed: {
@@ -188,6 +196,9 @@ export default {
     },
     intoSingerPage(singer_id) {
       this.$router.push(`/SingerInfoPage/${singer_id}`);
+    },
+    intoMVPlayPage(vid) {
+      this.$router.push(`/MVPlayPage/${vid}`);
     }
   }
 };
@@ -415,5 +426,16 @@ export default {
   border-left: 5px solid rgb(49, 122, 255);
   border-top-left-radius: unset;
   border-bottom-left-radius: unset;
+}
+.im_mv {
+  background-image: url("./../../assets/icon_sprite.png");
+  display: inline-block;
+  width: 33px;
+  height: 16px;
+  background-position: -40px -280px;
+  vertical-align: middle;
+  margin-right: 6px;
+  margin-left: 6px;
+  cursor: pointer;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="singerInfoPage">
+  <div class="singerAlbumPage">
     <div class="singer_head_box" v-if="singerInfo">
       <div class="singer_img_box">
         <img
@@ -14,63 +14,11 @@
         <div class="singer_desc">
           <span>{{singerInfo.desc}}</span>
         </div>
-        <div class="singer_func_btns">
-          <button class="sfc_btn play_hot_song" @click="playMusic(singer_hot_songs[0].mid)">
-            <i class="im im-play"></i>
-            <span>播放歌手热门歌曲</span>
-          </button>
-          <button class="sfc_btn">
-            <i class="im im-plus"></i>
-            <span>收藏歌手热门歌曲</span>
-          </button>
-        </div>
       </div>
     </div>
-    <div class="singer_hot_songs_box">
-      <span class="hot_song_title">热门歌曲</span>
-    </div>
-    <ul class="song_list" ref="singer_hot_song_list" v-if="singer_hot_songs">
-      <li class="songlist_item_th">
-        <div class="song_index"></div>
-        <div class="song_Name">
-          <span>歌名</span>
-        </div>
-        <div class="song_album">
-          <span>专辑</span>
-        </div>
-        <div class="song_time">
-          <span>时长</span>
-        </div>
-      </li>
-      <li
-        v-for="(songlist,index) in singer_hot_songs"
-        :key="index"
-        :class="getPlaying.songMid == songlist.mid?'songlist_item isplay':'songlist_item'"
-      >
-        <div class="song_index">{{index + 1}}.</div>
-        <div class="song_Name">
-          <a @click="playMusic(songlist.mid)">{{songlist.title}}</a>
-          <i class="im_mv" @click="intoMVPlayPage(songlist.mv.vid)" v-if="songlist.mv.id !=0"></i>
-        </div>
-        <div class="song_album">
-          <a @click="intoAlbumPage(songlist.album.mid)">{{songlist.album.title}}</a>
-        </div>
-        <div class="song_time">
-          <span
-            v-if="songlist.interval % 60 < 10"
-          >0{{parseInt(songlist.interval / 60)}}:0{{songlist.interval % 60}}</span>
-          <span v-else>0{{parseInt(songlist.interval / 60)}}:{{songlist.interval % 60}}</span>
-        </div>
-      </li>
-    </ul>
-
     <ul class="singer_album_list" ref="album_list" v-if="singer_album_list">
       <li class="album_title_li">
         <span>专辑</span>
-        <div class="more_album" @click="intoSingerAlbumPage()">
-          <span>全部</span>
-          <i class="im im-angle-right"></i>
-        </div>
       </li>
       <li class="album_item" v-for="(item,index) in singer_album_list" :key="index">
         <div class="item_cover" :style="item.albumImg" @click="intoAlbumPage(item.album_mid)">
@@ -83,56 +31,23 @@
         </div>
       </li>
     </ul>
-
-    <ul class="singer_mv_list" ref="mv_list" v-if="singer_mv_list">
-      <li class="mv_title_li">
-        <span>MV</span>
-      </li>
-      <li class="mv_item" v-for="(item,index) in singer_mv_list" :key="index">
-        <div class="item_cover">
-          <img class="mv_pic" :src="item.pic" @click="intoMVPlayPage(item.vid)" />
-          <i class="im im-play"></i>
-        </div>
-        <div class="mv_info">
-          <span class="mv_title">{{item.title}}</span>
-          <span class="mv_username">播放量：{{item.listenCount /10000 }} f万</span>
-        </div>
-      </li>
-    </ul>
-
-    <ul class="singer_similar_list" v-if="singer_similar_list">
-      <li class="similar_title_li">
-        <span>相似歌手</span>
-      </li>
-      <li class="similar_item" v-for="(item,index) in singer_similar_list.slice(0,5)" :key="index">
-        <div class="item_cover" @click="changeSingerId(item.mid)">
-          <img class="similar_pic" :src="item.pic" />
-        </div>
-        <div class="similar_info">
-          <span class="similar_title">{{item.name}}</span>
-        </div>
-      </li>
-    </ul>
   </div>
 </template>
 
 <script>
 export default {
-  name: "SingerInfoPage",
+  name: "SingerAlbumPage",
   data() {
     return {
       singerId: "",
       singerInfo: [],
-      singer_hot_songs: [],
       singer_album_list: [],
-      singer_mv_list: [],
-      singer_similar_list: [],
       playing: {}
     };
   },
   watch: {
     $route() {
-      if (this.$route.name == "SingerInfoPage") {
+      if (this.$route.name == "SingerAlbumPage") {
         this.singerId = this.$route.params.singerId;
       }
     },
@@ -158,20 +73,10 @@ export default {
         .then(res => {
           this.singerInfo = res.data.result.data.info;
         });
-      //获取歌手热门歌曲
-      this.$http
-        .get(
-          `http://39.108.229.8:3300/singer/songs?singermid=${singerId}&raw=1`
-        )
-        .then(res => {
-          this.singer_hot_songs = res.data.singer.data.songlist;
-          console.log(this.singer_hot_songs);
-        })
-        .catch(err => console.log(err));
       //获取歌手专辑
       this.$http
         .get(
-          `http://39.108.229.8:3300/singer/album?singermid=${singerId}&pageSize=5&raw=1`
+          `http://39.108.229.8:3300/singer/album?singermid=${singerId}&raw=1`
         )
         .then(async res => {
           this.singer_album_list = res.data.singerAlbum.data.list;
@@ -179,24 +84,6 @@ export default {
             item.albumImg = `background-image:url(https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album_mid}.jpg?max_age=2592000);`;
           });
           console.log(res.data.singerAlbum.data.list);
-        })
-        .catch(err => console.log(err));
-      //获取歌手MV
-      this.$http
-        .get(
-          `http://39.108.229.8:3300/singer/mv?singermid=${singerId}&pageSize=3&raw=1`
-        )
-        .then(async res => {
-          this.singer_mv_list = res.data.data.list;
-          console.log(res.data.data.list);
-        })
-        .catch(err => console.log(err));
-      //获取相似歌手
-      this.$http
-        .get(`http://39.108.229.8:3300/singer/sim?singermid=${singerId}&raw=1`)
-        .then(async res => {
-          this.singer_similar_list = res.data.singers.items;
-          console.log(res.data.singers.items);
         })
         .catch(err => console.log(err));
     },
@@ -229,9 +116,7 @@ export default {
     intoAlbumPage(album_id) {
       this.$router.push(`/AlbumPage/${album_id}`);
     },
-    intoSingerAlbumPage(){
-      this.$router.push(`/SingerAlbumPage/${this.singerId}`)
-    },
+
     intoMVPlayPage(vid) {
       this.$router.push(`/MVPlayPage/${vid}`);
     },
@@ -249,7 +134,7 @@ export default {
 };
 </script>
 <style scoped>
-.singerInfoPage {
+.singerAlbumPage {
   margin-top: 80px;
   /* margin-left: 30px; */
   overflow-y: auto;
@@ -392,9 +277,7 @@ export default {
 }
 
 /****** */
-.singer_album_list,
-.singer_mv_list,
-.singer_similar_list {
+.singer_album_list {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -406,28 +289,14 @@ export default {
   margin-left: 30px;
   margin-top: 30px;
 }
-.album_title_li,
-.mv_title_li,
-.similar_title_li {
+.album_title_li {
   width: 100%;
   margin-bottom: 20px;
   font-size: 24px;
 }
-.album_title_li{
-  display: flex;
-  justify-content: space-between;
-  margin-right: 50px;
-}
-.album_item,
-.mv_item {
+.album_item {
   margin-right: 25px;
   margin-bottom: 30px;
-  position: relative;
-}
-.similar_item {
-  background: rgb(241, 241, 241);
-  margin-right: 8px;
-  padding: 20px 10px 30px 10px;
   position: relative;
 }
 .item_cover {
@@ -438,31 +307,6 @@ export default {
   position: relative;
   cursor: pointer;
   transition: all 0.2s linear;
-}
-.singer_mv_list {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-right: 20px;
-}
-.mv_item {
-  /* display: flex; */
-  /* margin:0 20px; */
-}
-.mv_info,
-.similar_info {
-  width: 250px;
-  display: flex;
-  height: 50px;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.similar_info {
-  width: 150px;
-}
-.mv_pic {
-  width: 250px;
-  border-radius: 5px;
 }
 .item_cover_after {
   content: "";
@@ -501,66 +345,15 @@ export default {
   height: 50px;
 }
 
-.albums_title,
-.similar_title {
+.albums_title {
   font-weight: bold;
   font-size: 12px;
   width: 130px;
   color: rgb(43, 43, 43);
 }
-.similar_info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.similar_title {
-  text-align: center;
-  font-size: 14px;
-}
-.mv_title {
-  font-weight: bold;
-  font-size: 12px;
-  color: rgb(43, 43, 43);
-}
-.albums_username,
-.mv_username {
+.albums_username {
   font-size: 10px;
   margin-top: 3px;
   color: rgb(158, 158, 158);
-}
-.similar_pic {
-  border-radius: 50%;
-}
-.im_mv {
-  background-image: url("./../../assets/icon_sprite.png");
-  display: inline-block;
-  width: 33px;
-  height: 16px;
-  background-position: -40px -280px;
-  vertical-align: middle;
-  margin-right: 6px;
-  margin-left: 6px;
-  cursor: pointer;
-}
-
-.more_album {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-.more_album span {
-  font-size: 14px;
-  color: #555;
-  cursor: pointer;
-  transition: all 0.2s linear;
-}
-.more_album .im {
-  font-size: 12px;
-  margin-left: 3px;
-  transition: all 0.2s linear;
-}
-.more_album:hover span,
-.more_album:hover .im {
-  color: rgb(49, 122, 255);
 }
 </style>

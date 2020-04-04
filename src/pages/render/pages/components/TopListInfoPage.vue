@@ -55,6 +55,8 @@
             <span
               @click="playMusic(top_data.songInfoList[index].mid)"
             >{{ top_data.songInfoList[index].title }}</span>
+          <i class="im_mv" @click="intoMVPlayPage(top_data.songInfoList[index].mv.vid)" v-if="top_data.songInfoList[index].mv.id !=0"></i>
+
           </div>
           <div class="top_singer">
             <div v-for="(s_item,s_index) in top_data.songInfoList[index].singer" :key="s_index">
@@ -145,7 +147,10 @@ export default {
     },
     intoSingerPage(mid) {
       this.$router.push(`/SingerInfoPage/${mid}`);
-    }
+    },
+     intoMVPlayPage(vid) {
+      this.$router.push(`/MVPlayPage/${vid}`);
+    },
   }
 };
 </script>
@@ -301,5 +306,16 @@ export default {
   width: 24px;
   height: 10px;
   background-position: 0 -40px;
+}
+.im_mv {
+  background-image: url("./../../assets/icon_sprite.png");
+  display: inline-block;
+  width: 33px;
+  height: 16px;
+  background-position: -40px -280px;
+  vertical-align: middle;
+  margin-right: 6px;
+  margin-left: 6px;
+  cursor: pointer;
 }
 </style>

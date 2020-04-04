@@ -4,7 +4,7 @@
     <main class="right_mainContent">
       <p_header></p_header>
       <transition mode="out-in" name="mk">
-        <keep-alive :max="10">
+        <keep-alive :max="10" exclude="MVPlayPage">
           <router-view v-if="!refresh" />
         </keep-alive>
       </transition>

@@ -69,7 +69,8 @@
                 <img class="new_albumCover" :src="song.url" />
               </div>
               <div class="newSong_SongName">
-                <a>{{song.title}}</a>
+                <a @click="playMusic(song.mid)">{{song.title}}</a>
+                <i class="im_mv" @click="intoMVPlayPage(song.mv.vid)" v-if="song.mv.id !=0"></i>
               </div>
               <div class="newSong_songer">
                 <div
@@ -117,7 +118,7 @@
         <div class="mv_list_box">
           <ul class="mv_list" ref="mvList">
             <li class="mv_list_item" v-for="(mvlist,index) in mv_list.slice(0,5)" :key="index">
-              <div class="mv_cover">
+              <div class="mv_cover" @click="intoMVPlayPage(mvlist.vid)">
                 <img class="mv_cover_img" :src="mvlist.picurl" />
               </div>
               <div class="mv_info">
@@ -201,6 +202,7 @@ export default {
       .get("http://39.108.229.8:3200/getMvByTag")
       .then(response => {
         this.mv_list = response.data.response.data.mvlist;
+        console.log(this.mv_list);
       })
       .catch(error => {
         console.log(error);
@@ -238,9 +240,38 @@ export default {
       this.$refs.tu_buts.children[1].children[0].style =
         "color: rgb(175, 175, 175);";
     },
-    intoCategorySingerPage(){
-      this.$router.push('/CategorySingerPage')
-    }
+    intoCategorySingerPage() {
+      this.$router.push("/CategorySingerPage");
+    },
+    intoMVPlayPage(vid) {
+      this.$router.push(`/MVPlayPage/${vid}`);
+    },
+    playMusic: async function(mid) {
+      let p_list = [];
+      let smid = mid
+      let actIndex = -1;
+      for (let i = 0; i < this.newSong_list.length; i++) {
+        if (this.newSong_list[i].mid == smid) actIndex = i;
+        await p_list.push({
+          title: this.newSong_list[i].title,
+          singer: this.newSong_list[i].singer[0].title,
+          songMid: this.newSong_list[i].mid,
+          interval: this.newSong_list[i].interval,
+          albumMid: this.newSong_list[i].album.id
+        });
+      }
+      
+      this.$store.commit("changeIsRadioState", {
+        radioId: -1,
+        isplay: false
+      });
+      this.$store.commit("replacePlayList", p_list);
+      let tempList = p_list[actIndex];
+      this.$store.dispatch("chageplayingStateAsync", {
+        tempList: tempList,
+        actIndex: actIndex
+      });
+    },
   }
 };
 </script>
@@ -529,6 +560,7 @@ export default {
   width: 420px;
   height: 220px;
   border-radius: 5px;
+  cursor: pointer;
 }
 .mv_cover_img {
   border-radius: 5px;
@@ -583,28 +615,28 @@ export default {
   margin-top: 30px;
   /* margin-left: 30px; */
 }
-.singer_info_mod_box{
+.singer_info_mod_box {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.more_singer{
+.more_singer {
   display: flex;
   align-items: center;
 }
-.more_singer span{
+.more_singer span {
   font-size: 14px;
   color: #555;
   cursor: pointer;
-  transition: all .2s linear;
+  transition: all 0.2s linear;
 }
-.more_singer .im{
+.more_singer .im {
   font-size: 12px;
-  margin-left: 3px;  transition: all .2s linear;
-
-  
+  margin-left: 3px;
+  transition: all 0.2s linear;
 }
-.more_singer:hover span,.more_singer:hover .im{
+.more_singer:hover span,
+.more_singer:hover .im {
   color: rgb(49, 122, 255);
 }
 .similar_title_li {
@@ -690,5 +722,16 @@ export default {
 .similar_title {
   text-align: center;
   font-size: 14px;
+}
+.im_mv {
+  background-image: url("./../../assets/icon_sprite.png");
+  display: inline-block;
+  width: 33px;
+  height: 16px;
+  background-position: -40px -280px;
+  vertical-align: middle;
+  margin-right: 6px;
+  margin-left: 6px;
+  cursor: pointer;
 }
 </style>

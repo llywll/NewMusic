@@ -85,6 +85,10 @@ export default {
   },
   mounted: function() {
     this.boxele = document.getElementById("progress_box");
+    this.$ipc.on("playMusic",() =>{
+      console.log("正在请求暂停")
+      if(!this.$store.state.playing.pause) this.music_Play()
+    })
   },
   watch: {
     playing() {

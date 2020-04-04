@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <div id="region">
-    </div>
+    <div id="region"></div>
     <router-view />
   </div>
 </template>
@@ -153,6 +152,7 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  font-family: poppin, Tahoma, Arial, \5fae\8f6f\96c5\9ed1, sans-serif;
 }
 #region {
   /*background-color: rgba(255, 192, 203, 0.575);*/
@@ -172,7 +172,7 @@ body {
   /* overflow: hidden; */
   border-radius: 5px;
   z-index: 12;
-   box-shadow:0px 0px 10px 0 rgba(0, 0, 0, 0.24);
+  box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.24);
 }
 .bg_video {
   display: none;

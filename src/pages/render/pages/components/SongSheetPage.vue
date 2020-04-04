@@ -35,7 +35,9 @@
         <li class="songlist_item" v-for="(songlist,index) in cdlist.songlist" :key="index">
           <div class="song_index">{{index + 1}}.</div>
           <div class="song_Name" @click="playMusic($event)">
-            <a :data-song-id="songlist.mid">{{songlist.title}}</a>
+            <a  @click="playMusic(songlist.mid)">{{songlist.title}}</a>
+            <i class="im_mv"
+             @click="intoMVPlayPage(songlist.mv.vid)" v-if="songlist.mv.id !=0"></i>
           </div>
           <div class="song_songer">
             <a
@@ -139,7 +141,10 @@ export default {
     },
     intoAlbumPage(mid) {
       this.$router.push(`/AlbumPage/${mid}`);
-    }
+    },
+     intoMVPlayPage(vid) {
+      this.$router.push(`/MVPlayPage/${vid}`);
+    },
   },
   beforeRouteLeave(to, from, next) {
     if (to.name === "PageContent") {
@@ -320,5 +325,17 @@ export default {
 .songlist_item:hover span,
 .songlist_item:hover .song_index {
   color: white;
+}
+
+.im_mv {
+  background-image: url("./../../assets/icon_sprite.png");
+  display: inline-block;
+  width: 33px;
+  height: 16px;
+  background-position: -40px -280px;
+  vertical-align: middle;
+  margin-right: 6px;
+  margin-left: 6px;
+  cursor: pointer;
 }
 </style>
