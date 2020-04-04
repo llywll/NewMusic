@@ -6,6 +6,7 @@ import router from './router'
 import store from './store/store.js'
 import fs from 'fs'
 import { dataDb, userDb } from './../../util/nedb.js'
+import iscroll from './../../util/iscroll'
 
 import vp from "vue-video-player";
 require("video.js/dist/video-js.css");
@@ -23,11 +24,12 @@ Vue.config.productionTip = false
 
 Vue.$ipc = Vue.prototype.$ipc = ipcRenderer
 Vue.$remote = Vue.prototype.$remote = remote
-Vue.$home =Vue.prototype.$home = remote.app.getPath('home')
+Vue.$home = Vue.prototype.$home = remote.app.getPath('home')
 Vue.$fs = Vue.prototype.$fs = fs
-Vue.$MainWinodw =Vue.prototype.$MainWinodw =remote.BrowserWindow.fromId(1).webContents
+Vue.$MainWinodw = Vue.prototype.$MainWinodw = remote.BrowserWindow.fromId(1).webContents
 Vue.$Menu = Vue.prototype.$Menu = Menu
 Vue.$MenuItem = Vue.prototype.$MenuItem = MenuItem
+Vue.$iscroll = Vue.prototype.$iscroll = iscroll
 
 Vue.use(vp)
 new Vue({

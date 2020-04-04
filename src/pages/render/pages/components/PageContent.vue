@@ -8,7 +8,7 @@
           <span class="recom_title">精心准备的歌单</span>
         </div>
         <div class="recom_pageTurning" ref="tu_buts">
-          <button class="turning" @click="le_left()">
+          <button class="turning fg" @click="le_left()">
             <i class="im im-angle-left"></i>
           </button>
           <button class="turning" @click="ne_right()">
@@ -16,11 +16,11 @@
           </button>
         </div>
       </div>
-      <div class="recom_songList_box">
+      <div class="recom_songList_box" ref="rebox">
         <ul class="recom_songList" ref="recomList">
           <li
-            class="recomList_item"
-            v-for="(item,index) in v_hot.slice(0, 10)"
+            :class="index==5?'recomList_item big_margin':'recomList_item'"
+            v-for="(item,index) in v_hot.slice(0, 12)"
             :key="index"
             @click="intoSongSheetPage($event)"
           >
@@ -100,22 +100,22 @@
         </div>
       </div>
       <div class="mv_box">
-        <div class="info_and_pageTurning">
-          <div class="recom_info_box">
-            <span class="recom_title_sub">让！我！康！康！</span>
-            <span class="recom_title">MV</span>
+        <div class="mv_info_and_pageTurning">
+          <div class="mv_info_box">
+            <span class="mv_title_sub">让！我！康！康！</span>
+            <span class="mv_title">MV</span>
           </div>
-          <div class="recom_pageTurning" ref="tu_buts">
-            <button class="turning" @click="le_left()">
+          <div class="mv_pageTurning" ref="mv_btn">
+            <button class="mv_turning" @click="mv_left()">
               <i class="im im-angle-left"></i>
             </button>
-            <button class="turning" @click="ne_right()">
+            <button class="mv_turning" @click="mv_right()">
               <i class="im im-angle-right"></i>
             </button>
           </div>
         </div>
 
-        <div class="mv_list_box">
+        <div class="mv_list_box" ref="mvbox">
           <ul class="mv_list" ref="mvList">
             <li class="mv_list_item" v-for="(mvlist,index) in mv_list.slice(0,5)" :key="index">
               <div class="mv_cover" @click="intoMVPlayPage(mvlist.vid)">
@@ -135,6 +135,7 @@
         </div>
       </div>
     </div>
+    <!--歌手推荐-->
     <div class="singer_mod_box">
       <div class="singer_info_mod_box">
         <div class="recom_info_box">
@@ -173,8 +174,29 @@ export default {
       v_hot: [],
       newSong_list: [],
       mv_list: [],
-      singer_list: []
+      singer_list: [],
+      recom_iscroll: "",
+      mv_iscroll: "",
+      act_mv_pap: 0
     };
+  },
+  watch: {
+    act_mv_pap() {
+      this.mv_iscroll.scrollToElement(
+        this.$refs.mvList.children[this.act_mv_pap]
+      );
+
+      if (this.act_mv_pap == 0) {
+        this.$refs.mv_btn.children[0].children[0].style =
+          "color: rgb(175, 175, 175);";
+      } else if (this.act_mv_pap == 4) {
+        this.$refs.mv_btn.children[1].children[0].style =
+          "color: rgb(175, 175, 175);";
+      } else {
+        this.$refs.mv_btn.children[0].children[0].style = "color: black";
+        this.$refs.mv_btn.children[1].children[0].style = "color: black";
+      }
+    }
   },
   mounted: function() {
     this.$http
@@ -194,6 +216,17 @@ export default {
           tempList[i].url = this.toUrl(tempList[i].album.id);
         }
         this.$data.newSong_list = tempList;
+        this.$nextTick(() => {
+          this.recom_iscroll = new this.$iscroll(this.$refs.rebox, {
+            scrollbars: false,
+            scrollX: true
+          });
+          this.mv_iscroll = new this.$iscroll(this.$refs.mvbox, {
+            scrollbars: false,
+            scrollX: true
+          });
+          console.log(this.mv_iscroll);
+        });
       })
       .catch(error => {
         console.log(error);
@@ -208,7 +241,7 @@ export default {
         console.log(error);
       });
     this.$http.get(`http://39.108.229.8:3300/singer/list?raw=1`).then(res => {
-      this.singer_list = res.data.singerList.data.singerlist.slice(0, 10);
+      this.singer_list = res.data.singerList.data.singerlist.slice(0, 5);
     });
   },
   methods: {
@@ -229,16 +262,31 @@ export default {
       this.$router.push(`/AlbumPage/${mid}`);
     },
     le_left: function() {
-      this.$refs.recomList.style = `left:-${this.$refs.recomList.children[0].offsetLeft}px`;
+      this.recom_iscroll.scrollToElement(
+        this.$refs.recomList.children[0],
+        1000,
+        -40
+      );
       this.$refs.tu_buts.children[0].children[0].style =
         "color: rgb(175, 175, 175);";
       this.$refs.tu_buts.children[1].children[0].style = "color: black";
     },
     ne_right: function() {
-      this.$refs.recomList.style = `left:- ${this.$refs.recomList.children[6].offsetLeft}px`;
+      this.recom_iscroll.scrollToElement(
+        this.$refs.recomList.children[6],
+        1000,
+        -40
+      );
+
       this.$refs.tu_buts.children[0].children[0].style = "color: black";
       this.$refs.tu_buts.children[1].children[0].style =
         "color: rgb(175, 175, 175);";
+    },
+    mv_left: function() {
+      if (this.act_mv_pap > 0) this.act_mv_pap -= 1;
+    },
+    mv_right: function() {
+      if (this.act_mv_pap < 4) this.act_mv_pap += 1;
     },
     intoCategorySingerPage() {
       this.$router.push("/CategorySingerPage");
@@ -248,7 +296,7 @@ export default {
     },
     playMusic: async function(mid) {
       let p_list = [];
-      let smid = mid
+      let smid = mid;
       let actIndex = -1;
       for (let i = 0; i < this.newSong_list.length; i++) {
         if (this.newSong_list[i].mid == smid) actIndex = i;
@@ -260,7 +308,7 @@ export default {
           albumMid: this.newSong_list[i].album.id
         });
       }
-      
+
       this.$store.commit("changeIsRadioState", {
         radioId: -1,
         isplay: false
@@ -271,7 +319,7 @@ export default {
         tempList: tempList,
         actIndex: actIndex
       });
-    },
+    }
   }
 };
 </script>
@@ -287,34 +335,49 @@ export default {
 
 .recom_list_box,
 .singer_mod_box {
-  margin: 20px 35px 5px 35px;
+  /* max-width: 100%; */
+  margin: 20px 0 5px 0;
   padding-bottom: 10px;
   border-bottom: 1px solid rgb(233, 233, 233);
 }
-
+.singer_mod_box {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+}
 .info_and_pageTurning {
   display: flex;
-  justify-content: space-between;
+  margin: 0 35px;
+  padding: 0 40px;
+  /* justify-content: space-between; */
   align-items: flex-end;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
+.recom_pageTurning {
+  margin-left: 690px;
+  z-index: 20;
+}
 .recom_info_box {
   display: flex;
   flex-direction: column;
 }
 
+.mv_title_sub,
 .recom_title_sub {
   font-size: 12px;
   color: rgb(114, 114, 114);
   margin-bottom: 5px;
 }
-
+.mv_title,
 .recom_title {
   font-size: 18px;
   font-weight: bold;
   color: rgb(39, 39, 39);
 }
-
+.mv_turning,
 .turning {
   background: none;
   border: none;
@@ -322,32 +385,47 @@ export default {
   padding: 0 2px;
   outline: none;
 }
-
+.mv_turning .im,
 .turning .im {
   font-size: 12px;
   font-weight: bold;
   pointer-events: none;
 }
-
+.mv_turning .im-angle-left,
 .turning .im-angle-left {
   color: rgb(175, 175, 175);
 }
-
+.fg {
+  font-size: 24px;
+}
+.recom_songList_box {
+  max-width: 1000px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
 .recom_songList {
   display: flex;
+  padding-left: 40px;
   flex-direction: row;
+  justify-content: flex-start;
   list-style: none;
-  padding-left: 0;
-  position: relative;
-  left: 0;
+  width: calc(200% + 500px);
   transition: all 0.5s ease-out;
 }
 
 .recomList_item {
   margin-right: 15px;
+  width: 130px;
   position: relative;
 }
 
+.big_margin {
+  margin-right: 150px;
+}
 .item_cover {
   background-size: cover;
   width: 150px;
@@ -385,7 +463,7 @@ export default {
 .item_cover:hover {
   transform: scale(1.05);
 }
-
+.mv_info_box,
 .recom_info {
   margin-top: 20px;
   display: flex;
@@ -412,6 +490,9 @@ export default {
  */
 .two_mod_box {
   display: flex;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 /****
 *
@@ -419,15 +500,19 @@ export default {
 *
 **/
 .newSong_box {
-  margin: 20px 15px 5px 35px;
+  margin: 20px 15px 5px 0;
   padding-bottom: 10px;
-  width: 50%;
+  /* width: 80%; */
+  height: 33vh;
+  overflow-y: auto;
   border-bottom: 1px solid rgb(233, 233, 233);
 }
+.mv_info_and_pageTurning,
 .info_and_menu {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  height: 45px;
 }
 .newSong_info_box {
   display: flex;
@@ -460,7 +545,7 @@ export default {
   pointer-events: none;
 }
 .newSong_list_box {
-  height: 250px;
+  /* height: 250px; */
   overflow-x: hidden;
 }
 .newSong_list {
@@ -537,16 +622,27 @@ export default {
 }
 
 /***  MV */
+
+.mv_info_and_pageTurning {
+  /* padding-right: 40px; */
+}
 .mv_box {
-  margin: 20px 35px 5px 0px;
+  margin: 20px 0px 5px 0px;
   padding-bottom: 10px;
-  width: 50%;
+  /* width: 50%; */
+  height: 33vh;
   border-bottom: 1px solid rgb(233, 233, 233);
   display: flex;
   flex-direction: column;
 }
+.mv_list_box {
+  width: 400px;
+  overflow-y: hidden;
+  position: relative;
+}
 .mv_list {
   list-style: none;
+  width: 500%;
   padding: 0;
   display: flex;
   flex-direction: row;
@@ -557,8 +653,8 @@ export default {
 }
 .mv_cover {
   overflow: hidden;
-  width: 420px;
-  height: 220px;
+  width: 380px;
+  height: 200px;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -570,7 +666,10 @@ export default {
   top: 0%;
   width: 100%;
 }
-
+.mv_pageTurning {
+  /* position: relative;
+  right: -60px; */
+}
 .mv_info {
   position: absolute;
   height: 100%;

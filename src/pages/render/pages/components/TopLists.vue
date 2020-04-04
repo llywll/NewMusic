@@ -40,7 +40,8 @@ export default {
   margin-top: 80px;
   margin-left: 30px;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: hidden;   
+   height: 78vh;
 }
 .top_Title {
   /* margin-left: 30px; */
@@ -54,14 +55,13 @@ export default {
 .topList_box {
   display: flex;
   flex-wrap: wrap;
-  height: 71vh;
 }
 .mod_top_item {
   position: relative;
   overflow: hidden;
   margin-right: 28px;
   margin-bottom: 28px;
-  cursor: pointer;
+  cursor: pointer;    height: 150px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.199);
 }
 .bg_cover {

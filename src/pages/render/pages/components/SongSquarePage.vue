@@ -164,6 +164,7 @@ export default {
   margin-top: 80px;
   padding-left: 30px;
   overflow-y: auto;
+  height: 82vh;
 }
 .square_title {
   font-size: 24px;
@@ -315,7 +316,6 @@ export default {
   padding-left: 0;
   position: relative;
   left: 0;
-  height: 60vh;
   transition: all 0.5s ease-out;
   /* margin-left: 30px; */
 }

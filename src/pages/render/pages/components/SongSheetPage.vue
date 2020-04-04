@@ -32,12 +32,16 @@
             <span>时长</span>
           </div>
         </li>
-        <li class="songlist_item" v-for="(songlist,index) in cdlist.songlist" :key="index">
+        <li
+          class="songlist_item"
+          v-for="(songlist,index) in cdlist.songlist"
+          @contextmenu="sheetRightMenu(songlist)"
+          :key="index"
+        >
           <div class="song_index">{{index + 1}}.</div>
           <div class="song_Name" @click="playMusic($event)">
-            <a  @click="playMusic(songlist.mid)">{{songlist.title}}</a>
-            <i class="im_mv"
-             @click="intoMVPlayPage(songlist.mv.vid)" v-if="songlist.mv.id !=0"></i>
+            <a @click="playMusic(songlist.mid)">{{songlist.title}}</a>
+            <i class="im_mv" @click="intoMVPlayPage(songlist.mv.vid)" v-if="songlist.mv.id !=0"></i>
           </div>
           <div class="song_songer">
             <a
@@ -124,7 +128,7 @@ export default {
           albumMid: this.cdlist.songlist[i].album.id
         });
       }
-      
+
       this.$store.commit("changeIsRadioState", {
         radioId: -1,
         isplay: false
@@ -142,9 +146,67 @@ export default {
     intoAlbumPage(mid) {
       this.$router.push(`/AlbumPage/${mid}`);
     },
-     intoMVPlayPage(vid) {
+    intoMVPlayPage(vid) {
       this.$router.push(`/MVPlayPage/${vid}`);
     },
+    sheetRightMenu: function(_sid) {
+      const menuTempList = [
+        {
+          label: "播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          label: "下一首播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "收藏到我喜欢",
+          click: () => {
+            console.log(this.historyList);
+          }
+        },
+        {
+          label: "添加到...",
+          submenu: [
+            {
+              label: "播放列表"
+            },
+            {
+              type: "separator"
+            }
+          ]
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "删除",
+          click: () => {
+            this.$ipc.once("questionResult", (e, val) => {
+              if (val)
+                this.$db.remove({ _id: _sid }, (reErr, reRes) => {
+                  if (!reErr) if (reRes > 0) this.initList();
+                });
+            });
+            this.$MainWinodw.send("ShowAlertBox", {
+              type: "warning",
+              text: "确认要删除吗？",
+              caller: "questionResult"
+            });
+          }
+        }
+      ];
+      
+      const menu = this.$Menu.buildFromTemplate(menuTempList);
+      menu.popup(this.$remote.getCurrentWindow());
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (to.name === "PageContent") {
