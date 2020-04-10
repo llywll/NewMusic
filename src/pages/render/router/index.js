@@ -38,7 +38,6 @@ import SingerAlbumPage from './../pages/components/SingerAlbumPage'
 
 import NotFoundComponent from '../pages/NotFoundComponent'
 
-import store from './../store/store'
 Vue.use(Router)
 
 const originalPush = Router.prototype.push
@@ -68,7 +67,12 @@ const router = new Router({
             path: '/SonglistPage/:list_id',
             name: 'SonglistPage',
             component: songlistPage,
-            props: { default: true, sidebar: false }
+            props: { default: true, sidebar: false },
+            meta: {
+                isUseCache: false,
+                keepAlive: false
+            }
+            
         },
         {
             path: '/SongSheetPage/:sheet_id',
@@ -108,42 +112,42 @@ const router = new Router({
             component: RadioLists
         },
         {
-            path: 'LocalFilePage',
+            path: '/LocalFilePage',
             name: 'LocalFilePage',
             component: LocalFilePage
         },
         {
-            path: 'DownloadMusicPage',
+            path: '/DownloadMusicPage',
             name: 'DownloadMusicPage',
             component: DownloadMusicPage
         },
         {
-            path: 'SongSquarePage',
+            path: '/SongSquarePage',
             name: 'SongSquarePage',
             component: SongSquarePage
         },
         
         {
-            path: 'CategorySingerPage',
+            path: '/CategorySingerPage',
             name: 'CategorySingerPage',
             component: CategorySingerPage
         },
         
         {
-            path: 'SingerInfoPage/:singerId',
+            path: '/SingerInfoPage/:singerId',
             name: 'SingerInfoPage',
             component: SingerInfoPage,
             props: { default: true, sidebar: false }
         },
         
         {
-            path: 'MVPlayPage/:vId',
+            path: '/MVPlayPage/:vId',
             name: 'MVPlayPage',
             component: MVPlayPage,
             props: { default: true, sidebar: false }
         },
         {
-            path: 'SingerAlbumPage/:singerId',
+            path: '/SingerAlbumPage/:singerId',
             name: 'SingerAlbumPage',
             component: SingerAlbumPage,
             props: { default: true, sidebar: false }
@@ -156,16 +160,6 @@ const router = new Router({
     }]
 })
 router.beforeEach((to, from, next) => {
-    console.log("路由检测to：", to)
-    if (to.name === "SonglistPage" &&
-        to.params.list_id !== null &&
-        to.params.list_id !== undefined &&
-        to.params.list_id !== "" &&
-        to.params.list_id !== from.params.list_id) {
-        console.log("???")
-        store.commit("changeSongId", to.params.list_id)
-    }
-    console.log("路由检测from：", from)
     next()
 })
 export default router

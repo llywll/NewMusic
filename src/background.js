@@ -61,7 +61,7 @@ function createWindow() {
 let desktopLylrc
 function createDesktopLyirc() {
   desktopLylrc = new BrowserWindow({
-    width: 800,
+    width: 1000,
     height: 65,
     minimizable: false,
     fullscreenable: false,
@@ -95,13 +95,14 @@ function createLoginWindw() {
     titleBarStyle: "customButtonsOnHover",
     alwaysOnTop: true,
     // transparent: true,
-    parent: win, //win是主窗口
+    //parent: win, //win是主窗口
     webPreferences: {
       // backgroundThrottling: false,
       nodeIntegration: true
     },
     // hasShadow: false,
   })
+  loginWindow.webContents.openDevTools()
   loginWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + '/login.html');
   loginWindow.on('closed', () => { loginWindow = null })
 
@@ -140,12 +141,20 @@ ipc.on("autoLogin", (e, val) => {
 ipc.on("loginIn", (e, obj) => {
   win.webContents.send("loginIn", obj)
 })
+ipc.on("signUp", (e, obj) => {
+  win.webContents.send("signUp", obj)
+})
 ipc.on("showError", (e, obj) => {
   loginWindow.webContents.send("showError", obj)
 })
+ipc.on("showRegError", (e, obj) => {
+  loginWindow.webContents.send("showRegError", obj)
+})
 ipc.on("loginSuccess", (e, obj) => {
   loginWindow.webContents.send("loginSuccess", obj)
-
+})
+ipc.on("signUpSuccess", (e, obj) => {
+  loginWindow.webContents.send("signUpSuccess", obj)
 })
 
 // Quit when all windows are closed.

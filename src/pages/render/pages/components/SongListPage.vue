@@ -28,7 +28,10 @@
           </div>
         </div>
         <div class="song_func_btns">
-          <button class="s_btn s_btn_1" v-show="Object.keys(listInfo.songs).length>0">
+          <button
+            class="s_btn s_btn_1"
+            v-if="listInfo.songs"
+          >
             <i class="im im-play"></i>
             <span>播放全部</span>
           </button>
@@ -36,7 +39,7 @@
             <i class="im im-menu-dot-v"></i>
           </button>
         </div>
-        <ul class="s_list_ul" v-if="Object.keys(listInfo.songs).length>0">
+        <ul class="s_list_ul" v-if="listInfo.songs">
           <li class="s_list_item s_th">
             <div class="song_index"></div>
             <div class="song_name">
@@ -66,7 +69,12 @@
               <span>{{ item.sAlbumName }}</span>
             </div>
             <div class="song_time">
-              <span>{{ item.sTime }}</span>
+              <span
+                v-if="item.sTime % 60 < 10"
+              >0{{parseInt(item.sTime / 60)}}:0{{item.sTime % 60}}</span>
+              <span
+                v-else
+              >0{{parseInt(item.sTime / 60)}}:{{item.sTime % 60}}</span>
             </div>
           </li>
         </ul>
@@ -102,80 +110,48 @@ export default {
   name: "SonglistPage",
   data() {
     return {
-      list_id: "",
-      listInfo: {}
+      list_id: ""
     };
   },
   mounted() {
-    this.init();
+    this.list_id = this.$route.params.list_id;
   },
   watch: {
-    "$store.state.state.songListId"() {
-      this.init();
+    list_id() {
+      this.init(this.list_id);
     },
-    "$store.state.suser.collectionSonglist"() {
-      this.init();
+    $route() {
+      if (this.$route.name == "SonglistPage")
+        this.list_id = this.$route.params.list_id;
     }
   },
-  computed: {},
-  beforeRouteLeave(to, from, next) {
-    console.log(to, from);
-    next();
+  computed: {
+    listInfo() {
+      for (
+        let i = 0;
+        i < this.$store.state.suser.collectionSonglist.length;
+        i++
+      ) {
+        if (this.$store.state.suser.collectionSonglist[i].lId == this.list_id)
+          return this.$store.state.suser.collectionSonglist[i];
+      }
+      return {};
+    }
   },
   methods: {
-    init: function() {
-      this.list_id = this.$store.state.state.songListId;
-      let collectionSonglist = this.$store.state.suser.collectionSonglist;
-
-      if (
-        collectionSonglist !== null &&
-        collectionSonglist !== undefined &&
-        collectionSonglist !== "" &&
-        collectionSonglist.length > 0
-      ) {
-        for (let i = 0; i < Object.keys(collectionSonglist).length; i++) {
+    init: function(list_id) {
+      this.$httpV
+        .get(`http://localhost:9649/songList/getSongListInfo?lId= ${list_id}`)
+        .then(response => {
           console.log(
-            i,
-            this.$store.state.state.songListId,
-            collectionSonglist[i].lId
+            this.$store.state.suser.collectionSonglist,
+            response.data.data[0]
           );
-          if (this.$store.state.state.songListId == collectionSonglist[i].lId) {
-            this.listInfo = collectionSonglist[i];
-            return;
-          }
-        }
-        console.log("collectionSonglist中没找到", this.list_id);
-        this.$httpV
-          .get(
-            `http://localhost:9649/songList/getSongListInfo?lId= ${this.list_id}`
-          )
-          .then(response => {
-            console.log(response.data.data[0]);
-            this.$store.dispatch(
-              "changeCollectionSonglist",
-              response.data.data[0]
-            );
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      } else {
-        console.log("collectionSonglist为空", this.list_id);
-        this.$httpV
-          .get(
-            `http://localhost:9649/songList/getSongListInfo?lId= ${this.list_id}`
-          )
-          .then(response => {
-            console.log(response.data.data[0]);
-            this.$store.dispatch(
-              "changeCollectionSonglist",
-              response.data.data[0]
-            );
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
+          this.$store.dispatch("upSTSonglist", response.data.data[0]);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   }
 };
@@ -353,7 +329,7 @@ export default {
   background: rgb(49, 112, 255);
   border-radius: 5px;
 }
-.s_td:hover span{
+.s_td:hover span {
   color: white;
 }
 .song_index span {
@@ -375,7 +351,7 @@ export default {
 .s_td .song_name span {
   color: black;
 }
-.s_td:hover .song_name span{
+.s_td:hover .song_name span {
   color: white;
 }
 .s_list_item .song_singer,
@@ -389,10 +365,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.null_td:hover{
+.null_td:hover {
   background: unset;
 }
-.null_td:hover span{
+.null_td:hover span {
   color: unset;
 }
 .tip_ani {

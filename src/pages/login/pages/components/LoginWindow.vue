@@ -5,7 +5,7 @@
     </div>
     <div class="login">
       <div class="t_box login_title_box">
-        <span class="login_title">账户登录</span>
+        <span class="login_title">登录</span>
       </div>
       <div class="t_box user_name_box" ref="name_box">
         <div :class="inName.length>0? 'tip_box focus_tip_box':'tip_box'">
@@ -45,9 +45,16 @@
             <i :class="isCheck?'im im-check-square-i':'im im-square-o'"></i>
           </div>
           <span>自动登录</span>
-          <span style="margin-left:10px;color:red" ref="error_message"></span>
+
+          <div class="REG_box">
+            <span>
+              沒有帳戶？
+              <a class="reg_tg_btn" @click="intoREGPage(true)">立即注冊</a>
+            </span>
+          </div>
         </div>
         <div class="xy_box">
+          <span class="err_tip" style="margin-left:10px;color:red" ref="error_message"></span>
           <span>登录即同意《用户许可协议》《隐私政策》</span>
         </div>
       </div>
@@ -57,7 +64,7 @@
 <script>
 // import Qs from "qs";
 export default {
-  name: "loginWindow",
+  name: "LoginWindow",
   data() {
     return {
       inName: "",
@@ -75,7 +82,6 @@ export default {
     this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
       if (!err)
         if (res) {
-          console.log("自主查询", res);
           this.isCheck = res.autoLogin;
         } else {
           console.log("autologin为空", res);
@@ -117,7 +123,7 @@ export default {
       if (this.isfocus) {
         this.isfocus = !this.isfocus;
         this.$refs.pwd_box.className = "t_box user_pwd_box";
-        this.$refs.pwd_box.blur()
+        this.$refs.pwd_box.blur();
         this.login();
       }
     },
@@ -135,6 +141,9 @@ export default {
           password: this.inPwd
         });
       }
+    },
+    intoREGPage:function(val){
+      this.$parent.changeRegWindowState(val)
     }
   }
 };
@@ -417,9 +426,10 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+  position: relative;
 }
 .other_box span {
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(0, 0, 0, 0.726);
 }
 .flow_checkbox {
@@ -440,10 +450,31 @@ export default {
 .flow_checkbox .im-square-o {
   color: black;
 }
+.REG_box {
+  position: absolute;
+  right: 25px;
+  top: -5px;
+}
+.REG_box span {
+  font-size: 10px;
+}
+.reg_tg_btn {
+  color: rgb(49, 112, 255);
+  cursor: pointer;
+}
 .xy_box {
   width: calc(100% - 30px);
   text-align: center;
   margin: 10px 20px 0 10px;
+  display: flex;
+  flex-direction: column;
+}
+.err_tip {
+  margin: 3px 0;
+  align-self: flex-start;
+  position: relative;
+  left: 15px;
+  height: 15px;
 }
 .xy_box span {
   font-size: 10px;

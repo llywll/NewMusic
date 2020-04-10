@@ -11,13 +11,11 @@ export default {
   name: "app",
   created() {
     this.$userDb.find({}, (err, res) => {
-      console.log("启动自检：", res);
+      console.log("检索用户数据：", res);
     });
     this.$userDb.findOne({ name: "autoLogin" }, (err, res) => {
-      console.log("autoLogin检查:", res);
       if (!err)
         if (res !== null && res !== undefined && res !== "") {
-          console.log("自检结果:", res.autoLogin);
           if (res.autoLogin) {
             console.log("已开启自动登录:", res.autoLogin);
             this.$userDb.findOne(
@@ -79,9 +77,11 @@ export default {
               user: response.data.data[0]
             },
             (err, queryDbres) => {
+              //查找是有此用户
               if (!err)
                 if (!queryDbres) {
                   this.$userDb.insert(
+                    //没有就插入
                     {
                       name: "user",
                       user: response.data.data[0]
@@ -89,6 +89,7 @@ export default {
                     (err, insertRes) => {
                       if (!err)
                         if (insertRes !== null) {
+                          //存入运行时数据，返回登录成功状态
                           this.$store.dispatch("loginIn", insertRes.user);
                           this.$ipc.send("loginSuccess");
                         }
@@ -96,6 +97,7 @@ export default {
                   );
                 } else {
                   this.$userDb.update(
+                    //有就更新
                     {
                       name: "user"
                     },
@@ -106,6 +108,7 @@ export default {
                     (err, upres) => {
                       if (!err)
                         if (upres > 0) {
+                          //存入运行时数据，返回登录成功状态
                           this.$store.dispatch("loginIn", queryDbres.user);
                           this.$ipc.send("loginSuccess");
                         }
@@ -115,7 +118,69 @@ export default {
             }
           );
         } else {
-          this.$ipc.send("showError", response.data.message);
+          this.$ipc.send("showError", response.data.message); //登录出错，返回失败原因
+        }
+      });
+    });
+    this.$ipc.on("signUp", (e, userData) => {
+      this.$httpV({
+        method: "post",
+        url: "http://localhost:9649/user/register",
+        data: Qs.stringify({
+          nAccount: userData.account,
+          nPassword: userData.password,
+          nName: userData.userName
+        })
+      }).then(response => {
+        if (response.data.state === "success") {
+          this.$userDb.findOne(
+            {
+              name: "user",
+              user: response.data.data[0]
+            },
+            (err, queryDbres) => {
+              //查找是有此用户
+              if (!err)
+                if (!queryDbres) {
+                  this.$userDb.insert(
+                    //没有就插入
+                    {
+                      name: "user",
+                      user: response.data.data[0]
+                    },
+                    (err, insertRes) => {
+                      if (!err)
+                        if (insertRes !== null) {
+                          //存入运行时数据，返回登录成功状态
+                          this.$store.dispatch("loginIn", insertRes.user);
+                          this.$ipc.send("signUpSuccess");
+                        }
+                    }
+                  );
+                } else {
+                  this.$userDb.update(
+                    //有就更新
+                    {
+                      name: "user"
+                    },
+                    {
+                      name: "user",
+                      user: response.data.data[0]
+                    },
+                    (err, upres) => {
+                      if (!err)
+                        if (upres > 0) {
+                          //存入运行时数据，返回登录成功状态
+                          this.$store.dispatch("loginIn", queryDbres.user);
+                          this.$ipc.send("signUpSuccess");
+                        }
+                    }
+                  );
+                }
+            }
+          );
+        } else {
+          this.$ipc.send("showRegError", response.data.message); //登录出错，返回失败原因
         }
       });
     });

@@ -9,7 +9,6 @@ import { ipcRenderer } from 'electron'
 Vue.prototype.$httpV = Vaxios
 Vue.prototype.$userDb = userDb
 Vue.config.productionTip = false
-
 Vue.$ipc = Vue.prototype.$ipc = ipcRenderer
 
 new Vue({

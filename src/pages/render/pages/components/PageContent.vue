@@ -37,8 +37,8 @@
       </div>
     </div>
 
-    <!-- 新歌推荐 -->
     <div class="two_mod_box">
+    <!-- 新歌推荐 -->
       <div class="newSong_box">
         <div class="info_and_menu">
           <div class="newSong_info_box">
@@ -99,6 +99,7 @@
           </ul>
         </div>
       </div>
+    <!-- MV推荐 -->
       <div class="mv_box">
         <div class="mv_info_and_pageTurning">
           <div class="mv_info_box">

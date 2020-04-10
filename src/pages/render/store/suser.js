@@ -1,4 +1,4 @@
-
+import httpV from './../../../util/ajax'
 const suser = {
     state: {
         suser: {
@@ -20,6 +20,7 @@ const suser = {
             //     songs: []
             // }
         ],
+
         autoLogin: false
     },
     mutations: {
@@ -49,7 +50,7 @@ const suser = {
         },
         setCollectionSonglist: (state, list = {}) => {
             state.collectionSonglist = list
-            console.log(state.collectionSonglist)
+            console.log("suser:", state.collectionSonglist)
         },
         setAutoLogin: (state, val = false) => {
             state.autoLogin = val
@@ -68,22 +69,26 @@ const suser = {
                 }
             })
         },
-        changeCollectionSonglist: (store, list) => {
-            if (list !== null && list != undefined && list !== "") {
-                let ctr = store.state.collectionSonglist !== undefined &&
-                    store.state.collectionSonglist !== null &&
-                    store.state.collectionSonglist !== "" ?
-                    store.state.collectionSonglist : []
-                for (let i = 0; i < Object.keys(ctr).length; i++) {
-                    if (list.lId === ctr[i].lId) {
-                        console.log("已存在，请勿重复添加")
-                        return;
+        changeCollectionSonglist: (store) => {
+            httpV.get("http://localhost:9649/songList/getSongList")
+                .then(res => {
+                    console.log(res.data);
+                    if (res.data.state == "success") {
+                        store.commit('setCollectionSonglist', res.data.data[0])
+
                     }
-                }
-                ctr = [...ctr, list]
-                store.commit('setCollectionSonglist', ctr)
-            }
+                })
+                .catch(err => console.log(err));
             // store.commit('setCollectionSonglist', list)
+        },
+        upSTSonglist: async (store, list) => {
+            console.log(store)
+            let tempList = store.state.collectionSonglist
+            for (let i = 0; i < tempList.length; i++) {
+                if (tempList[i].lId == list.lId) tempList[i].songs = list.songs
+            }
+
+            store.commit('setCollectionSonglist', tempList)
         }
     },
     getters: {

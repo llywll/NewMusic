@@ -33,7 +33,7 @@
       </ul>
       <span class="list_title s2_title">我的音乐</span>
       <ul class="s_menu s_menu_s2" id="song_nav">
-        <li class="s2_li">
+        <li class="s2_li" @click="intoSongListPage(iLikeId)">
           <i class="im im-heart"></i>
           <span>我喜欢</span>
         </li>
@@ -41,11 +41,11 @@
           <i class="im im-monitor-o"></i>
           <span>本地歌曲</span>
         </li>
-        <li class="s2_li"  @click="intoFuncPage('DownloadMusicPage')">
+        <li class="s2_li" @click="intoFuncPage('DownloadMusicPage')">
           <i class="im im-download"></i>
           <span>下载歌曲</span>
         </li>
-        <li class="s2_li"  @click="intoFuncPage('playHistoryPage')">
+        <li class="s2_li" @click="intoFuncPage('playHistoryPage')">
           <i class="im im-history"></i>
           <span>播放历史</span>
         </li>
@@ -58,6 +58,7 @@
           :key="index"
           @click="intoSongListPage(item.lId)"
           @contextmenu="listRightMenu(item.lId,item.lListname)"
+          v-show="item.userSonglistLink.listType!=='iLike'"
         >
           <i class="im_icon"></i>
           <span v-html="item.lListname"></span>
@@ -135,15 +136,10 @@ export default {
   watch: {
     "$store.state.suser.suser"() {
       if (this.$store.state.suser.suser.isLogin)
-        this.$httpV
-          .get("http://localhost:9649/songList/getSongList")
-          .then(res => {
-            console.log(res.data);
-            if (res.data.state == "success") {
-              this.songlistre = res.data.data[0];
-            }
-          })
-          .catch(err => console.log(err));
+        this.$store.dispatch("changeCollectionSonglist");
+    },
+    "$store.state.suser.collectionSonglist"() {
+      this.songlistre = this.$store.state.suser.collectionSonglist;
     }
   },
   computed: {
@@ -155,13 +151,10 @@ export default {
       ) {
         return "";
       }
-      return (
-        "background-image: url(http://imgcache.qq.com/music/photo/album_300/" +
-        (this.$store.state.playing.playing.albumMid % 100) +
-        "/300_albumpic_" +
-        this.$store.state.playing.playing.albumMid +
-        "_0.jpg)"
-      );
+      return `background-image: url('http://imgcache.qq.com/music/photo/album_300/${this
+        .$store.state.playing.playing.albumMid % 100}/300_albumpic_${
+        this.$store.state.playing.playing.albumMid
+      }_0.jpg')`;
     },
     lyric() {
       return this.$store.state.playing.playing.lyric == undefined
@@ -169,16 +162,25 @@ export default {
         : this.$store.state.playing.playing.lyric;
     },
     suser() {
-      console.log(this.$store.state.suser.suser);
+      console.log("用户数据：", this.$store.state.suser.suser);
       return this.$store.state.suser.suser;
+    },
+    iLikeId() {
+      for (let i = 0; i < this.songlistre.length; i++) {
+        console.log(this.songlistre[i]);
+        if (this.songlistre[i].userSonglistLink.listType == "iLike") {
+          return this.songlistre[i].lId;
+        }
+      }
+      return 0;
     }
   },
-  mounted(){
-     this.$ipc.on("upPlayPapel", (e, val) => {
-       if(!e)console.log(e)
-       if(!val)console.log(val)
-       this.intoPlayPage()
-     })
+  mounted() {
+    this.$ipc.on("upPlayPapel", (e, val) => {
+      if (!e) console.log(e);
+      if (!val) console.log(val);
+      this.intoPlayPage();
+    });
   },
   methods: {
     topage: function(index, page) {
@@ -196,7 +198,6 @@ export default {
     },
     intoSongListPage(akey) {
       this.$router.push("/SonglistPage/" + akey);
-      this.$store.commit("changeSongId", akey);
     },
     intoFuncPage(page) {
       this.$router.push(`/${page}`);
@@ -218,7 +219,6 @@ export default {
       this.$refs.cera_text.focus();
     },
     submitNewitem: function() {
-      console.log("老子提交了");
       this.isLoading = true;
       if (this.isLoading)
         this.$httpV
@@ -230,12 +230,12 @@ export default {
           )
           .then(res => {
             if (res.data.state == "success") {
-              console.log(res.data.data[0]);
+              this.isLoading = false;
+              console.log("请求结束");
               this.isOpenNewListPapel = false;
               this.cre_text = "";
-              this.songlistre = res.data.data[0];
+              this.$store.dispatch("changeCollectionSonglist");
             }
-            this.isLoading = false;
           })
           .catch(err => {
             this.isLoading = false;
@@ -284,7 +284,8 @@ export default {
                   .then(res => {
                     console.log(res.data);
                     if (res.data.state == "success") {
-                      this.songlistre = res.data.data[0];
+                      this.$store.dispatch("changeCollectionSonglist");
+                      // this.songlistre = res.data.data[0];
                     }
                   })
                   .catch(err => console.log(err));

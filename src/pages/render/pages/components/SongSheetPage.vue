@@ -70,13 +70,44 @@
 </template>
 <script>
 import loading from "./../loading";
+import Qs from "qs";
 export default {
   name: "SongSheetPage",
   data: function() {
     return {
       sheet_id: "",
       cdlist: [],
-      isloading_Box: true
+      isloading_Box: true,
+      menuList: [
+        {
+          label: "播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          label: "下一首播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "收藏到我喜欢",
+          click: () => {
+            console.log(this.historyList);
+          }
+        },
+        {
+          label: "添加到...",
+          submenu: []
+        },
+        {
+          type: "separator"
+        }
+      ]
     };
   },
   components: {
@@ -114,9 +145,9 @@ export default {
       }
     },
 
-    playMusic: async function(el) {
+    playMusic: async function(mid) {
       let p_list = [];
-      let smid = el.target.attributes["data-song-id"].value;
+      let smid = mid;
       let actIndex = -1;
       for (let i = 0; i < this.cdlist.songlist.length; i++) {
         if (this.cdlist.songlist[i].mid == smid) actIndex = i;
@@ -149,63 +180,45 @@ export default {
     intoMVPlayPage(vid) {
       this.$router.push(`/MVPlayPage/${vid}`);
     },
-    sheetRightMenu: function(_sid) {
-      const menuTempList = [
+    sheetRightMenu: function(val) {
+      this.menuList[4].submenu = [
         {
-          label: "播放",
-          click: () => {
-            console.log("click me");
-          }
-        },
-        {
-          label: "下一首播放",
-          click: () => {
-            console.log("click me");
-          }
+          label: "播放列表"
         },
         {
           type: "separator"
-        },
-        {
-          label: "收藏到我喜欢",
-          click: () => {
-            console.log(this.historyList);
-          }
-        },
-        {
-          label: "添加到...",
-          submenu: [
-            {
-              label: "播放列表"
-            },
-            {
-              type: "separator"
-            }
-          ]
-        },
-        {
-          type: "separator"
-        },
-        {
-          label: "删除",
-          click: () => {
-            this.$ipc.once("questionResult", (e, val) => {
-              if (val)
-                this.$db.remove({ _id: _sid }, (reErr, reRes) => {
-                  if (!reErr) if (reRes > 0) this.initList();
-                });
-            });
-            this.$MainWinodw.send("ShowAlertBox", {
-              type: "warning",
-              text: "确认要删除吗？",
-              caller: "questionResult"
-            });
-          }
         }
       ];
-      
-      const menu = this.$Menu.buildFromTemplate(menuTempList);
+      console.log(this.$store.state.suser.collectionSonglist);
+      this.$store.state.suser.collectionSonglist.forEach(item => {
+        this.menuList[4].submenu.push({
+          label: item.lListname,
+          click: () => {
+            console.log(val, item.lId);
+            this.$httpV({
+              method: "post",
+              url: `http://localhost:9649/songList/addSongToTheSongList`,
+              data: Qs.stringify({
+                songListId: item.lId,
+                sMid: val.mid,
+                sAlbumName: val.album.name,
+                sSinger: val.singer[0].name,
+                sSource: "y.qq.com",
+                sTime: val.interval,
+                sName: val.name
+              })
+            }).then(res =>{
+              console.log(res)
+            })
+            .catch(err =>console.log(err))
+          }
+        });
+      });
+
+      const menu = this.$Menu.buildFromTemplate(this.menuList);
       menu.popup(this.$remote.getCurrentWindow());
+      // console.log("用户是否登录：", this.$store.state.suser.suser.isLogin);
+      // console.log("用户可用歌单", this.$store.state.suser.collectionSonglist);
     }
   },
   beforeRouteLeave(to, from, next) {

@@ -23,7 +23,7 @@ export default {
 #newWindow {
   background: rgba(0, 0, 0, 0.384);
   height: 65px;
-  width: 800px;
+  width: 1000px;
   display: flex;
   align-items: center;
   justify-self: center;

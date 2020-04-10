@@ -1,21 +1,31 @@
 <template>
   <div id="app">
     <div class="derg"></div>
-    <login></login>
+    <LoginWindow v-if="!regWindowState" />
+    <RegisterWindow v-if="regWindowState" />
   </div>
 </template>
 
 <script>
-import login from "./pages/components/LoginWindow";
+import LoginWindow from "./pages/components/LoginWindow";
+import RegisterWindow from "./pages/components/RegisterWindow";
 export default {
   name: "app",
-  components: {
-    login: login
+  data() {
+    return {
+      regWindowState: false
+    };
   },
-  // mounted: function() {
-  //   console.log(this.$store.state.playList);
-  // },
-  created: function() {}
+  components: {
+    LoginWindow,
+    RegisterWindow
+  },
+  methods: {
+    changeRegWindowState: function(val) {
+      console.log(val);
+      this.regWindowState = val;
+    }
+  }
 };
 </script>
 
@@ -54,9 +64,20 @@ body {
   -webkit-app-region: drag;
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100vw;
+  right: 0;
+  width: 88vw;
   height: 20px;
   z-index: 3;
+}
+.acc_err_top {
+  color: red;
+  font-size: 10px;
+  margin-top: 5px;
+  width: 282px;
+  position: absolute;
+}
+.acc_err_top .im {
+  font-size: 10px;
+  margin-right: 5px;
 }
 </style>

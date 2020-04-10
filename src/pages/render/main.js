@@ -7,7 +7,7 @@ import store from './store/store.js'
 import fs from 'fs'
 import { dataDb, userDb } from './../../util/nedb.js'
 import iscroll from './../../util/iscroll'
-
+import isEmpty from './../../util/util'
 import vp from "vue-video-player";
 require("video.js/dist/video-js.css");
 require("vue-video-player/src/custom-theme.css");
@@ -30,6 +30,7 @@ Vue.$MainWinodw = Vue.prototype.$MainWinodw = remote.BrowserWindow.fromId(1).web
 Vue.$Menu = Vue.prototype.$Menu = Menu
 Vue.$MenuItem = Vue.prototype.$MenuItem = MenuItem
 Vue.$iscroll = Vue.prototype.$iscroll = iscroll
+Vue.$isEmpty = Vue.prototype.$isEmpty =isEmpty
 
 Vue.use(vp)
 new Vue({
