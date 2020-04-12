@@ -55,7 +55,7 @@
       <PlayList v-show="is_p"></PlayList>
       <div class="volume_box">
         <span class="volume_logo">
-          <i :class="volume_value==0?'im im-volume-off':'im im-volume'"></i>
+          <i :class="volume_value==0?'im im-volume-off':'im im-volume'" @click="volume_switch()"></i>
         </span>
         <div class="range_box">
           <div class="mn_range_box">
@@ -96,7 +96,9 @@ export default {
       isShow: false,
       isCreateEve: false,
       lyric_line_Act: -1,
-      volume_value: 100
+      volume_value: 100,
+      temp_volume_value: 0,
+      is_volume_off: false
     };
   },
   components: {
@@ -158,7 +160,7 @@ export default {
       }
     },
     volume_value() {
-      console.log(this.volume_value)
+      console.log(this.volume_value);
       this.$refs.music_player.volume = this.volume_value / 100;
     }
   },
@@ -366,6 +368,16 @@ export default {
     },
     mouse_stop() {
       this.t_stop = false;
+    },
+    volume_switch() {
+      this.is_volume_off = !this.is_volume_off;
+      if (this.is_volume_off) {
+        this.temp_volume_value = this.volume_value;
+        this.volume_value = 0;
+      } else {
+        this.volume_value = this.temp_volume_value;
+      }
+      this.$refs.music_player.volume = this.volume_value / 100;
     }
   }
 };
@@ -680,6 +692,7 @@ export default {
 .volume_logo .im {
   /* margin: 0 5px; */
   font-size: 14px;
+  cursor: pointer;
 }
 .range_box {
   /* width: 50px; */
@@ -700,7 +713,7 @@ export default {
   left: 0;
   overflow: hidden;
 }
-.mn_range{
+.mn_range {
   border-radius: 5px;
   pointer-events: none;
   height: 100%;
