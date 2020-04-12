@@ -48,13 +48,18 @@
 
           <div class="REG_box">
             <span>
-              沒有帳戶？
-              <a class="reg_tg_btn" @click="intoREGPage(true)">立即注冊</a>
+              沒有账户？
+              <a class="reg_tg_btn" @click="intoREGPage(true)">立即注册</a>
             </span>
           </div>
         </div>
         <div class="xy_box">
-          <span class="err_tip" style="margin-left:10px;color:red" ref="error_message"></span>
+          <span
+            class="err_tip"
+            style="margin-left:10px;color:red"
+            v-if="errisShow"
+            v-html="login_err_msg"
+          ></span>
           <span>登录即同意《用户许可协议》《隐私政策》</span>
         </div>
       </div>
@@ -70,7 +75,9 @@ export default {
       inName: "",
       inPwd: "",
       isCheck: false,
-      isfocus: false
+      isfocus: false,
+      login_err_msg: "",
+      errisShow: false
     };
   },
   computed: {
@@ -90,11 +97,13 @@ export default {
     });
     this.$ipc.on("showError", (e, message) => {
       console.log(e);
-      this.$refs.error_message.innerHTML = `<i class="im im-warning-circle" style="margin-right:2px;font-size:10px"></i>${message}`;
+      this.errisShow = true;
+      this.login_err_msg = `<i class="im im-warning-circle" style="margin-right:2px;font-size:10px"></i>${message}`;
     });
     this.$ipc.on("loginSuccess", (e, message) => {
       console.log(e, message);
-      this.$refs.error_message.innerHTML = "";
+      this.login_err_msg = "";
+      this.errisShow = false;
       this.$ipc.send("offLoginWindow");
     });
   },
@@ -103,7 +112,7 @@ export default {
       this.isfocus = isfocus;
       this.$refs.name_tip.innerHTML = "用户名";
       this.$refs.pwd_tip.innerHTML = "密码";
-      this.$refs.error_message.innerHTML = "";
+      this.login_err_msg = "";
       if (ele == "name") {
         this.$refs.name_box.className = isfocus
           ? "t_box user_name_box focus_box"
@@ -135,15 +144,16 @@ export default {
         this.$refs.pwd_tip.innerHTML = `<i class="im im-warning-circle" style='color: red; font-size: 10px;margin-right:2px'></i><span style='color:red'>密码不能为空</span>`;
       }
       if (this.inName.length > 0 && this.inPwd.length > 0) {
-        this.$refs.error_message.innerHTML = "登录中...";
+        this.errisShow = true;
+        this.login_err_msg = "登录中...";
         this.$ipc.send("loginIn", {
           userName: this.inName,
           password: this.inPwd
         });
       }
     },
-    intoREGPage:function(val){
-      this.$parent.changeRegWindowState(val)
+    intoREGPage: function(val) {
+      this.$parent.changeRegWindowState(val);
     }
   }
 };

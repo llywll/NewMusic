@@ -53,6 +53,24 @@
     </div>
     <div id="vcon">
       <PlayList v-show="is_p"></PlayList>
+      <div class="volume_box">
+        <span class="volume_logo">
+          <i :class="volume_value==0?'im im-volume-off':'im im-volume'"></i>
+        </span>
+        <div class="range_box">
+          <div class="mn_range_box">
+            <div class="mn_range" :style="'width:'+volume_value +'%'"></div>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="100"
+            class="range_func"
+            v-model="volume_value"
+          />
+        </div>
+      </div>
       <button class="view_lyric_btn" @click.stop="showLyric()">
         <img class="lyricIcon" v-if="isShow" src="./../../assets/ciblue.svg" />
         <img class="lyricIcon" v-else src="./../../assets/ciblack.svg" />
@@ -77,7 +95,8 @@ export default {
       dishX: 0,
       isShow: false,
       isCreateEve: false,
-      lyric_line_Act: -1
+      lyric_line_Act: -1,
+      volume_value: 100
     };
   },
   components: {
@@ -85,10 +104,10 @@ export default {
   },
   mounted: function() {
     this.boxele = document.getElementById("progress_box");
-    this.$ipc.on("playMusic",() =>{
-      console.log("正在请求暂停")
-      if(!this.$store.state.playing.pause) this.music_Play()
-    })
+    this.$ipc.on("playMusic", () => {
+      console.log("正在请求暂停");
+      if (!this.$store.state.playing.pause) this.music_Play();
+    });
   },
   watch: {
     playing() {
@@ -137,6 +156,10 @@ export default {
           this.isCreateEve = false;
         }
       }
+    },
+    volume_value() {
+      console.log(this.volume_value)
+      this.$refs.music_player.volume = this.volume_value / 100;
     }
   },
   computed: {
@@ -650,4 +673,42 @@ export default {
   color: black;
 }
 /*** */
+.volume_box {
+  display: flex;
+  align-items: center;
+}
+.volume_logo .im {
+  /* margin: 0 5px; */
+  font-size: 14px;
+}
+.range_box {
+  /* width: 50px; */
+  width: 80px;
+  height: 21px;
+  margin: 10px;
+  position: relative;
+}
+
+.mn_range_box {
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  background: rgb(202, 202, 202);
+  pointer-events: none;
+  position: absolute;
+  top: 40%;
+  left: 0;
+  overflow: hidden;
+}
+.mn_range{
+  border-radius: 5px;
+  pointer-events: none;
+  height: 100%;
+  background: rgb(49, 112, 255);
+}
+.range_func {
+  width: 80px;
+  opacity: 0;
+  cursor: pointer;
+}
 </style>

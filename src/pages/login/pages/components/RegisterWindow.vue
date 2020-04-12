@@ -175,9 +175,8 @@ export default {
           (this.fromData.account.length > 30)
         ) {
           this.accerrisshow = true;
-          return;
         } else {
-        await  this.$httpV
+            await  this.$httpV
             .get(
               `http://localhost:9649/user/finduserbynaccount?nAccount=${this.fromData.account}`
             )
@@ -197,7 +196,6 @@ export default {
         }
       }
       if(this.accerrisshow)return;
-      console.log("草拟吗")
       switch (this.stepNum) {
         case 2:
           if (this.fromData.password.length < 6) {

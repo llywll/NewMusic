@@ -48,7 +48,7 @@ function createWindow() {
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
-  } 
+  }
   win.on('closed', () => {
     win = null
   })
@@ -132,8 +132,9 @@ ipc.on("showMainWindow", (e, message) => {
   win.show()
 })
 
-ipc.on("offLoginWindow", (e, msg) => {
+ipc.on("offLoginWindow", () => {
   loginWindow.hide()
+  loginWindow = null
 })
 ipc.on("autoLogin", (e, val) => {
   win.webContents.send("autoLogin", val)
