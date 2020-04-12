@@ -39,7 +39,7 @@
           :key="index"
         >
           <div class="song_index">{{index + 1}}.</div>
-          <div class="song_Name" @click="playMusic($event)">
+          <div class="song_Name">
             <a @click="playMusic(songlist.mid)">{{songlist.title}}</a>
             <i class="im_mv" @click="intoMVPlayPage(songlist.mv.vid)" v-if="songlist.mv.id !=0"></i>
           </div>
@@ -145,31 +145,42 @@ export default {
       }
     },
 
-    playMusic: async function(mid) {
+    playMusic: function(mid) {
+      console.log("我被执行了")
       let p_list = [];
       let smid = mid;
       let actIndex = -1;
-      for (let i = 0; i < this.cdlist.songlist.length; i++) {
-        if (this.cdlist.songlist[i].mid == smid) actIndex = i;
-        await p_list.push({
-          title: this.cdlist.songlist[i].title,
-          singer: this.cdlist.songlist[i].singer[0].title,
-          songMid: this.cdlist.songlist[i].mid,
-          interval: this.cdlist.songlist[i].interval,
-          albumMid: this.cdlist.songlist[i].album.id
-        });
-      }
-
-      this.$store.commit("changeIsRadioState", {
-        radioId: -1,
-        isplay: false
-      });
-      this.$store.commit("replacePlayList", p_list);
-      let tempList = p_list[actIndex];
-      this.$store.dispatch("chageplayingStateAsync", {
-        tempList: tempList,
-        actIndex: actIndex
-      });
+      new Promise((success, fail) => {
+        try {
+          for (let i = 0; i < this.cdlist.songlist.length; i++) {
+            if (this.cdlist.songlist[i].mid == smid) actIndex = i;
+            p_list.push({
+              title: this.cdlist.songlist[i].title,
+              singer: this.cdlist.songlist[i].singer[0].title,
+              songMid: this.cdlist.songlist[i].mid,
+              interval: this.cdlist.songlist[i].interval,
+              albumMid: this.cdlist.songlist[i].album.id
+            });
+            success();
+          }
+        } catch (err) {
+          fail(err);
+        }
+      }).then(
+        () => {
+          console.log("执行成果")
+          this.$store.commit("changeIsRadioState", {
+            radioId: -1,
+            isplay: false
+          });
+          this.$store.commit("replacePlayList", p_list);
+          this.$store.dispatch("chageplayingStateAsync", {
+            p_ing: p_list[actIndex],
+            actIndex: actIndex
+          });
+        },
+        err => console.log(err)
+      );
     },
     intoSingerPage(mid) {
       this.$router.push(`/SingerInfoPage/${mid}`);
@@ -207,10 +218,11 @@ export default {
                 sTime: val.interval,
                 sName: val.name
               })
-            }).then(res =>{
-              console.log(res)
             })
-            .catch(err =>console.log(err))
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => console.log(err));
           }
         });
       });

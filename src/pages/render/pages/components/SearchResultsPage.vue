@@ -363,7 +363,7 @@ export default {
           });
           this.$store.commit("addToListHead", p_list);
           this.$store.dispatch("chageplayingStateAsync", {
-            tempList: p_list,
+            p_ing: p_list,
             actIndex: 0
           });
         })

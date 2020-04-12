@@ -10,7 +10,7 @@
           <i class="im im-play"></i>
           <span>播放全部</span>
         </button>
-        <button class="his_btn his_btn_2">
+        <button class="his_btn his_btn_2" @click="moreMenu">
           <i class="im im-menu-dot-v"></i>
         </button>
       </div>
@@ -135,9 +135,58 @@ export default {
                   if (!reErr) if (reRes > 0) this.initList();
                 });
             });
-           this.$MainWinodw.send("ShowAlertBox", {
+            this.$MainWinodw.send("ShowAlertBox", {
               type: "warning",
               text: "确认要删除吗？",
+              caller: "questionResult"
+            });
+          }
+        }
+      ];
+      const menu = this.$Menu.buildFromTemplate(menuTempList);
+      menu.popup(this.$remote.getCurrentWindow());
+    },
+    moreMenu: function() {
+      const menuTempList = [
+        {
+          label: "全部播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "添加到...",
+          submenu: [
+            {
+              label: "播放列表"
+            },
+            {
+              type: "separator"
+            }
+          ]
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "全部删除",
+          click: () => {
+            this.$ipc.once("questionResult", (e, val) => {
+              if (val)
+                this.$db.remove(
+                  { name: "playHistory" },
+                  { multi: true },
+                  (reErr, reRes) => {
+                    if (!reErr) if (reRes > 0) this.initList();
+                  }
+                );
+            });
+            this.$MainWinodw.send("ShowAlertBox", {
+              type: "warning",
+              text: "确认要全部删除吗？",
               caller: "questionResult"
             });
           }

@@ -83,7 +83,7 @@ export default {
           this.$store.commit("replacePlayList", p_list);
           let tempList = p_list[actIndex];
           this.$store.dispatch("chageplayingStateAsync", {
-            tempList: tempList,
+            p_ing: tempList,
             actIndex: actIndex
           });
         })
@@ -102,9 +102,9 @@ export default {
       //   });
       // }
       // this.$store.commit("replacePlayList", p_list);
-      // let tempList = p_list[actIndex];
+      // let p_ing = p_list[actIndex];
       // this.$store.dispatch("chageplayingStateAsync", {
-      //   tempList: tempList,
+      //   p_ing: p_ing,
       //   actIndex: actIndex
       // });
     }

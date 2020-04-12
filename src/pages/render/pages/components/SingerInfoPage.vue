@@ -222,7 +222,7 @@ export default {
       this.$store.commit("replacePlayList", p_list);
       let tempList = p_list[actIndex];
       this.$store.dispatch("chageplayingStateAsync", {
-        tempList: tempList,
+        p_ing: tempList,
         actIndex: actIndex
       });
     },

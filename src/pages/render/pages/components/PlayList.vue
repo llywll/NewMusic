@@ -13,7 +13,7 @@
             <i class="im im-plus"></i>
             添加到
           </button>
-          <button class="removeBtn">
+          <button class="removeBtn" @click="removeAllSongs">
             <i class="im im-trash-can"></i>清空
           </button>
         </div>
@@ -61,7 +61,7 @@ export default {
   methods: {
     playSong: function(index) {
       this.$store.dispatch("chageplayingStateAsync", {
-        tempList: this.$store.state.playList.playList[index],
+        p_ing: this.$store.state.playList.playList[index],
         actIndex: index
       });
     },
@@ -80,6 +80,12 @@ export default {
     comtime: function(stime) {
       if (stime % 60 < 10) return parseInt(stime / 60) + ":0" + (stime % 60);
       return parseInt(stime / 60) + ":" + (stime % 60);
+    },
+    removeAllSongs(){
+       this.$store.dispatch("chageplayingStateAsync", {
+        p_ing: null,
+        actIndex: null
+      });
     }
   }
 };

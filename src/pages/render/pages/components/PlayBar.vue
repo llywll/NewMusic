@@ -1,5 +1,6 @@
 <template>
   <div id="playBar" :class="playBar">
+    <!-- 歌曲信息-->
     <div class="songInfo">
       <div id="ilikeStaru">
         <i class="im im-heart"></i>
@@ -9,13 +10,17 @@
         <span id="ather">{{playing.singer}}</span>
       </div>
     </div>
+    <!--播放控制条-->
     <div id="player">
       <div id="player_btns">
+        <!-- 上一曲 -->
         <span class="playbox" @click="lastSong()" v-if="!radioPlay">
           <i class="im im-previous"></i>
         </span>
+        <!-- 播放/暂停-->
         <span class="playbox act" @click="music_Play()">
           <i :class="pause?'im im-play':'im im-pause'" ref="isplayIcon" id="isplay"></i>
+          <!-- 播放节点-->
           <audio
             autoplay
             id="music_play"
@@ -30,10 +35,12 @@
             <source :src="playing.playLists[0]" type="audio/flac" />
           </audio>
         </span>
+        <!-- 下一曲 -->
         <span class="playbox" @click="nextSong()">
           <i class="im im-next"></i>
         </span>
       </div>
+      <!--播放进度条 -->
       <div id="player_pressBar">
         <span class="time" id="played_time">{{ already_time }}</span>
         <div id="progress_box" v-on:click.stop="changeProgress($event)">
@@ -51,8 +58,10 @@
         <span class="time" id="total_time">{{comtime(playing.interval)}}</span>
       </div>
     </div>
+    <!-- 杂项控制 -->
     <div id="vcon">
       <PlayList v-show="is_p"></PlayList>
+      <!--音量控制-->
       <div class="volume_box">
         <span class="volume_logo">
           <i :class="volume_value==0?'im im-volume-off':'im im-volume'" @click="volume_switch()"></i>
@@ -71,10 +80,12 @@
           />
         </div>
       </div>
+      <!--歌词栏显示-->
       <button class="view_lyric_btn" @click.stop="showLyric()">
         <img class="lyricIcon" v-if="isShow" src="./../../assets/ciblue.svg" />
         <img class="lyricIcon" v-else src="./../../assets/ciblack.svg" />
       </button>
+      <!-- 播放列表 -->
       <button class="view_list_btn" @click.stop="showListPage()" v-if="!radioPlay">
         <i class="im im-data"></i>
       </button>
@@ -113,7 +124,9 @@ export default {
   },
   watch: {
     playing() {
+      //重载音乐
       this.$refs.music_player.load();
+      //加入到播放历史
       this.$db.remove(
         {
           name: "playHistory",
@@ -195,88 +208,80 @@ export default {
   },
   methods: {
     timeUp: function() {
-      if (Object.keys(this.$store.state.playing.playing.lyric).length === 0) {
+      let lyric = this.$store.state.playing.playing.lyric; //歌词数组
+      let lyric_lines = document.getElementById("lyric_lines"); //播放页面歌词面板
+      if (lyric.length === 0) {
         this.lyric_line_Act = 0;
         this.$ipc.send("chageLyric", { text: "暂无歌词" });
-        console.log("暂无歌词");
-      } else if (
-        Object.keys(this.$store.state.playing.playing.lyric).length === 1
-      ) {
-        this.lyric_line_Act = 0;
-        document.getElementById("lyric_lines").children[0].className =
-          "lyric_line act_line";
-        this.$ipc.send("chageLyric", {
-          text: this.$store.state.playing.playing.lyric[0].text
-        });
+      } else if (lyric.length === 1) {
+        //歌词长度等于1的情况下
+        this.lyric_line_Act = 0; //活动歌词赋值为1
+        lyric_lines.children[0].className = "lyric_line act_line"; //设置为活动歌词
+        this.$ipc.send("chageLyric", { text: lyric[0].text }); //向歌词栏更新歌词
       } else {
-        this.lyric_line_Act = this.$store.state.playing.lyricLine;
+        this.lyric_line_Act = this.$store.state.playing.lyricLine; //获取实时歌词的索引
         if (
-          this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
+          lyric[this.lyric_line_Act].time <=
             this.$refs.music_player.currentTime + 0.5 &&
-          this.lyric_line_Act <
-            Object.keys(this.$store.state.playing.playing.lyric).length
+          this.lyric_line_Act < Object.keys(lyric).length //判断是播放时长是否达到歌词索引的最后一条
         ) {
-          let lines = document.getElementById("lyric_lines").childNodes;
+          let lines = lyric_lines.childNodes; //获取歌词面板的歌词组
           for (let i = 0; i < lines.length; i++) {
-            if (i != this.lyric_line_Act) lines[i].className = "lyric_line";
+            if (i != this.lyric_line_Act) lines[i].className = "lyric_line"; //全部设为不活动状态
           }
         }
       }
 
       if (
         this.lyric_line_Act > 0 &&
-        document.getElementById("lyric_lines").children[this.lyric_line_Act - 1]
-          .className !== "lyric_line act_line"
+        lyric_lines.children[this.lyric_line_Act - 1].className !==
+          "lyric_line act_line" //判断是播放时长是否达到歌词索引的时间
       ) {
-        document.getElementById("lyric_lines").children[
-          this.lyric_line_Act
-        ].className = "lyric_line act_line";
-        document
-          .getElementById("lyric_lines")
-          .children[this.lyric_line_Act].scrollIntoView({
-            block: "center",
-            inline: "center"
-          });
+        lyric_lines.children[this.lyric_line_Act].className =
+          "lyric_line act_line"; //设为活动状态
+        lyric_lines.children[this.lyric_line_Act].scrollIntoView({
+          block: "center",
+          inline: "center"
+        }); //歌词面板滚动到活动歌词
 
+        //向歌词栏更新歌词
         this.$ipc.send("chageLyric", {
-          text: this.$store.state.playing.playing.lyric[this.lyric_line_Act]
-            .text
+          text: lyric[this.lyric_line_Act].text
         });
       }
 
-      this.$refs.already_press.style =
-        "width:" +
-        (parseInt(this.$refs.music_player.currentTime) /
-          this.$store.state.playing.playing.interval) *
-          100 +
-        "%";
+      //已播放进度
+      this.$refs.already_press.style = `width:${(parseInt(
+        this.$refs.music_player.currentTime
+      ) /
+        this.$store.state.playing.playing.interval) *
+        100}%`;
+
+      //已缓冲进度
       if (this.$refs.music_player.buffered.length != 0)
-        this.$refs.cached_press.style =
-          "width:" +
-          (parseInt(
-            this.$refs.music_player.buffered.end(
-              this.$refs.music_player.buffered.length - 1
-            )
-          ) /
-            this.$store.state.playing.playing.interval) *
-            100 +
-          "%";
+        this.$refs.cached_press.style = `width:${(parseInt(
+          this.$refs.music_player.buffered.end(
+            this.$refs.music_player.buffered.length - 1
+          )
+        ) /
+          this.$store.state.playing.playing.interval) *
+          100}%`;
+
+      //转换已播放时长
       this.already_time = this.comtime(
         parseInt(this.$refs.music_player.currentTime)
       );
 
-      if (Object.keys(this.$store.state.playing.playing.lyric).length > 1) {
+      if (Object.keys(lyric).length > 1) {
         if (
-          this.$store.state.playing.playing.lyric[this.lyric_line_Act].time <=
+          lyric[this.lyric_line_Act].time <=
             this.$refs.music_player.currentTime + 0.5 &&
-          this.lyric_line_Act <
-            Object.keys(this.$store.state.playing.playing.lyric).length
+          this.lyric_line_Act < Object.keys(lyric).length
         ) {
           if (this.lyric_line_Act != this.$store.state.playing.lyricLine)
             this.lyric_line_Act = this.$store.state.playing.lyricLine;
           else
-            this.lyric_line_Act <
-            Object.keys(this.$store.state.playing.playing.lyric).length - 1
+            this.lyric_line_Act < Object.keys(lyric).length - 1
               ? this.lyric_line_Act++
               : this.lyric_line_Act;
           this.$store.commit("chagelyricLine", this.lyric_line_Act);
@@ -315,10 +320,13 @@ export default {
         this.$store.commit("chageErrorState", -1);
         this.nextSong();
       }
-      document.getElementById("lyric_lines").children[0].scrollIntoView({
-        block: "start",
-        inline: "center"
-      });
+      this.lyric_line_Act = 0;
+      if (this.$store.state.playing.playing.lyric)
+        if (this.$store.state.playing.playing.lyric.length > 0)
+          document.getElementById("lyric_lines").children[0].scrollIntoView({
+            block: "start",
+            inline: "center"
+          });
     },
     nextSong() {
       this.$store.dispatch("nextSongAsync");
@@ -345,7 +353,6 @@ export default {
       let ysline = Object.keys(this.$store.state.playing.playing.lyric).length;
       let tempLine = el.offsetX / el.toElement.offsetWidth;
       this.$store.commit("chagelyricLine", parseInt(ysline * tempLine));
-
       this.$refs.music_player.currentTime = parseInt(
         (el.offsetX / el.toElement.offsetWidth) *
           this.$store.state.playing.playing.interval

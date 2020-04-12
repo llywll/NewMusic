@@ -232,8 +232,8 @@ body {
 }
 #app {
   background-color: white;
-  height: 98%;
-  width: 98%;
+  height: 100%;
+  width: 100%;
   /* overflow: hidden; */
   border-radius: 5px;
   z-index: 12;

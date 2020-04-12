@@ -30,8 +30,8 @@ function createWindow() {
     minHeight: 800,
     zoomFactor: 1,
     titleBarStyle: "customButtonsOnHover",
-    thickFrame: false,
-    transparent: true,
+    // thickFrame: false,
+    // transparent: true,
     frame: false,
     show: false,
     webPreferences: {
@@ -49,8 +49,17 @@ function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-  win.on('closed', () => {
-    win = null
+  ipc.on('close', () => {
+    win.close()
+  })
+  ipc.on('min', () => {
+    win.minimize()
+  })
+  ipc.on('unmax', () => {
+    win.isFullScreen()
+  })
+  ipc.on('max', () => {
+    win.isFullScreen()
   })
   // win.on('ready-to-show', function () {
   //   win.show() // 初始化后再显示
@@ -133,8 +142,7 @@ ipc.on("showMainWindow", (e, message) => {
 })
 
 ipc.on("offLoginWindow", () => {
-  loginWindow.hide()
-  loginWindow = null
+  loginWindow.close()
 })
 ipc.on("autoLogin", (e, val) => {
   win.webContents.send("autoLogin", val)

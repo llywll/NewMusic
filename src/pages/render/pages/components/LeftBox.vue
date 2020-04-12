@@ -2,13 +2,13 @@
   <nav :class="sidebar_a" ref="siderbar_a">
     <div id="menu_backgroud">
       <div class="win_btns">
-        <button class="win_btn cx">
+        <button class="win_btn cx" @click="window_close">
           <i class="im im-x-mark-circle"></i>
         </button>
-        <button class="win_btn win_min">
+        <button class="win_btn win_min" @click="window_min">
           <i class="im im-minus-circle"></i>
         </button>
-        <button class="win_btn win_max">
+        <button class="win_btn win_max" @click="window_max">
           <i class="im im-plus-circle"></i>
         </button>
       </div>
@@ -306,6 +306,18 @@ export default {
         this.cre_text = "";
         this.isOpenNewListPapel = false;
       }
+    },
+    window_close(){
+      this.$ipc.send('close')
+    },
+    window_min(){
+      this.$ipc.send('min')
+    },
+    window_max(){
+      console.log(this.$remote.BrowserWindow.fromId(1).isFullScreen())
+      if(this.$remote.BrowserWindow.fromId(1).isFullScreen())
+      this.$ipc.send('unmax')
+      else this.$ipc.send('max')
     }
   }
 };
@@ -646,12 +658,12 @@ export default {
 }
 .play_page {
   position: fixed;
-  bottom: 1%;
-  left: 1%;
+  bottom: 0;
+  left: 0;
   height: 0%;
-  width: 98%;
+  width: 100%;
   z-index: 2;
-  border-radius: 5px;
+  /* border-radius: 5px; */
 }
 .mubu {
   height: 100%;
@@ -676,8 +688,8 @@ export default {
   align-items: center;
 }
 .start_play_page {
-  height: 98%;
-  bottom: 1%;
+  height: 100%;
+  /* bottom: 1%; */
   animation: start_op 0.3s ease-in-out forwards;
 }
 @keyframes start_op {
@@ -703,12 +715,12 @@ export default {
 }
 @keyframes over_op {
   0% {
-    height: 98%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.46);
   }
   99% {
     background: rgba(0, 0, 0, 0);
-    height: 98%;
+    height: 100%;
   }
   100% {
     height: 0;
@@ -779,6 +791,6 @@ export default {
   transition: all 0.1s linear;
 }
 .act_line {
-  color: pink;
+  color: rgb(49, 112, 255);
 }
 </style>
