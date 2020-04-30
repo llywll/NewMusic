@@ -1,11 +1,11 @@
 import http from 'axios'
 const playing = {
     state: {
-        playing: {},
-        pause: true,
-        lyricLine: 0,
-        playListIndex: -1,
-        errorType: -1,
+        playing: {},//正在播放歌曲信息
+        pause: true,//是否播放
+        lyricLine: 0,//歌词实时行
+        playListIndex: -1, //播放列表的中此歌曲的索引位置
+        errorType: -1, //错误码
         isRadio: {
             radioId: -1,
             isplay: false
@@ -15,18 +15,17 @@ const playing = {
         chageplayingState: (state, playing) => {
             console.log(playing)
             if (playing !== null) {
-                if (playing.songMid == state.playing.songMid)
-                    console.log('已经在播放了')
-                else state.playing = playing
+                // if (playing.songMid == state.playing.songMid)
+                //     console.log('已经在播放了')
+                // else
+                state.playing = playing
             } else state.playing = null
         },
-        chageplayState: (state, playState = true) => state.pause = playState,
-        chagelyricLine: (state, line = 0) => state.lyricLine = line,
-        chagePlayListIndex: (state, index = 0) => {
-            state.playListIndex = index
-        },
-        chageErrorState: (state, errorType = -1) => state.errorType = errorType,
-        changeIsRadioState: (state, isRadioState = {
+        chageplayState: (state, playState = true) => state.pause = playState,//改变播放状态
+        chagelyricLine: (state, line = 0) => state.lyricLine = line, //改变歌词实时行
+        chagePlayListIndex: (state, index = 0) => state.playListIndex = index, //改变播放列表中正在播放的歌曲的索引
+        chageErrorState: (state, errorType = -1) => state.errorType = errorType, //改变错误状态
+        changeIsRadioState: (state, isRadioState = { //切换电台/普通播放模式
             radioId: -1,
             isplay: false
         }) => {
@@ -38,6 +37,7 @@ const playing = {
     getters: {},
     actions: {
         chageplayingStateAsync: async (store, playing) => {
+            console.log(playing)
             if (playing.p_ing !== undefined & playing.p_ing !== null) {
                 if (playing.p_ing.songMid != store.state.playing.songMid) {
                     await http.get(`http://39.108.229.8:3200/getMusicVKey?songmid=${playing.p_ing.songMid}`)
@@ -56,51 +56,18 @@ const playing = {
                                     text: res.data.response.lyric.lines[i].txt
                                 });
                             }
-                            if(lyricArr.length==0)lyricArr.push({time:0,text:"该歌曲暂无歌词"})
+                            if (lyricArr.length == 0) lyricArr.push({ time: 0, text: "该歌曲暂无歌词" })
                             playing.p_ing.lyric = lyricArr
                             console.log(playing)
                             store.commit('chagelyricLine')
                         })
                         .catch(err => console.log(err))
-                    //标准歌词文件的解析方式
-                    // .then(response => {
-                    //     let lyricStr = response.data.response.lyric.split("\n");
-                    //     let lyricArr = [];
-                    //     if (!response.data.response.lyric.includes("[")) { lyricArr = lyricStr }
-                    //     else {
-                    //         for (let i = 0; i < lyricStr.length; i++) {
-                    //             if (lyricStr[i].replace(/\s/g, '').length == 0) continue;
-                    //             if (
-                    //                 !lyricStr[i].includes("ti:") &&
-                    //                 !lyricStr[i].includes("ar:") &&
-                    //                 !lyricStr[i].includes("al:") &&
-                    //                 !lyricStr[i].includes("by:") &&
-                    //                 !lyricStr[i].includes("offset:")
-                    //             ) {
-                    //                 let regExp = lyricStr.length == 1 ? /\[(\d{2}):(\d{2}):(\d{2})\](.*)/g : /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/g;
-                    //                 let result = regExp.exec(lyricStr[i]);
-                    //                 if (result[4] === null) continue
-                    //                 if (result[4] === "") continue
-
-                    //                 let temp = parseInt(result[1] * 60) + parseInt(result[2])
-                    //                 lyricArr.push({
-                    //                     time: temp + "." + result[3],
-                    //                     text: result[4]
-                    //                 });
-                    //             }
-
-                    //         }
-
-                    //     }
-                    //     playing.lyric = lyricArr
-                    //     store.commit('chagelyricLine')
-                    // }).catch(error => console.log(error))
                 }
                 store.commit('chageplayingState', playing.p_ing)
                 store.commit('chagePlayListIndex', playing.actIndex)
                 store.commit('changeActivesindex', playing.actIndex)
             }
-            else if (playing.playing == null) {
+            else if (playing.p_ing === null) {
                 console.log(playing)
                 store.commit('chagelyricLine')
                 store.commit('chageplayState', false)
@@ -188,3 +155,38 @@ const playing = {
     }
 }
 export default playing
+
+
+                    //标准歌词文件的解析方式
+                    // .then(response => {
+                    //     let lyricStr = response.data.response.lyric.split("\n");
+                    //     let lyricArr = [];
+                    //     if (!response.data.response.lyric.includes("[")) { lyricArr = lyricStr }
+                    //     else {
+                    //         for (let i = 0; i < lyricStr.length; i++) {
+                    //             if (lyricStr[i].replace(/\s/g, '').length == 0) continue;
+                    //             if (
+                    //                 !lyricStr[i].includes("ti:") &&
+                    //                 !lyricStr[i].includes("ar:") &&
+                    //                 !lyricStr[i].includes("al:") &&
+                    //                 !lyricStr[i].includes("by:") &&
+                    //                 !lyricStr[i].includes("offset:")
+                    //             ) {
+                    //                 let regExp = lyricStr.length == 1 ? /\[(\d{2}):(\d{2}):(\d{2})\](.*)/g : /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/g;
+                    //                 let result = regExp.exec(lyricStr[i]);
+                    //                 if (result[4] === null) continue
+                    //                 if (result[4] === "") continue
+
+                    //                 let temp = parseInt(result[1] * 60) + parseInt(result[2])
+                    //                 lyricArr.push({
+                    //                     time: temp + "." + result[3],
+                    //                     text: result[4]
+                    //                 });
+                    //             }
+
+                    //         }
+
+                    //     }
+                    //     playing.lyric = lyricArr
+                    //     store.commit('chagelyricLine')
+                    // }).catch(error => console.log(error))

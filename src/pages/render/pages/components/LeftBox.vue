@@ -88,11 +88,23 @@
           </div>
         </li>
       </ul>
+      <div class="tip_in_login" v-show="!suser.isLogin">
+        <span>
+          <button @click="inToLogin">登录</button>后可使用收藏功能
+        </span>
+      </div>
     </div>
 
     <div :class="cover_box" ref="cover_box" @animationend="full_down()">
-      <div class="albumCover" @click="intoPlayPage()" :style="coverImgUrl"></div>
-      <div class="albumCover_sub" :style="coverImgUrl"></div>
+      <img
+        class="albumCover"
+        @click="intoPlayPage()"
+        v-if="!coverImgUrl"
+        src="../../assets/defCover.jpg"
+      />
+      <img class="albumCover" @click="intoPlayPage()" v-else :src="coverImgUrl" />
+      <img class="albumCover_sub" v-if="!coverImgUrl" src="../../assets/defCover.jpg" />
+      <img class="albumCover_sub" v-else :src="coverImgUrl" />
     </div>
     <div :class="play_page">
       <div class="mubu" @click="downplay()"></div>
@@ -149,12 +161,12 @@ export default {
         isNaN(this.$store.state.playing.playing.albumMid) |
         (this.$store.state.playing.playing.albumMid == "0")
       ) {
-        return "";
+        return false;
       }
-      return `background-image: url('http://imgcache.qq.com/music/photo/album_300/${this
-        .$store.state.playing.playing.albumMid % 100}/300_albumpic_${
+      return `http://imgcache.qq.com/music/photo/album_300/${this.$store.state
+        .playing.playing.albumMid % 100}/300_albumpic_${
         this.$store.state.playing.playing.albumMid
-      }_0.jpg')`;
+      }_0.jpg`;
     },
     lyric() {
       return this.$store.state.playing.playing.lyric == undefined
@@ -307,17 +319,24 @@ export default {
         this.isOpenNewListPapel = false;
       }
     },
-    window_close(){
-      this.$ipc.send('close')
+    inToLogin: function() {
+      this.$store.commit("changeLoginWindwState", true);
+      this.$ipc.send(
+        "showLoginWindow",
+        this.$store.state.state.loginWindowIsShow
+      );
     },
-    window_min(){
-      this.$ipc.send('min')
+    window_close() {
+      this.$ipc.send("close");
     },
-    window_max(){
-      console.log(this.$remote.BrowserWindow.fromId(1).isFullScreen())
-      if(this.$remote.BrowserWindow.fromId(1).isFullScreen())
-      this.$ipc.send('unmax')
-      else this.$ipc.send('max')
+    window_min() {
+      this.$ipc.send("min");
+    },
+    window_max() {
+      console.log(this.$remote.BrowserWindow.fromId(1).isFullScreen());
+      if (this.$remote.BrowserWindow.fromId(1).isFullScreen())
+        this.$ipc.send("unmax");
+      else this.$ipc.send("max");
     }
   }
 };
@@ -489,7 +508,8 @@ export default {
   align-items: center;
   border-radius: 50px;
   border: 0;
-  background-color: rgba(139, 147, 186, 0.9);
+  /* background-color: rgba(139, 147, 186, 0.9); */
+  background: rgb(49, 112, 255);
   margin-top: 10px;
   padding: 5px 10px;
   outline: none;
@@ -517,6 +537,7 @@ export default {
 .act_s3 .cerate_list_box {
   overflow: hidden;
   border: 2px solid rgba(139, 147, 186, 0.9);
+  border: 2px solid rgb(49, 112, 255);
   /* background-color:rgba(139, 147, 186, 0.9); */
   background: white;
   border-radius: 5px;
@@ -580,10 +601,10 @@ export default {
   height: 220px;
   border-radius: 5px;
   cursor: pointer;
-  background-image: url(../../assets/defCover.jpg);
+  /* background-image: url(../../assets/defCover.jpg);
   background-color: rgb(255, 255, 255);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover; */
   transition: all 0.2s 0.1s linear;
   z-index: 16;
   position: relative;
@@ -596,8 +617,8 @@ export default {
   left: 0%;
   width: 220px;
   height: 220px;
-  background: url(../../assets/defCover.jpg) no-repeat;
-  background-size: 100% 100%;
+  /* background: url(../../assets/defCover.jpg) no-repeat;
+  background-size: 100% 100%; */
   transform: scale(1.25);
   filter: blur(25px) brightness(80%) opacity(0.8);
   z-index: 15;
@@ -751,7 +772,7 @@ export default {
 /*** */
 .lyric_area_box {
   height: 65%;
-  width: 400px;
+  width: 450px;
   margin-left: 20%;
   margin-top: -5%;
   overflow-x: hidden;
@@ -788,9 +809,23 @@ export default {
 .lyric_line {
   margin: 20px 0;
   font-size: 16px;
-  transition: all 0.1s linear;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.2s linear;
 }
 .act_line {
   color: rgb(49, 112, 255);
+  font-size: 18px;
+  font-weight: bold;
+}
+.tip_in_login {
+  padding-left: 24px;
+  font-size: 14px;
+}
+.tip_in_login button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgb(49, 112, 255);
+  outline: none;
 }
 </style>

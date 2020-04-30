@@ -1,24 +1,16 @@
-function isEmpty(data) {
-    var dataType = typeof (data);//typeof 返回的是字符串，有六种可能："number"、"string"、"boolean"、"object"、"function"、"undefined";
-    switch (dataType) {
-        case "number"://数字
-            return false;
-        case "string"://字符串
-            if (data == "") return true;//为空
-            else return false;
-        case "boolean": return data;//布尔值      
-        case "object"://对象
-            if (!data && typeof (data) != "undefined" && data != 0) return true;//为null
-            else {
-                for (var key in data) {//非空对象
-                    return false;
-                }
-                return true;
-            }
-        case "function"://函数
-            return false;
-        case "undefined":
-            return true;//undefined
-    }
+function getUrlBase64(url, ext, callback) {
+    let canvas = document.createElement("canvas");   //创建canvas DOM元素
+    let ctx = canvas.getContext("2d");
+    let img = new Image;
+    img.setAttribute("crossOrigin",'Anonymous')
+    img.src = url;
+    img.onload = function () {
+        canvas.height = 60; //指定画板的高度,自定义
+        canvas.width = 85; //指定画板的宽度，自定义
+        ctx.drawImage(img, 0, 0, 60, 85); //参数可自定义
+        let dataURL = canvas.toDataURL(`image/${ext}`);
+        callback.call(this, dataURL); //回掉函数获取Base64编码
+        canvas = null;
+    };
 }
-export default isEmpty
+export default getUrlBase64

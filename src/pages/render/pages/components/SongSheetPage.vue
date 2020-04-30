@@ -146,7 +146,6 @@ export default {
     },
 
     playMusic: function(mid) {
-      console.log("我被执行了")
       let p_list = [];
       let smid = mid;
       let actIndex = -1;
@@ -168,7 +167,6 @@ export default {
         }
       }).then(
         () => {
-          console.log("执行成果")
           this.$store.commit("changeIsRadioState", {
             radioId: -1,
             isplay: false

@@ -1,12 +1,11 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, Tray } from 'electron'
 import {
   createProtocol,
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
-import store from './pages/render/store/store.js'
-import axios from 'axios'
+import path from 'path'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const ipc = require('electron').ipcMain
@@ -39,7 +38,6 @@ function createWindow() {
       nodeIntegration: true
     }
   })
-
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -62,10 +60,20 @@ function createWindow() {
     win.isFullScreen()
   })
   // win.on('ready-to-show', function () {
+    
   //   win.show() // 初始化后再显示
   // })
 }
-
+ipc.on('showThumbarFunc',(e,img)=>{
+  console.log(img)
+  win.setThumbarButtons([
+    {
+      tooltip: '上一曲',
+      icon:img,
+      click() { console.log('button1 clicked') }
+    }
+  ])
+})
 
 let desktopLylrc
 function createDesktopLyirc() {

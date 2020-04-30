@@ -80,6 +80,13 @@
           />
         </div>
       </div>
+      <!--循环方式-->
+      <button class="view_loop_btn" @click.stop="changeLoop()">
+        <i class="im im-loop" v-if="play_loop == 1"></i>
+        <i class="im im-crown" v-if="play_loop == 2"></i>
+        <i class="im im-menu" v-if="play_loop == 3"></i>
+        <i class="im im-random" v-if="play_loop == 4"></i>
+      </button>
       <!--歌词栏显示-->
       <button class="view_lyric_btn" @click.stop="showLyric()">
         <img class="lyricIcon" v-if="isShow" src="./../../assets/ciblue.svg" />
@@ -109,7 +116,8 @@ export default {
       lyric_line_Act: -1,
       volume_value: 100,
       temp_volume_value: 0,
-      is_volume_off: false
+      is_volume_off: false,
+      play_loop: 1
     };
   },
   components: {
@@ -153,6 +161,23 @@ export default {
           }
         }
       );
+      this.getUrlBase64(
+        `http://imgcache.qq.com/music/photo/album_300/${this.$store.state
+          .playing.playing.albumMid % 100}/300_albumpic_${
+          this.$store.state.playing.playing.albumMid
+        }_0.jpg`,
+        "jpg",
+        res => {
+          console.log(res);
+        }
+      );
+      // this.$ipc.send(
+      //   "showThumbarFunc",
+      //   `http://imgcache.qq.com/music/photo/album_300/${this.$store.state
+      //     .playing.playing.albumMid % 100}/300_albumpic_${
+      //     this.$store.state.playing.playing.albumMid
+      //   }_0.jpg`
+      // );
     },
     is_p() {
       if (this.is_p) {
@@ -222,34 +247,33 @@ export default {
         this.lyric_line_Act = this.$store.state.playing.lyricLine; //获取实时歌词的索引
         if (
           lyric[this.lyric_line_Act].time <=
-            this.$refs.music_player.currentTime + 0.5 &&
+            this.$refs.music_player.currentTime + 0.2 &&
           this.lyric_line_Act < Object.keys(lyric).length //判断是播放时长是否达到歌词索引的最后一条
         ) {
           let lines = lyric_lines.childNodes; //获取歌词面板的歌词组
           for (let i = 0; i < lines.length; i++) {
             if (i != this.lyric_line_Act) lines[i].className = "lyric_line"; //全部设为不活动状态
           }
+
+          if (
+            this.lyric_line_Act > 0 &&
+            lyric_lines.children[this.lyric_line_Act - 1].className !==
+              "lyric_line act_line" //判断是播放时长是否达到歌词索引的时间
+          ) {
+            lyric_lines.children[this.lyric_line_Act].className =
+              "lyric_line act_line"; //设为活动状态
+            lyric_lines.children[this.lyric_line_Act].scrollIntoView({
+              block: "center",
+              inline: "center"
+            }); //歌词面板滚动到活动歌词
+
+            //向歌词栏更新歌词
+            this.$ipc.send("chageLyric", {
+              text: lyric[this.lyric_line_Act].text
+            });
+          }
         }
       }
-
-      if (
-        this.lyric_line_Act > 0 &&
-        lyric_lines.children[this.lyric_line_Act - 1].className !==
-          "lyric_line act_line" //判断是播放时长是否达到歌词索引的时间
-      ) {
-        lyric_lines.children[this.lyric_line_Act].className =
-          "lyric_line act_line"; //设为活动状态
-        lyric_lines.children[this.lyric_line_Act].scrollIntoView({
-          block: "center",
-          inline: "center"
-        }); //歌词面板滚动到活动歌词
-
-        //向歌词栏更新歌词
-        this.$ipc.send("chageLyric", {
-          text: lyric[this.lyric_line_Act].text
-        });
-      }
-
       //已播放进度
       this.$refs.already_press.style = `width:${(parseInt(
         this.$refs.music_player.currentTime
@@ -275,16 +299,18 @@ export default {
       if (Object.keys(lyric).length > 1) {
         if (
           lyric[this.lyric_line_Act].time <=
-            this.$refs.music_player.currentTime + 0.5 &&
+            this.$refs.music_player.currentTime + 0.2 &&
           this.lyric_line_Act < Object.keys(lyric).length
         ) {
           if (this.lyric_line_Act != this.$store.state.playing.lyricLine)
             this.lyric_line_Act = this.$store.state.playing.lyricLine;
-          else
-            this.lyric_line_Act < Object.keys(lyric).length - 1
-              ? this.lyric_line_Act++
-              : this.lyric_line_Act;
-          this.$store.commit("chagelyricLine", this.lyric_line_Act);
+          // this.lyric_line_Act < Object.keys(lyric).length - 1
+          //   ? this.lyric_line_Act+=1
+          //   : this.lyric_line_Act;
+          else {
+            if (this.lyric_line_Act < Object.keys(lyric).length - 1)
+              this.$store.commit("chagelyricLine", this.lyric_line_Act + 1);
+          }
         }
       }
     },
@@ -385,6 +411,25 @@ export default {
         this.volume_value = this.temp_volume_value;
       }
       this.$refs.music_player.volume = this.volume_value / 100;
+    },
+    changeLoop() {
+      console.log(this.play_loop);
+      this.play_loop = this.play_loop == 4 ? 0 : this.play_loop;
+      this.play_loop += 1;
+    },
+
+    getUrlBase64: function(url, ext, callback) {
+      let canvas = document.createElement("canvas"); //创建canvas DOM元素
+      let ctx = canvas.getContext("2d");
+      let img = document.getElementById;
+      img.onload = function() {
+        canvas.height = 60; //指定画板的高度,自定义
+        canvas.width = 85; //指定画板的宽度，自定义
+        ctx.drawImage(img, 0, 0, 60, 85); //参数可自定义
+        let dataURL = canvas.toDataURL(`image/${ext}`);
+        callback.call(this, dataURL); //回掉函数获取Base64编码
+        canvas = null;
+      };
     }
   }
 };
@@ -730,5 +775,14 @@ export default {
   width: 80px;
   opacity: 0;
   cursor: pointer;
+}
+.view_loop_btn {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background: none;
+}
+.view_loop_btn .im {
+  font-size: 14px;
 }
 </style>

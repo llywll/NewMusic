@@ -55,8 +55,11 @@
             <span
               @click="playMusic(top_data.songInfoList[index].mid)"
             >{{ top_data.songInfoList[index].title }}</span>
-          <i class="im_mv" @click="intoMVPlayPage(top_data.songInfoList[index].mv.vid)" v-if="top_data.songInfoList[index].mv.id !=0"></i>
-
+            <i
+              class="im_mv"
+              @click="intoMVPlayPage(top_data.songInfoList[index].mv.vid)"
+              v-if="top_data.songInfoList[index].mv.id !=0"
+            ></i>
           </div>
           <div class="top_singer">
             <div v-for="(s_item,s_index) in top_data.songInfoList[index].singer" :key="s_index">
@@ -116,31 +119,38 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    playMusic: async function(mid) {
+    playMusic: function(mid) {
       let p_list = [];
       let smid = mid;
       let actIndex = -1;
-      for (let i = 0; i < this.top_data.songInfoList.length; i++) {
-        if (this.top_data.songInfoList[i].mid == smid) actIndex = i;
-        await p_list.push({
-          title: this.top_data.songInfoList[i].title,
-          singer: this.top_data.songInfoList[i].singer[0].title,
-          songMid: this.top_data.songInfoList[i].mid,
-          interval: this.top_data.songInfoList[i].interval,
-          albumMid: this.top_data.songInfoList[i].album.id
+      new Promise((success, fail) => {
+        try {
+          for (let i = 0; i < this.top_data.songInfoList.length; i++) {
+            if (this.top_data.songInfoList[i].mid == smid) actIndex = i;
+            p_list.push({
+              title: this.top_data.songInfoList[i].title,
+              singer: this.top_data.songInfoList[i].singer[0].title,
+              songMid: this.top_data.songInfoList[i].mid,
+              interval: this.top_data.songInfoList[i].interval,
+              albumMid: this.top_data.songInfoList[i].album.id
+            });
+          }
+          success();
+        } catch (e) {
+          fail(e);
+        }
+      }).then(() => {
+        this.$store.commit("changeIsRadioState", {
+          radioId: -1,
+          isplay: false
         });
-      }
-      
-      this.$store.commit("changeIsRadioState", {
-        radioId: -1,
-        isplay: false
-      });
-      this.$store.commit("replacePlayList", p_list);
-      let tempList = p_list[actIndex];
-      this.$store.dispatch("chageplayingStateAsync", {
-        tempList: tempList,
-        actIndex: actIndex
-      });
+        this.$store.commit("replacePlayList", p_list);
+        this.$store.dispatch("chageplayingStateAsync", {
+          p_ing: p_list[actIndex],
+          actIndex: actIndex
+        });
+      }),
+        err => console.log(err);
     },
     intoAlbumInfoPage(mid) {
       this.$router.push(`/AlbumPage/${mid}`);
@@ -148,9 +158,9 @@ export default {
     intoSingerPage(mid) {
       this.$router.push(`/SingerInfoPage/${mid}`);
     },
-     intoMVPlayPage(vid) {
+    intoMVPlayPage(vid) {
       this.$router.push(`/MVPlayPage/${vid}`);
-    },
+    }
   }
 };
 </script>

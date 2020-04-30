@@ -59,7 +59,7 @@
             <div class="song_index">
               <span>{{ index + 1 }}</span>
             </div>
-            <div class="song_name">
+            <div class="song_name" @click="playSong(item.sMid)">
               <span>{{item.sName}}</span>
             </div>
             <div class="song_singer">
@@ -152,6 +152,9 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+    playSong:function(sMid){
+      console.log(sMid)
     }
   }
 };
@@ -166,7 +169,7 @@ export default {
   width: 100%;
   height: 400px;
   /* border:1px solid pink; */
-  background-image: url(../../assets/fin.jpg);
+  /* background-image: url(../../assets/fin.jpg); */
   background-size: cover;
   background-position-y: 50%;
   position: absolute;

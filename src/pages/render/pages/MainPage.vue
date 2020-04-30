@@ -166,6 +166,9 @@ export default {
   top: 2px;
   font-size: 24px;
 }
+.tip_body span{
+  width: 70%;
+}
 .tip_fouter {
   display: flex;
   justify-content: flex-end;
