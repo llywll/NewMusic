@@ -38,6 +38,8 @@ import SingerAlbumPage from './../pages/components/SingerAlbumPage'
 
 import NotFoundComponent from '../pages/NotFoundComponent'
 
+import CloudMusicPage from './../pages/components/CloudMusicPage'
+
 Vue.use(Router)
 
 const originalPush = Router.prototype.push
@@ -72,7 +74,7 @@ const router = new Router({
                 isUseCache: false,
                 keepAlive: false
             }
-            
+
         },
         {
             path: '/SongSheetPage/:sheet_id',
@@ -126,20 +128,20 @@ const router = new Router({
             name: 'SongSquarePage',
             component: SongSquarePage
         },
-        
+
         {
             path: '/CategorySingerPage',
             name: 'CategorySingerPage',
             component: CategorySingerPage
         },
-        
+
         {
             path: '/SingerInfoPage/:singerId',
             name: 'SingerInfoPage',
             component: SingerInfoPage,
             props: { default: true, sidebar: false }
         },
-        
+
         {
             path: '/MVPlayPage/:vId',
             name: 'MVPlayPage',
@@ -151,6 +153,12 @@ const router = new Router({
             name: 'SingerAlbumPage',
             component: SingerAlbumPage,
             props: { default: true, sidebar: false }
+        },
+        {
+            path: '/CloudMusicPage',
+            name: 'CloudMusicPage',
+            component: CloudMusicPage,
+
         },
         {
             path: '*',

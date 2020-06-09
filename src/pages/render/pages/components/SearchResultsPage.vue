@@ -48,7 +48,7 @@
           <div class="d_li song_singer">
             <div v-for="(s_singer,index) in item.singer" :key="index">
               <a @click="intoSingerPage(s_singer.mid)">
-                <span>{{s_singer.title_hilight}}</span>
+                <span v-html="s_singer.title_hilight"></span>
               </a>
               <label v-if="index!=item.singer.length - 1">/</label>
             </div>
@@ -236,38 +236,25 @@ export default {
           `http://39.108.229.8:3200/getSearchByKey?key= ${stext}&&page=${this.page}&&limit=${this.limit}`
         )
         .then(res => {
-          let temp = res.data.response.data.song.list;
-          for (let i = 0; i < Object.keys(temp).length; i++) {
-            if (temp[i].title_hilight) {
-              temp[i].title_hilight = temp[i].title_hilight.replace(
-                /<\s?em/,
-                "<span class='emt'"
-              );
-              temp[i].title_hilight = temp[i].title_hilight.replace(
-                /<\/\s?em/,
-                "</span"
-              );
-            }
-            if (temp[i].singer[0]) {
-              temp[i].singer[0].title_hilight = temp[
-                i
-              ].singer[0].title_hilight.replace(/<\s?em/, "<span class='emt'");
-              temp[i].singer[0].title_hiligh = temp[
-                i
-              ].singer[0].title_hilight.replace(/<\/\s?em/, "</span");
-            }
-            if (temp[i].album.title_hilight) {
-              temp[i].album.title_hilight = temp[i].album.title_hilight.replace(
-                /<\s?em/,
-                "<span class='emt'"
-              );
-              temp[i].album.title_hilight = temp[i].album.title_hilight.replace(
-                /<\/\s?em/,
-                "</span"
-              );
-            }
-          }
-          this.searchSongResults = temp;
+          // let temp = res.data.response.data.song.list;
+          // for (let i = 0; i < Object.keys(temp).length; i++) {
+          //   if (temp[i].title_hilight && temp[i].title_hilight.indexOf('<em>')>0) {
+          //     temp[
+          //       i
+          //     ].title_hilight = `<span class='emt'>${temp[i].title_hilight}</span>`;
+          //   }
+          //   if (temp[i].singer[0]) {
+          //     temp[
+          //       i
+          //     ].singer[0].title_hilight = `<span class='emt'>${temp[i].singer[0].title_hilight}</span>`;
+          //   }
+          //   if (temp[i].album.title_hilight) {
+          //     temp[
+          //       i
+          //     ].album.title_hilight = `<span class='emt'>${temp[i].album.title_hilight}</span>`;
+          //   }
+          // }
+          this.searchSongResults = res.data.response.data.song.list;
           this.isloading_Box = isloadingbox;
         })
         .catch(err => {
@@ -283,41 +270,22 @@ export default {
         .then(res => {
           console.log(res);
           this.searchAlbumResults = res.data.data.album.list;
-          // let temp = res.data.response.data.song.list;
-          for (
-            let i = 0;
-            i < Object.keys(this.searchAlbumResults).length;
-            i++
-          ) {
-            if (this.searchAlbumResults[i].albumName_hilight) {
-              this.searchAlbumResults[
-                i
-              ].albumName_hilight = this.searchAlbumResults[
-                i
-              ].albumName_hilight.replace(/<\s?em/, "<span class='emt'");
-              this.searchAlbumResults[
-                i
-              ].albumName_hilight = this.searchAlbumResults[
-                i
-              ].albumName_hilight.replace(/<\/\s?em/, "</span");
-            }
-            if (this.searchAlbumResults[i].singer_list[0]) {
-              this.searchAlbumResults[
-                i
-              ].singer_list[0].title_hilight = this.searchAlbumResults[
-                i
-              ].singer_list[0].title_hilight.replace(
-                /<\s?em/,
-                "<span class='emt'"
-              );
-              this.searchAlbumResults[
-                i
-              ].singer_list[0].title_hiligh = this.searchAlbumResults[
-                i
-              ].singer_list[0].title_hilight.replace(/<\/\s?em/, "</span");
-            }
-          }
-          // this.searchSongResults = temp;
+          // for (
+          //   let i = 0;
+          //   i < Object.keys(this.searchAlbumResults).length;
+          //   i++
+          // ) {
+          //   if (this.searchAlbumResults[i].albumName_hilight) {
+          //     this.searchAlbumResults[
+          //       i
+          //     ].albumName_hilight = `<span class='emt'>${this.searchAlbumResults[i].albumName_hilight}</span>`;
+          //   }
+          //   if (this.searchAlbumResults[i].singer_list[0]) {
+          //     this.searchAlbumResults[
+          //       i
+          //     ].singer_list[0].title_hilight = `<span class='emt>${this.searchAlbumResults[i].singer_list[0].title_hiligh}</span>`;
+          //   }
+          // }
           this.isloading_Box = isloadingbox;
         })
         .catch(err => {
@@ -333,7 +301,6 @@ export default {
         .then(res => {
           console.log(res);
           this.searchSongSheetResults = res.data.data.list;
-          // this.searchSongResults = temp;
           this.isloading_Box = isloadingbox;
         })
         .catch(err => {

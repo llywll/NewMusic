@@ -324,6 +324,7 @@ export default {
     },
     intoInput(text) {
       this.inText = text;
+      this.search()
     },
     search: function() {
       if (this.isfoucs & (this.inText != "")) {

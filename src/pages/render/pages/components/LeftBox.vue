@@ -33,7 +33,12 @@
       </ul>
       <span class="list_title s2_title">我的音乐</span>
       <ul class="s_menu s_menu_s2" id="song_nav">
-        <li class="s2_li" @click="intoSongListPage(iLikeId)">
+
+        <li class="s2_li" v-if="suser.isLogin" @click="intoSongListPage(iLikeId)">
+          <i class="im im-heart"></i>
+          <span>我喜欢</span>
+        </li>
+        <li class="s2_li" v-else @click="inToLogin()">
           <i class="im im-heart"></i>
           <span>我喜欢</span>
         </li>
@@ -48,6 +53,10 @@
         <li class="s2_li" @click="intoFuncPage('playHistoryPage')">
           <i class="im im-history"></i>
           <span>播放历史</span>
+        </li> 
+        <li class="s2_li" @click="intoFuncPage('CloudMusicPage')">
+          <i class="im im-cloud"></i>
+          <span>音乐云盘</span>
         </li>
       </ul>
       <span class="list_title s2_title" v-show="suser.isLogin">创建的歌单</span>
@@ -809,7 +818,9 @@ export default {
 .lyric_line {
   margin: 20px 0;
   font-size: 16px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color: rgb(63, 63, 63);
   transition: all 0.2s linear;
 }
 .act_line {
@@ -820,6 +831,7 @@ export default {
 .tip_in_login {
   padding-left: 24px;
   font-size: 14px;
+  margin-top: 50px;
 }
 .tip_in_login button {
   background: none;

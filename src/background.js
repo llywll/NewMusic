@@ -60,16 +60,16 @@ function createWindow() {
     win.isFullScreen()
   })
   // win.on('ready-to-show', function () {
-    
+
   //   win.show() // 初始化后再显示
   // })
 }
-ipc.on('showThumbarFunc',(e,img)=>{
+ipc.on('showThumbarFunc', (e, img) => {
   console.log(img)
   win.setThumbarButtons([
     {
       tooltip: '上一曲',
-      icon:img,
+      icon: img,
       click() { console.log('button1 clicked') }
     }
   ])
@@ -94,6 +94,7 @@ function createDesktopLyirc() {
     },
     hasShadow: false,
   })
+  desktopLylrc.setPosition(500,1000)
   desktopLylrc.loadURL(process.env.WEBPACK_DEV_SERVER_URL + '/back.html');
   desktopLylrc.on('closed', () => { desktopLylrc = null })
 
@@ -109,6 +110,8 @@ function createLoginWindw() {
     maximizable: false,
     resizable: false,
     frame: false,
+    parent: win,
+    modal: true,
     titleBarStyle: "customButtonsOnHover",
     alwaysOnTop: true,
     // transparent: true,
@@ -119,7 +122,7 @@ function createLoginWindw() {
     },
     // hasShadow: false,
   })
-  loginWindow.webContents.openDevTools()
+  // loginWindow.webContents.openDevTools()
   loginWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + '/login.html');
   loginWindow.on('closed', () => { loginWindow = null })
 

@@ -4,8 +4,8 @@ const suser = {
         suser: {
             isLogin: false,
             info: {
-                userName: "请登录",
-                desc: "星海里的笙箫",
+                userName: "未登录",
+                desc: "星星",
                 sex: 'women',
                 birthday: "1997/07/27",
                 headImgLink: ''
@@ -27,7 +27,7 @@ const suser = {
         setUser: (state, suser = {
             info: {
                 userName: "请登录",
-                desc: "星海里的笙箫",
+                desc: "星星",
                 sex: 'women',
                 birthday: "1997/07/27",
                 headImgLink: ""
@@ -41,7 +41,7 @@ const suser = {
                 isLogin: false,
                 info: {
                     userName: "请登录",
-                    desc: "星海里的笙箫",
+                    desc: "星星",
                     sex: 'women',
                     birthday: "1997/07/27",
                     headImgLink: ""

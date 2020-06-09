@@ -28,10 +28,7 @@
           </div>
         </div>
         <div class="song_func_btns">
-          <button
-            class="s_btn s_btn_1"
-            v-if="listInfo.songs"
-          >
+          <button class="s_btn s_btn_1" v-if="listInfo.songs">
             <i class="im im-play"></i>
             <span>播放全部</span>
           </button>
@@ -55,7 +52,12 @@
               <span>时长</span>
             </div>
           </li>
-          <li class="s_list_item s_td" v-for="(item,index) in listInfo.songs" :key="index">
+          <li
+            class="s_list_item s_td"
+            v-for="(item,index) in listInfo.songs"
+            :key="index"
+            @contextmenu="listRightMenu(item.sId)"
+          >
             <div class="song_index">
               <span>{{ index + 1 }}</span>
             </div>
@@ -69,12 +71,8 @@
               <span>{{ item.sAlbumName }}</span>
             </div>
             <div class="song_time">
-              <span
-                v-if="item.sTime % 60 < 10"
-              >0{{parseInt(item.sTime / 60)}}:0{{item.sTime % 60}}</span>
-              <span
-                v-else
-              >0{{parseInt(item.sTime / 60)}}:{{item.sTime % 60}}</span>
+              <span v-if="item.sTime % 60 < 10">0{{parseInt(item.sTime / 60)}}:0{{item.sTime % 60}}</span>
+              <span v-else>0{{parseInt(item.sTime / 60)}}:{{item.sTime % 60}}</span>
             </div>
           </li>
         </ul>
@@ -153,8 +151,69 @@ export default {
           console.log(error);
         });
     },
-    playSong:function(sMid){
-      console.log(sMid)
+    playSong: function(sMid) {
+      this.$http
+        .get(`http://39.108.229.8:3200/getSongInfo?songmid=${sMid}`)
+        .then(res => {
+          console.log(res.data.response.songinfo.data.track_info);
+          let tempItem = res.data.response.songinfo.data.track_info;
+          let p_list = {
+            title: tempItem.title,
+            singer: tempItem.singer[0].title,
+            songMid: tempItem.mid,
+            interval: tempItem.interval,
+            albumMid: tempItem.album.id
+          };
+
+          this.$store.commit("changeIsRadioState", {
+            radioId: -1,
+            isplay: false
+          });
+          this.$store.commit("addToListHead", p_list);
+          this.$store.dispatch("chageplayingStateAsync", {
+            p_ing: p_list,
+            actIndex: 0
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    listRightMenu:function(songId){
+       const menuTempList = [
+        {
+          label: "播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          label: "下一首播放",
+          click: () => {
+            console.log("click me");
+          }
+        },
+        {
+          label: "删除",
+          click: () => {
+            this.$ipc.once("questionResult", (e, val) => {
+              if (val)
+                this.$httpV.get(`http://localhost:9649/song/delSong?listId=${this.list_id}&songId=${songId}`)
+                .then(res =>{
+                  if(res.data.state =='success')this.init(this.list_id)
+                })
+                .catch(err =>console.log(err))
+            });
+            this.$MainWinodw.send("ShowAlertBox", {
+              type: "warning",
+              text: "确认要删除吗？",
+              caller: "questionResult"
+            });
+          }
+        }
+      ];
+      const menu = this.$Menu.buildFromTemplate(menuTempList);
+      menu.popup(this.$remote.getCurrentWindow());
     }
   }
 };
@@ -350,6 +409,7 @@ export default {
 }
 .s_list_item .song_name {
   width: 50%;
+  cursor: pointer;
 }
 .s_td .song_name span {
   color: black;

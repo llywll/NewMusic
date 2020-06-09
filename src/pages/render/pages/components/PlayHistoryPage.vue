@@ -42,7 +42,7 @@
             <span>{{ index +1 }}</span>
           </div>
           <div class="song_name">
-            <span>{{item.title}}</span>
+            <span @click="playSong(item.songMid)">{{item.title}}</span>
           </div>
           <div class="song_singer">
             <span>{{ item.singer }}</span>
@@ -194,6 +194,33 @@ export default {
       ];
       const menu = this.$Menu.buildFromTemplate(menuTempList);
       menu.popup(this.$remote.getCurrentWindow());
+    },
+    playSong:function(sMid){      
+      this.$http
+        .get(`http://39.108.229.8:3200/getSongInfo?songmid=${sMid}`)
+        .then(res => {
+          console.log(res.data.response.songinfo.data.track_info);
+          let tempItem = res.data.response.songinfo.data.track_info;
+          let p_list = {
+            title: tempItem.title,
+            singer: tempItem.singer[0].title,
+            songMid: tempItem.mid,
+            interval: tempItem.interval,
+            albumMid: tempItem.album.id
+          };
+          this.$store.commit("changeIsRadioState", {
+            radioId: -1,
+            isplay: false
+          });
+          this.$store.commit("addToListHead", p_list);
+          this.$store.dispatch("chageplayingStateAsync", {
+            p_ing: p_list,
+            actIndex: 0
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
   activated() {
@@ -294,6 +321,7 @@ export default {
 }
 .history_item .song_name {
   width: 40%;
+  cursor: pointer;
 }
 .history_item .song_singer,
 .history_item .song_album {
